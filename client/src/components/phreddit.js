@@ -1,20 +1,52 @@
-import {useState, useEffect} from 'react';
 import axios from 'axios';
+import { useEffect, useState } from 'react';
+import { HOME } from '../display.js';
+import '../stylesheets/Phreddit.css';
+import Banner from './Banner.js';
+import Main from './Main.js';
+import Navbar from './Navbar.js';
 
 export default function Phreddit() {
-    const [msg, setMsg] = useState("");
-    
+    const [display, setDisplay] = useState(HOME);
+    const [displayPosts, setDisplayPosts] = useState(null);
+    const [displayCommunity, setDisplayCommunity] = useState(null);
+    const [query, setQuery] = useState(null);
+    const [isLoading, setIsLoading] = useState(true);
+
     useEffect(() => {
-        axios.get("http://127.0.0.1:8000/")
-        .then((res) => {
-            setMsg(res.data);
-        })
-        .catch((err) => {
-            console.log("Request failed");
-        });
+        (async () => {
+            const response = await axios.get('http://127.0.0.1:8000/posts/newest');
+            setDisplayPosts(response.data);
+
+            setIsLoading(false);
+        })();
     }, []);
-    
-  return (
-    <h1> {msg} </h1>
-  );
+
+    return (
+        <div className='Phreddit'>
+            {!isLoading && <>
+                <Banner
+                    display={display}
+                    setDisplay={setDisplay}
+                    setDisplayPosts={setDisplayPosts}
+                    setQuery={setQuery} />
+                <div className='container'>
+                    <Navbar
+                        display={display}
+                        displayCommunity={displayCommunity}
+                        setDisplay={setDisplay}
+                        setDisplayPosts={setDisplayPosts}
+                        setDisplayCommunity={setDisplayCommunity} />
+                    <Main
+                        display={display}
+                        displayPosts={displayPosts}
+                        displayCommunity={displayCommunity}
+                        query={query}
+                        setDisplay={setDisplay}
+                        setDisplayPosts={setDisplayPosts}
+                        setDisplayCommunity={setDisplayCommunity} />
+                </div>
+            </>}
+        </div>
+    );
 }

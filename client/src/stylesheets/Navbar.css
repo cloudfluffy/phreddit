@@ -1,0 +1,50 @@
+.Navbar {
+    width: var(--navbar_width);
+    min-width: var(--navbar_width);
+    max-width: var(--navbar_width);
+    overflow: auto;
+    border-right: 1px solid var(--black);
+    padding: 12px 17px;
+}
+
+.Navbar * {
+    font-family: 'Segoe UI', sans-serif;
+    font-size: 14px;
+    font-weight: 425;
+}
+
+.Navbar .navbar_header {
+    width: 100%;
+    height: 40px;
+    padding: 4px 16px;
+    letter-spacing: 1.2px;
+}
+
+.Navbar .navbar_btn {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    height: 40px;
+    min-height: 40px;
+    border: none;
+    border-radius: 8px;
+    padding: 4px 16px;
+    background-color: var(--light_gray);
+    color: var(--black);
+}
+
+.Navbar .navbar_btn:hover,
+.Navbar .navbar_btn:active,
+.Navbar .navbar_btn:focus-visible {
+    background-color: var(--reddish_orange);
+    outline-color: var(--reddish_orange);
+    cursor: pointer;
+}
+
+.Navbar .community {
+    margin-bottom: 12px;
+}
+
+.Navbar .community:last-child {
+    margin-bottom: 0px;
+}

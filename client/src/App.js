@@ -1,14 +1,5 @@
-// ************** THIS IS YOUR APP'S ENTRY POINT. CHANGE THIS FILE AS NEEDED. **************
-// ************** DEFINE YOUR REACT COMPONENTS in ./components directory **************
-import './stylesheets/App.css';
-import Phreddit from './components/phreddit.js'
+import Phreddit from './components/Phreddit.js';
 
-function App() {
-  return (
-    <section className="phreddit">
-      <Phreddit />
-    </section>
-  );
+export default function App() {
+    return <Phreddit />;
 }
-
-export default App;
