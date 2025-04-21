@@ -1,0 +1,125 @@
+const express = require('express');
+
+const Community = require('../models/communities');
+const Post = require('../models/posts');
+
+const { newest_posts, oldest_posts, active_posts, populate_commentIDs, search_posts } = require('../util');
+
+const router = express.Router();
+
+router.post('/', async (req, res) => {
+    try {
+        const { title, content, linkFlairID, postedBy } = req.body;
+
+        const post = new Post({ title, content, linkFlairID, postedBy });
+
+        await post.save();
+
+        res.status(200).json({ postID: post._id });
+    } catch (error) {
+        console.error('Error creating post:', error);
+        res.status(500).json({ message: 'Error creating post.' });
+    }
+});
+
+router.get('/newest', async (req, res) => {
+    try {
+        let posts = await Post.find({});
+        posts = newest_posts(posts);
+        res.status(200).json(posts);
+    } catch (error) {
+        console.error('Error fetching posts:', error);
+        res.status(500).json({ message: 'Error fetching posts.' });
+    }
+});
+
+router.get('/oldest', async (req, res) => {
+    try {
+        let posts = await Post.find({});
+        posts = oldest_posts(posts);
+        res.status(200).json(posts);
+    } catch (error) {
+        console.error('Error fetching posts:', error);
+        res.status(500).json({ message: 'Error fetching posts.' });
+    }
+});
+
+router.get('/active', async (req, res) => {
+    try {
+        let posts = await Post.find({});
+        posts = await active_posts(posts);
+        res.status(200).json(posts);
+    } catch (error) {
+        console.error('Error fetching posts:', error);
+        res.status(500).json({ message: 'Error fetching posts.' });
+    }
+});
+
+router.get('/:postId', async (req, res) => {
+    try {
+        let post = await Post.findOne({ _id: req.params.postId }).populate('linkFlairID');
+        await populate_commentIDs(post);
+        res.status(200).json(post);
+    } catch (error) {
+        console.error('Error fetching post:', error);
+        res.status(500).json({ message: 'Error fetching post.' });
+    }
+});
+
+router.get('/:postId/community', async (req, res) => {
+    try {
+        const community = await Community.findOne({ postIDs: req.params.postId });
+        res.status(200).json(community);
+    } catch (error) {
+        console.error('Error fetching community:', error);
+        res.status(500).json({ message: 'Error fetching community.' });
+    }
+});
+
+router.put('/:postId/views', async (req, res) => {
+    try {
+        const result = await Post.updateOne({ _id: req.params.postId }, { $inc: { views: 1 } });
+        res.status(200).json({ message: 'Post views incremented successfully.', result })
+    } catch (error) {
+        console.error('Error incrementing post views:', error);
+        res.status(500).json({ message: 'Error incrementing post views.' })
+    }
+});
+
+router.get('/search/:query/newest', async (req, res) => {
+    try {
+        let posts = await Post.find({});
+        posts = await search_posts(req.params.query, posts);
+        posts = newest_posts(posts);
+        res.status(200).json(posts);
+    } catch (error) {
+        console.error('Error fetching posts:', error);
+        res.status(500).json({ message: 'Error fetching posts.' });
+    }
+});
+
+router.get('/search/:query/oldest', async (req, res) => {
+    try {
+        let posts = await Post.find({});
+        posts = await search_posts(req.params.query, posts);
+        posts = oldest_posts(posts);
+        res.status(200).json(posts);
+    } catch (error) {
+        console.error('Error fetching posts:', error);
+        res.status(500).json({ message: 'Error fetching posts.' });
+    }
+});
+
+router.get('/search/:query/active', async (req, res) => {
+    try {
+        let posts = await Post.find({});
+        posts = await search_posts(req.params.query, posts);
+        posts = await active_posts(posts);
+        res.status(200).json(posts);
+    } catch (error) {
+        console.error('Error fetching posts:', error);
+        res.status(500).json({ message: 'Error fetching posts.' });
+    }
+});
+
+module.exports = router;
