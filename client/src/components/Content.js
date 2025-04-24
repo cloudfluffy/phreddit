@@ -1,22 +1,22 @@
-import split_content from '../util/split_content';
+import splitContent from '../util/splitContent';
 
 export default function Content(props) {
     const { className, content, limit } = props;
 
-    const parts = split_content(content);
-    const parts_within_limit = [];
+    const parts = splitContent(content);
+    const partsWithinLimit = [];
     let characters = 0;
     let key = 0;
 
     for (let i = 0; i < parts.length; i++) {
-        parts_within_limit.push([]);
+        partsWithinLimit.push([]);
 
         for (let j = 0; j < parts[i].length; j++) {
             const match = parts[i][j].match(/\[(.+?)\]\((https?:\/\/.*?)\)/);
 
             if (match) {
                 if (limit && characters + match[1].length >= limit) {
-                    parts_within_limit[i].push(<a
+                    partsWithinLimit[i].push(<a
                         key={key++}
                         onClick={(event) => { event.stopPropagation() }}
                         href={match[2]}
@@ -26,7 +26,7 @@ export default function Content(props) {
                     break;
                 }
 
-                parts_within_limit[i].push(<a
+                partsWithinLimit[i].push(<a
                     key={key++}
                     onClick={(event) => { event.stopPropagation() }}
                     href={match[2]}
@@ -36,12 +36,12 @@ export default function Content(props) {
                 characters += match[1].length;
             } else {
                 if (limit && characters + parts[i][j].length >= limit) {
-                    parts_within_limit[i].push(`${parts[i][j].slice(0, limit - characters)}...`);
+                    partsWithinLimit[i].push(`${parts[i][j].slice(0, limit - characters)}...`);
                     characters += limit - characters;
                     break;
                 }
 
-                parts_within_limit[i].push(parts[i][j]);
+                partsWithinLimit[i].push(parts[i][j]);
 
                 characters += parts[i][j].length;
             }
@@ -54,7 +54,7 @@ export default function Content(props) {
 
     return (
         <div className={className}>
-            {parts_within_limit.map((part, index) => <p key={index}>{part}</p>)}
+            {partsWithinLimit.map((part, index) => <p key={index}>{part}</p>)}
         </div>
     )
 }

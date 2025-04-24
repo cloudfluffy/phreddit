@@ -18,7 +18,7 @@ export default function Communitypageview(props) {
                     <Post
                         key={post._id}
                         postID={post._id}
-                        show_community={false}
+                        showCommunity={false}
                         setDisplay={setDisplay}
                         setDisplayPostID={setDisplayPostID} />
                 ))

@@ -17,7 +17,7 @@ export default function Homepageview(props) {
                     <Post
                         key={post._id}
                         postID={post._id}
-                        show_community={true}
+                        showCommunity={true}
                         setDisplay={setDisplay}
                         setDisplayPostID={setDisplayPostID} />
                 ))

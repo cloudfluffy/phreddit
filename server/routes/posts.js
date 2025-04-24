@@ -3,7 +3,7 @@ const express = require('express');
 const Community = require('../models/communities');
 const Post = require('../models/posts');
 
-const { newest_posts, oldest_posts, active_posts, populate_commentIDs, search_posts } = require('../util');
+const { newestPosts, oldestPosts, activePosts, populateCommentIDs, searchPosts } = require('../util');
 
 const router = express.Router();
 
@@ -25,7 +25,7 @@ router.post('/', async (req, res) => {
 router.get('/newest', async (req, res) => {
     try {
         let posts = await Post.find({});
-        posts = newest_posts(posts);
+        posts = newestPosts(posts);
         res.status(200).json(posts);
     } catch (error) {
         console.error('Error fetching posts:', error);
@@ -36,7 +36,7 @@ router.get('/newest', async (req, res) => {
 router.get('/oldest', async (req, res) => {
     try {
         let posts = await Post.find({});
-        posts = oldest_posts(posts);
+        posts = oldestPosts(posts);
         res.status(200).json(posts);
     } catch (error) {
         console.error('Error fetching posts:', error);
@@ -47,7 +47,7 @@ router.get('/oldest', async (req, res) => {
 router.get('/active', async (req, res) => {
     try {
         let posts = await Post.find({});
-        posts = await active_posts(posts);
+        posts = await activePosts(posts);
         res.status(200).json(posts);
     } catch (error) {
         console.error('Error fetching posts:', error);
@@ -58,7 +58,7 @@ router.get('/active', async (req, res) => {
 router.get('/:postId', async (req, res) => {
     try {
         let post = await Post.findOne({ _id: req.params.postId }).populate('linkFlairID');
-        await populate_commentIDs(post);
+        await populateCommentIDs(post);
         res.status(200).json(post);
     } catch (error) {
         console.error('Error fetching post:', error);
@@ -89,8 +89,8 @@ router.put('/:postId/views', async (req, res) => {
 router.get('/search/:query/newest', async (req, res) => {
     try {
         let posts = await Post.find({});
-        posts = await search_posts(req.params.query, posts);
-        posts = newest_posts(posts);
+        posts = await searchPosts(req.params.query, posts);
+        posts = newestPosts(posts);
         res.status(200).json(posts);
     } catch (error) {
         console.error('Error fetching posts:', error);
@@ -101,8 +101,8 @@ router.get('/search/:query/newest', async (req, res) => {
 router.get('/search/:query/oldest', async (req, res) => {
     try {
         let posts = await Post.find({});
-        posts = await search_posts(req.params.query, posts);
-        posts = oldest_posts(posts);
+        posts = await searchPosts(req.params.query, posts);
+        posts = oldestPosts(posts);
         res.status(200).json(posts);
     } catch (error) {
         console.error('Error fetching posts:', error);
@@ -113,8 +113,8 @@ router.get('/search/:query/oldest', async (req, res) => {
 router.get('/search/:query/active', async (req, res) => {
     try {
         let posts = await Post.find({});
-        posts = await search_posts(req.params.query, posts);
-        posts = await active_posts(posts);
+        posts = await searchPosts(req.params.query, posts);
+        posts = await activePosts(posts);
         res.status(200).json(posts);
     } catch (error) {
         console.error('Error fetching posts:', error);

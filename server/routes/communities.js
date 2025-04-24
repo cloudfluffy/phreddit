@@ -2,7 +2,7 @@ const express = require('express');
 
 const Community = require('../models/communities');
 
-const { newest_posts, oldest_posts, active_posts } = require('../util');
+const { newestPosts, oldestPosts, activePosts } = require('../util');
 
 const router = express.Router();
 
@@ -48,7 +48,7 @@ router.put('/:communityId/posts', async (req, res) => {
 router.get('/:communityId/posts/newest', async (req, res) => {
     try {
         const community = await Community.findOne({ _id: req.params.communityId }).populate('postIDs');
-        const posts = newest_posts(community.postIDs);
+        const posts = newestPosts(community.postIDs);
         res.status(200).json(posts);
     } catch (error) {
         console.error('Error fetching posts:', error);
@@ -59,7 +59,7 @@ router.get('/:communityId/posts/newest', async (req, res) => {
 router.get('/:communityId/posts/oldest', async (req, res) => {
     try {
         const community = await Community.findOne({ _id: req.params.communityId }).populate('postIDs');
-        const posts = oldest_posts(community.postIDs);
+        const posts = oldestPosts(community.postIDs);
         res.status(200).json(posts);
     } catch (error) {
         console.error('Error fetching posts:', error);
@@ -70,7 +70,7 @@ router.get('/:communityId/posts/oldest', async (req, res) => {
 router.get('/:communityId/posts/active', async (req, res) => {
     try {
         const community = await Community.findOne({ _id: req.params.communityId }).populate('postIDs');
-        const posts = await active_posts(community.postIDs);
+        const posts = await activePosts(community.postIDs);
         res.status(200).json(posts);
     } catch (error) {
         console.error('Error fetching posts:', error);

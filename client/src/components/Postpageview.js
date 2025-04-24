@@ -2,8 +2,8 @@ import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { NEWCOMMENT } from '../display.js';
 import '../stylesheets/Postpageview.css';
-import count_comments from '../util/count_comments.js';
-import get_timestamp from '../util/get_timestamp.js';
+import countComments from '../util/countComments.js';
+import getTimestamp from '../util/getTimestamp.js';
 import Comment from './Comment.js';
 import Content from './Content.js';
 
@@ -17,18 +17,18 @@ export default function Postpageview(props) {
 
     useEffect(() => {
         (async () => {
-            const [post_response, community_response] = await Promise.all([
+            const [postResponse, communityResponse] = await Promise.all([
                 axios.get(`http://127.0.0.1:8000/posts/${displayPostID}`),
                 axios.get(`http://127.0.0.1:8000/posts/${displayPostID}/community`)
             ]);
-            setPost(post_response.data);
-            setCommunity(community_response.data);
+            setPost(postResponse.data);
+            setCommunity(communityResponse.data);
 
             setIsLoading(false);
         })();
     }, []);
 
-    function render_comments(commentIDs, depth, comments) {
+    function renderComments(commentIDs, depth, comments) {
         commentIDs.sort((a, b) => {
             a = new Date(a.commentedDate);
             b = new Date(b.commentedDate);
@@ -48,7 +48,7 @@ export default function Postpageview(props) {
                 depth={depth}
                 setDisplay={setDisplay}
                 setCommentToID={setCommentToID} />);
-            render_comments(commentID.commentIDs, depth + 1, comments);
+            renderComments(commentID.commentIDs, depth + 1, comments);
         }
 
         return comments;
@@ -58,23 +58,23 @@ export default function Postpageview(props) {
         <>
             {!isLoading && <>
                 <div className='Postpageview'>
-                    <p className='info'>{community.name} • {get_timestamp(post.postedDate)}</p>
+                    <p className='info'>{community.name} • {getTimestamp(post.postedDate)}</p>
                     <p className='info'>{post.postedBy}</p>
                     <h3>{post.title}</h3>
                     {post.linkFlairID && <p className='linkflair'>{post.linkFlairID.content}</p>}
                     <Content className='content' content={post.content} />
-                    <p className='info'>{post.views} view(s) {count_comments(post.commentIDs)} comment(s)</p>
+                    <p className='info'>{post.views} view(s) {countComments(post.commentIDs)} comment(s)</p>
                     <button className='btn' onClick={() => {
                         setCommentToID({
                             _id: post._id,
-                            is_post: true
+                            isPost: true
                         });
 
                         setDisplay(NEWCOMMENT);
                     }}>Add a Comment</button>
                 </div>
                 <hr />
-                {render_comments(post.commentIDs, 0, [])}
+                {renderComments(post.commentIDs, 0, [])}
             </>
             }
         </>

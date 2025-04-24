@@ -1,9 +1,9 @@
-async function populate_commentIDs(to_populate) {
-    await to_populate.populate('commentIDs');
-    await Promise.all(to_populate.commentIDs.map(commentID => populate_commentIDs(commentID)));
+async function populateCommentIDs(toPopulate) {
+    await toPopulate.populate('commentIDs');
+    await Promise.all(toPopulate.commentIDs.map(commentID => populateCommentIDs(commentID)));
 };
 
-function newest_posts(posts) {
+function newestPosts(posts) {
     const copy = Array.from(posts);
 
     copy.sort(({ postedDate: a }, { postedDate: b }) => {
@@ -22,7 +22,7 @@ function newest_posts(posts) {
     return copy;
 };
 
-function oldest_posts(posts) {
+function oldestPosts(posts) {
     const copy = Array.from(posts);
 
     copy.sort(({ postedDate: a }, { postedDate: b }) => {
@@ -41,33 +41,33 @@ function oldest_posts(posts) {
     return copy;
 };
 
-async function active_posts(posts) {
+async function activePosts(posts) {
     const copy = Array.from(posts);
 
-    await Promise.all(copy.map(post => populate_commentIDs(post)));
+    await Promise.all(copy.map(post => populateCommentIDs(post)));
 
-    function most_recent_comment(commentIDs) {
+    function mostRecentComment(commentIDs) {
         const queue = Array.from(commentIDs);
-        let most_recent = Number.MIN_SAFE_INTEGER;
+        let mostRecent = Number.MIN_SAFE_INTEGER;
 
         for (let i = 0; i < queue.length; i++) {
-            most_recent = Math.max(most_recent, (new Date(queue[i].commentedDate)).getTime());
+            mostRecent = Math.max(mostRecent, (new Date(queue[i].commentedDate)).getTime());
 
             for (let commentID of queue[i].commentIDs) {
                 queue.push(commentID);
             }
         }
 
-        return most_recent;
+        return mostRecent;
     }
 
     copy.sort((a, b) => {
-        const most_recentA = most_recent_comment(a.commentIDs);
-        const most_recentB = most_recent_comment(b.commentIDs);
+        const mostRecentA = mostRecentComment(a.commentIDs);
+        const mostRecentB = mostRecentComment(b.commentIDs);
 
-        if (most_recentA < most_recentB) {
+        if (mostRecentA < mostRecentB) {
             return 1;
-        } else if (most_recentA === most_recentB) {
+        } else if (mostRecentA === mostRecentB) {
             a = new Date(a.postedDate);
             b = new Date(b.postedDate);
 
@@ -86,8 +86,8 @@ async function active_posts(posts) {
     return copy;
 };
 
-async function search_posts(search_query, posts) {
-    let pattern = search_query.split(' ').filter(term => term);
+async function searchPosts(searchQuery, posts) {
+    let pattern = searchQuery.split(' ').filter(term => term);
 
     if (pattern.length === 0) {
         return [];
@@ -96,9 +96,9 @@ async function search_posts(search_query, posts) {
     pattern = pattern.reduce((previousValue, currentValue) => `${previousValue}|${currentValue}`);
     const regex = new RegExp(pattern, 'i');
 
-    await Promise.all(posts.map(post => populate_commentIDs(post)));
+    await Promise.all(posts.map(post => populateCommentIDs(post)));
 
-    function search_comments(commentIDs) {
+    function searchComments(commentIDs) {
         const queue = Array.from(commentIDs);
 
         for (let i = 0; i < queue.length; i++) {
@@ -114,26 +114,26 @@ async function search_posts(search_query, posts) {
         return false;
     }
 
-    const search_result = [];
+    const searchResult = [];
 
     for (let post of posts) {
         if (post.title.match(regex)) {
-            search_result.push(post);
+            searchResult.push(post);
             continue;
         }
 
         if (post.content.match(regex)) {
-            search_result.push(post);
+            searchResult.push(post);
             continue;
         }
 
-        if (search_comments(post.commentIDs)) {
-            search_result.push(post);
+        if (searchComments(post.commentIDs)) {
+            searchResult.push(post);
             continue;
         }
     }
 
-    return search_result;
+    return searchResult;
 }
 
-module.exports = { populate_commentIDs, newest_posts, oldest_posts, active_posts, search_posts };
+module.exports = { populateCommentIDs, newestPosts, oldestPosts, activePosts, searchPosts };

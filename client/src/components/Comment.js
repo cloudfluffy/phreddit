@@ -1,6 +1,6 @@
 import { NEWCOMMENT } from '../display';
 import '../stylesheets/Comment.css';
-import get_timestamp from '../util/get_timestamp';
+import getTimestamp from '../util/getTimestamp';
 import Content from './Content.js';
 
 export default function Comment(props) {
@@ -9,12 +9,12 @@ export default function Comment(props) {
 
     return (
         <div className='Comment' style={{ marginLeft: `${depth * 35}px` }}>
-            <p className='info'>{comment.commentedBy} • {get_timestamp(comment.commentedDate)}</p>
+            <p className='info'>{comment.commentedBy} • {getTimestamp(comment.commentedDate)}</p>
             <Content className='content' content={comment.content} />
             <button className='btn' onClick={() => {
                 setCommentToID({
                     _id: comment._id,
-                    is_post: false
+                    isPost: false
                 });
 
                 setDisplay(NEWCOMMENT);

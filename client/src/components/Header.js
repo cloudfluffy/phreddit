@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { COMMUNITY, HOME, SEARCHRESULTS } from '../display.js';
 import '../stylesheets/Header.css';
-import get_timestamp from '../util/get_timestamp.js';
+import getTimestamp from '../util/getTimestamp.js';
 import Content from './Content.js';
 
 export default function Header(props) {
@@ -59,7 +59,7 @@ export default function Header(props) {
                 </div>
             </div>
             {displayCommunity && <Content content={displayCommunity.description} />}
-            {displayCommunity && <p>Created {get_timestamp(displayCommunity.startDate)}</p>}
+            {displayCommunity && <p>Created {getTimestamp(displayCommunity.startDate)}</p>}
             <p>{displayPosts.length} Post(s) {displayCommunity && `${displayCommunity.memberCount} Member(s)`}</p>
             <hr />
         </>

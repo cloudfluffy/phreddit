@@ -23,7 +23,7 @@ router.post('/', async (req, res) => {
 
         await comment.save();
 
-        if (commentToID.is_post) {
+        if (commentToID.isPost) {
             await Post.findOneAndUpdate({ _id: commentToID._id }, { $push: { commentIDs: comment._id } });
         } else {
             await Comment.findOneAndUpdate({ _id: commentToID._id }, { $push: { commentIDs: comment._id } });

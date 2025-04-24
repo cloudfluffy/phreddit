@@ -20,12 +20,12 @@ export default function Newpostpageview(props) {
 
     useEffect(() => {
         (async () => {
-            const [linkflairs_response, communities_response] = await Promise.all([
+            const [linkflairsResponse, communitiesResponse] = await Promise.all([
                 axios.get('http://127.0.0.1:8000/linkflairs'),
                 axios.get('http://127.0.0.1:8000/communities')
             ])
-            setLinkflairs(linkflairs_response.data);
-            setCommunities(communities_response.data);
+            setLinkflairs(linkflairsResponse.data);
+            setCommunities(communitiesResponse.data);
 
             setIsLoading(false);
         })();
