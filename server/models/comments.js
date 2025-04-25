@@ -31,32 +31,30 @@ const CommentSchema = new Schema({
             }
         ]
     },
+    commentedDate: {
+        type: Date,
+        required: true,
+        default: Date.now
+    },
+    voteCount: {
+        type: Number,
+        required: true,
+        default: 0
+    },
+    commentedBy: {
+        type: {
+            type: Schema.Types.ObjectId,
+            ref: 'User'
+        },
+        required: true
+    },
     commentIDs: {
         type: [{
             type: Schema.Types.ObjectId,
             ref: 'Comment'
         }],
         default: []
-    },
-    commentedBy: {
-        type: String,
-        required: true,
-        validate: [
-            {
-                validator: commentedby => commentedby.trim().length > 0,
-                message: 'The username should not be empty.'
-            }
-        ]
-    },
-    commentedDate: {
-        type: Date,
-        required: true,
-        default: Date.now
     }
-});
-
-CommentSchema.virtual('url').get(function () {
-    return this._id;
 });
 
 module.exports = mongoose.model('Comment', CommentSchema);
