@@ -41,24 +41,30 @@ const PostSchema = new Schema({
             }
         ]
     },
+    postedDate: {
+        type: Date,
+        default: Date.now
+    },
+    views: {
+        type: Number,
+        default: 0
+    },
+    voteCount: {
+        type: Number,
+        default: 0
+    },
+    commentCount: {
+        type: Number,
+        default: 0
+    },
     linkFlairID: {
         type: Schema.Types.ObjectId,
         ref: 'LinkFlair'
     },
     postedBy: {
-        type: String,
-        required: true,
-        validate: [
-            {
-                validator: postedBy => postedBy.trim().length > 0,
-                message: 'The username should not be empty.'
-            }
-        ]
-    },
-    postedDate: {
-        type: Date,
-        required: true,
-        default: Date.now
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
     },
     commentIDs: {
         type: [{
@@ -66,16 +72,7 @@ const PostSchema = new Schema({
             ref: 'Comment'
         }],
         default: []
-    },
-    views: {
-        type: Number,
-        required: true,
-        default: 0
     }
-});
-
-PostSchema.virtual('url').get(function () {
-    return this._id;
 });
 
 module.exports = mongoose.model('Post', PostSchema);
