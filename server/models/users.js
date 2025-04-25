@@ -41,6 +41,10 @@ const UserSchema = new Schema({
         type: Number,
         default: 100
     },
+    isAdmin: {
+        type: Boolean,
+        default: false
+    },
     communityIDs: {
         type: [{
             type: Schema.Types.ObjectId,

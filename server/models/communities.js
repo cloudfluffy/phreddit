@@ -62,7 +62,7 @@ const CommunitySchema = new Schema({
             type: Schema.Types.ObjectId,
             ref: 'User'
         }],
-        required: true
+        defaults: []
     },
     owner: {
         type: Schema.Types.ObjectId,
