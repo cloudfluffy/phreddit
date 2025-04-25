@@ -19,8 +19,4 @@ const LinkFlairSchema = new Schema({
     }
 });
 
-LinkFlairSchema.virtual('url').get(function () {
-    return this._id;
-});
-
 module.exports = mongoose.model('LinkFlair', LinkFlairSchema);
