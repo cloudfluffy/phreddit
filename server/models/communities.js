@@ -8,6 +8,7 @@ const CommunitySchema = new Schema({
     name: {
         type: String,
         required: true,
+        unique: true,
         validate: [
             {
                 validator: name => name.trim().length > 0,
@@ -45,6 +46,10 @@ const CommunitySchema = new Schema({
             }
         ]
     },
+    startDate: {
+        type: Date,
+        default: Date.now
+    },
     postIDs: {
         type: [{
             type: Schema.Types.ObjectId,
@@ -52,27 +57,20 @@ const CommunitySchema = new Schema({
         }],
         default: []
     },
-    startDate: {
-        type: Date,
-        required: true,
-        default: Date.now
-    },
     members: {
         type: [{
-            type: String
+            type: Schema.Types.ObjectId,
+            ref: 'User'
         }],
-        required: true,
-        validate: [{
-            validator: members => members.length >= 1,
-            message: 'Community must have at least one member.'
-        }]
+        required: true
+    },
+    owner: {
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
     }
 }, {
     toJSON: { virtuals: true }
-});
-
-CommunitySchema.virtual('url').get(function () {
-    return this._id;
 });
 
 CommunitySchema.virtual('memberCount').get(function () {

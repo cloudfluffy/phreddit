@@ -33,12 +33,10 @@ const CommentSchema = new Schema({
     },
     commentedDate: {
         type: Date,
-        required: true,
         default: Date.now
     },
     voteCount: {
         type: Number,
-        required: true,
         default: 0
     },
     commentedBy: {
