@@ -40,10 +40,8 @@ const CommentSchema = new Schema({
         default: 0
     },
     commentedBy: {
-        type: {
-            type: Schema.Types.ObjectId,
-            ref: 'User'
-        },
+        type: Schema.Types.ObjectId,
+        ref: 'User',
         required: true
     },
     commentIDs: {
