@@ -109,7 +109,7 @@ export default function Newpostpageview(props) {
                         className='input_field'
                         name='communityID'
                         value={communityID}
-                        onChange={(event) => setCommunityID(event.target.value)}>
+                        onChange={event => setCommunityID(event.target.value)}>
                         <option value=''>Select a Community*</option>
                         {communities.map(({ _id, name }) => (
                             <option key={_id} value={_id}>{name}</option>
@@ -125,7 +125,7 @@ export default function Newpostpageview(props) {
                         placeholder='Title*'
                         name='title'
                         value={title}
-                        onChange={(event) => setTitle(event.target.value)} />
+                        onChange={event => setTitle(event.target.value)} />
                     {errors[1] && <p className='error'>The title should not be empty.</p>}
                     {errors[2] && <p className='error'>The title should not exceed 100 characters in length.</p>}
 
@@ -137,7 +137,7 @@ export default function Newpostpageview(props) {
                                 className='input_field'
                                 name='linkFlairID'
                                 value={existingLinkFlair}
-                                onChange={(event) => setExistingLinkFlair(event.target.value)}>
+                                onChange={event => setExistingLinkFlair(event.target.value)}>
                                 <option value=''>Select a Link Flair</option>
                                 {linkflairs.map(({ _id, content }) => (
                                     <option key={_id} value={_id}>{content}</option>
@@ -156,7 +156,7 @@ export default function Newpostpageview(props) {
                                 placeholder='New Link Flair'
                                 name='link_flair_content'
                                 value={newLinkFlair}
-                                onChange={(event) => setNewLinkFlair(event.target.value)} />
+                                onChange={event => setNewLinkFlair(event.target.value)} />
                         </div>
                     </div>
                     {errors[3] && <p className='error'>You cannot select an existing link flair and create a new link flair simultaneously.</p>}
@@ -169,7 +169,7 @@ export default function Newpostpageview(props) {
                         placeholder='Content*'
                         name='content'
                         value={content}
-                        onChange={(event) => setContent(event.target.value)}></textarea>
+                        onChange={event => setContent(event.target.value)}></textarea>
                     {errors[5] && <p className='error'>The content should not be empty.</p>}
                     {errors[6] && <p className='error'>The hyperlink name should not be empty.</p>}
                     {errors[7] && <p className='error'>The URL should start with "https://" or "http://".</p>}
@@ -182,7 +182,7 @@ export default function Newpostpageview(props) {
                         type='text'
                         name='postedBy'
                         value={postedBy}
-                        onChange={(event) => setPostedBy(event.target.value)} />
+                        onChange={event => setPostedBy(event.target.value)} />
                     {errors[8] && <p className='error'>The username should not be empty.</p>}
 
                     <button className='btn'>Submit Post</button>

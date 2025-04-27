@@ -73,7 +73,7 @@ export default function Newcommunitypageview(props) {
                 type='text'
                 name='name'
                 value={name}
-                onChange={(event) => setName(event.target.value)} />
+                onChange={event => setName(event.target.value)} />
             {errors[0] && <p className='error'>The community name should not be empty.</p>}
             {errors[1] && <p className='error'>The community name should not exceed 100 characters in length.</p>}
 
@@ -84,7 +84,7 @@ export default function Newcommunitypageview(props) {
                 placeholder='Description*'
                 name='description'
                 value={description}
-                onChange={(event) => setDescription(event.target.value)}></textarea>
+                onChange={event => setDescription(event.target.value)}></textarea>
             {errors[2] && <p className='error'>The hyperlink name should not be empty.</p>}
             {errors[3] && <p className='error'>The URL should start with "https://" or "http://".</p>}
             {errors[4] && <p className='error'>The description should not be empty.</p>}
@@ -98,7 +98,7 @@ export default function Newcommunitypageview(props) {
                 type='text'
                 name='username'
                 value={username}
-                onChange={(event) => setUsername(event.target.value)} />
+                onChange={event => setUsername(event.target.value)} />
             {errors[6] && <p className='error'>The username should not be empty.</p>}
 
             <button className='btn'>Engender Community</button>

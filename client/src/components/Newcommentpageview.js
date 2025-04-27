@@ -61,7 +61,7 @@ export default function Newcommentpageview(props) {
                 placeholder='Content*'
                 name='content'
                 value={content}
-                onChange={(event) => setContent(event.target.value)}></textarea>
+                onChange={event => setContent(event.target.value)}></textarea>
             {errors[0] && <p className='error'>The hyperlink name should not be empty.</p>}
             {errors[1] && <p className='error'>The URL should start with "https://" or "http://".</p>}
             {errors[2] && <p className='error'>The content should not be empty.</p>}
@@ -75,7 +75,7 @@ export default function Newcommentpageview(props) {
                 type='text'
                 name='commentedBy'
                 value={commentedBy}
-                onChange={(event) => setCommentedBy(event.target.value)} />
+                onChange={event => setCommentedBy(event.target.value)} />
             {errors[4] && <p className='error'>The username should not be empty.</p>}
 
             <button className='btn'>Submit Comment</button>
