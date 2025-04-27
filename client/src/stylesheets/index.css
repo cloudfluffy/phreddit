@@ -91,22 +91,19 @@ hr {
     min-height: 160px;
 }
 
-#link_flair_input_container {
+#duo_input_container {
     display: flex;
     justify-content: space-between;
+    gap: 50px;
 }
 
-#link_flair_input_container div {
-    flex: 1 1 auto;
+#duo_input_container div {
+    flex: 1;
 }
 
-#link_flair_input_container div input,
-#link_flair_input_container div select {
+#duo_input_container div input,
+#duo_input_container div select {
     width: 100%;
-}
-
-#link_flair_input_container span {
-    margin: 0px 5%;
 }
 
 .error {
