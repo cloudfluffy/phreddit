@@ -1,7 +1,6 @@
 import axios from 'axios';
 import { useState } from 'react';
 import { COMMUNITY } from '../display.js';
-import '../stylesheets/index.css';
 
 export default function Newcommunitypageview(props) {
     const { setDisplay, setDisplayPosts, setDisplayCommunity } = props;

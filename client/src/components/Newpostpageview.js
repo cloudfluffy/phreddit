@@ -1,7 +1,6 @@
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { HOME } from '../display.js';
-import '../stylesheets/index.css';
 
 export default function Newpostpageview(props) {
     const { setDisplay, setDisplayPosts } = props;

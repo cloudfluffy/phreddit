@@ -1,7 +1,6 @@
 import axios from 'axios';
 import { useState } from 'react';
 import { POST } from '../display.js';
-import '../stylesheets/index.css';
 
 export default function Newcommentpageview(props) {
     const { commentToID } = props;
