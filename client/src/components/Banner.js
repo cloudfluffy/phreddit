@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { HOME, NEWPOST, SEARCHRESULTS } from '../display';
+import { NEWPOST, SEARCHRESULTS, WELCOME } from '../display';
 import '../stylesheets/Banner.css';
 
 export default function Banner(props) {
@@ -14,7 +14,7 @@ export default function Banner(props) {
                     const response = await axios.get('http://127.0.0.1:8000/posts/newest');
                     setDisplayPosts(response.data);
 
-                    setDisplay(HOME);
+                    setDisplay(WELCOME);
                 }}>phreddit</p>
             <form
                 className='search_form'
