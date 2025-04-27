@@ -129,7 +129,7 @@ export default function Newpostpageview(props) {
                     {errors[1] && <p className='error'>The title should not be empty.</p>}
                     {errors[2] && <p className='error'>The title should not exceed 100 characters in length.</p>}
 
-                    <div id='link_flair_input_container'>
+                    <div id='duo_input_container'>
                         <div>
                             <label htmlFor='linkFlairID'>Select Existing Link Flair</label>
                             <select
