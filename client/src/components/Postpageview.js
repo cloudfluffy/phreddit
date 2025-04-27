@@ -60,7 +60,7 @@ export default function Postpageview(props) {
                 <div className='Postpageview'>
                     <p className='info'>{community.name} • {getTimestamp(post.postedDate)}</p>
                     <p className='info'>{post.postedBy}</p>
-                    <h3>{post.title}</h3>
+                    <h2>{post.title}</h2>
                     {post.linkFlairID && <p className='linkflair'>{post.linkFlairID.content}</p>}
                     <Content className='content' content={post.content} />
                     <p className='info'>{post.views} view(s) {countComments(post.commentIDs)} comment(s)</p>
