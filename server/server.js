@@ -9,22 +9,22 @@ const express = require('express');
 
 const app = express();
 
+const commentRoutes = require('./routes/comments');
 const communityRoutes = require('./routes/communities');
 const linkflairRoutes = require('./routes/linkflairs');
 const postRoutes = require('./routes/posts');
-const commentRoutes = require('./routes/comments');
 
 app.use(cors());
 
 app.use(express.json());
+
+app.use('/comments', commentRoutes);
 
 app.use('/communities', communityRoutes);
 
 app.use('/linkflairs', linkflairRoutes);
 
 app.use('/posts', postRoutes);
-
-app.use('/comments', commentRoutes);
 
 const server = app.listen(8000, () => {
     console.log('Server listening on port 8000...');
