@@ -50,12 +50,10 @@ const CommunitySchema = new Schema({
         type: Date,
         default: Date.now
     },
-    postIDs: {
-        type: [{
-            type: Schema.Types.ObjectId,
-            ref: 'Post'
-        }],
-        default: []
+    owner: {
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
     },
     members: {
         type: [{
@@ -64,10 +62,12 @@ const CommunitySchema = new Schema({
         }],
         defaults: []
     },
-    owner: {
-        type: Schema.Types.ObjectId,
-        ref: 'User',
-        required: true
+    postIDs: {
+        type: [{
+            type: Schema.Types.ObjectId,
+            ref: 'Post'
+        }],
+        default: []
     }
 }, {
     toJSON: { virtuals: true }

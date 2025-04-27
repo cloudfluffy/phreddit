@@ -53,18 +53,19 @@ const PostSchema = new Schema({
         type: Number,
         default: 0
     },
-    commentCount: {
-        type: Number,
-        default: 0
-    },
-    linkFlairID: {
+    communityID: {
         type: Schema.Types.ObjectId,
-        ref: 'LinkFlair'
+        ref: 'Community',
+        required: true
     },
     postedBy: {
         type: Schema.Types.ObjectId,
         ref: 'User',
         required: true
+    },
+    linkFlairID: {
+        type: Schema.Types.ObjectId,
+        ref: 'LinkFlair'
     },
     commentIDs: {
         type: [{
