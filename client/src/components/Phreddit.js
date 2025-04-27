@@ -1,13 +1,13 @@
 import axios from 'axios';
 import { useEffect, useState } from 'react';
-import { HOME } from '../display.js';
+import { WELCOME } from '../display.js';
 import '../stylesheets/Phreddit.css';
 import Banner from './Banner.js';
 import Main from './Main.js';
 import Navbar from './Navbar.js';
 
 export default function Phreddit() {
-    const [display, setDisplay] = useState(HOME);
+    const [display, setDisplay] = useState(WELCOME);
     const [displayPosts, setDisplayPosts] = useState(null);
     const [displayCommunity, setDisplayCommunity] = useState(null);
     const [query, setQuery] = useState(null);
