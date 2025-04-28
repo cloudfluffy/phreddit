@@ -13,9 +13,9 @@ router.post('/', async (req, res) => {
 
         const post = new Post({ title, content, linkFlairID, postedBy });
 
-        await post.save();
+        const savedPost = await post.save();
 
-        res.status(200).json({ postID: post._id });
+        res.status(200).json({ postID: savedPost._id });
     } catch (error) {
         console.error('Error creating post:', error);
         res.status(500).json({ message: 'Error creating post.' });

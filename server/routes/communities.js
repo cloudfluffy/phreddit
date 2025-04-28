@@ -22,9 +22,9 @@ router.post('/', async (req, res) => {
 
         const community = new Community({ name, description, members });
 
-        await community.save();
+        const savedCommunity = await community.save();
 
-        res.status(200).json({ community });
+        res.status(200).json(savedCommunity);
     } catch (error) {
         console.error('Error creating community:', error);
         res.status(500).json({ message: 'Error creating community.' });

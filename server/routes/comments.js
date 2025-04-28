@@ -21,12 +21,12 @@ router.post('/', async (req, res) => {
 
         const comment = new Comment({ content, commentedBy });
 
-        await comment.save();
+        const savedComment = await comment.save();
 
         if (commentToID.isPost) {
-            await Post.findOneAndUpdate({ _id: commentToID._id }, { $push: { commentIDs: comment._id } });
+            await Post.findOneAndUpdate({ _id: commentToID._id }, { $push: { commentIDs: savedComment._id } });
         } else {
-            await Comment.findOneAndUpdate({ _id: commentToID._id }, { $push: { commentIDs: comment._id } });
+            await Comment.findOneAndUpdate({ _id: commentToID._id }, { $push: { commentIDs: savedComment._id } });
         }
 
         res.status(200).json({ message: 'Comment created successfully.' })

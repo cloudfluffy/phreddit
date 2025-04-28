@@ -49,7 +49,7 @@ export default function Newcommunitypageview(props) {
                 members: [username]
             });
 
-            const community = response.data.community;
+            const community = response.data;
 
             response = await axios.get(`http://127.0.0.1:8000/communities/${community._id}/posts/newest`);
 
