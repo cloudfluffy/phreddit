@@ -78,5 +78,5 @@ export default function Postpageview(props) {
             </>
             }
         </>
-    )
+    );
 }

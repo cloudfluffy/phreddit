@@ -20,5 +20,5 @@ export default function Comment(props) {
                 setDisplay(NEWCOMMENT);
             }}>Reply</button>
         </div>
-    )
+    );
 }

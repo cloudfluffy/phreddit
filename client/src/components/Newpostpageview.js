@@ -75,7 +75,7 @@ export default function Newpostpageview(props) {
                 const response = await axios.post('http://127.0.0.1:8000/linkflairs', {
                     content: newLinkFlair
                 });
-                linkFlairID = response.data.linkFlairID;
+                linkFlairID = response.data;
             }
 
             let response = await axios.post('http://127.0.0.1:8000/posts', {
@@ -86,7 +86,7 @@ export default function Newpostpageview(props) {
             });
 
             await axios.put(`http://127.0.0.1:8000/communities/${communityID}/posts`, {
-                postID: response.data.postID
+                postID: response.data
             });
 
             response = await axios.get(`http://127.0.0.1:8000/posts/newest`);

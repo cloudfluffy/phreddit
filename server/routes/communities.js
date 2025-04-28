@@ -12,7 +12,7 @@ router.get('/', async (req, res) => {
         return res.status(200).json(communities);
     } catch (error) {
         console.error('Error fetching communities:', error);
-        return res.status(500).json({ message: 'Error fetching communities.' })
+        return res.status(500).json('Error fetching communities.');
     }
 });
 
@@ -21,15 +21,15 @@ router.post('/', async (req, res) => {
         const { name, description, members } = req.body;
 
         if (!name) {
-            return res.status(400).json({ message: 'name is required.' });
+            return res.status(400).json('name is required.');
         }
 
         if (!description) {
-            return res.status(400).json({ message: 'description is required.' });
+            return res.status(400).json('description is required.');
         }
 
         if (!members) {
-            return res.status(400).json({ message: 'members is required.' });
+            return res.status(400).json('members is required.');
         }
 
         const community = new Community({ name, description, members });
@@ -39,7 +39,7 @@ router.post('/', async (req, res) => {
         return res.status(200).json(savedCommunity);
     } catch (error) {
         console.error('Error creating community:', error);
-        return res.status(500).json({ message: 'Error creating community.' });
+        return res.status(500).json('Error creating community.');
     }
 });
 
@@ -49,15 +49,15 @@ router.put('/:communityId/posts', async (req, res) => {
         const { postID } = req.body;
 
         if (!postID) {
-            return res.status(400).json({ message: 'postID is required.' });
+            return res.status(400).json('postID is required.');
         }
 
         await Community.updateOne({ _id: communityId }, { $push: { postIDs: postID } });
 
-        return res.status(200).json({ message: 'Post added to the community successfully.' });
+        return res.status(200).json('Post added to the community successfully.');
     } catch (error) {
         console.error('Error adding post to the community:', error);
-        return res.status(500).json({ message: 'Error adding post to the community.' });
+        return res.status(500).json('Error adding post to the community.');
     }
 });
 
@@ -68,7 +68,7 @@ router.get('/:communityId/posts/newest', async (req, res) => {
         return res.status(200).json(posts);
     } catch (error) {
         console.error('Error fetching posts:', error);
-        return res.status(500).json({ message: 'Error fetching posts.' });
+        return res.status(500).json('Error fetching posts.');
     }
 });
 
@@ -79,7 +79,7 @@ router.get('/:communityId/posts/oldest', async (req, res) => {
         return res.status(200).json(posts);
     } catch (error) {
         console.error('Error fetching posts:', error);
-        return res.status(500).json({ message: 'Error fetching posts.' });
+        return res.status(500).json('Error fetching posts.');
     }
 });
 
@@ -90,7 +90,7 @@ router.get('/:communityId/posts/active', async (req, res) => {
         return res.status(200).json(posts);
     } catch (error) {
         console.error('Error fetching posts:', error);
-        return res.status(500).json({ message: 'Error fetching posts.' });
+        return res.status(500).json('Error fetching posts.');
     }
 });
 

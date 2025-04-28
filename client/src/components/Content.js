@@ -56,5 +56,5 @@ export default function Content(props) {
         <div className={className}>
             {partsWithinLimit.map((part, index) => <p key={index}>{part}</p>)}
         </div>
-    )
+    );
 }
