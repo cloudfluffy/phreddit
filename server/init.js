@@ -11,11 +11,12 @@ const User = require('./models/users');
 const args = process.argv.slice(2);
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-if (args.length < 3) {
-    console.error('You should provide three arguments.');
+if (args.length < 4) {
+    console.error('You should provide four arguments.');
     console.error('The first argument should be a MongoDB URL.');
     console.error('The second argument should be the email address for the admin account.');
-    console.error('The third argument should be the password for the admin account.');
+    console.error('The third argument should be the display name for the admin account.');
+    console.error('The fourth argument should be the password for the admin account.');
     process.exit(1);
 }
 
@@ -115,8 +116,8 @@ async function main() {
             name: 'Am I the Jerk?',
             description: 'A practical application of the principles of justice.',
             startDate: 'August 10, 2024 04:18:00',
-            members: [users['Phreddit Admin'], users.rollo, users.shemp, users.catlady13, users.astyanax, users.truckfan69],
-            owner: users['Phreddit Admin'],
+            members: [users[args[2]], users.rollo, users.shemp, users.catlady13, users.astyanax, users.truckfan69],
+            owner: users[args[2]],
             postIDs: [{
                 title: 'AITJ: I parked my cybertruck in the handicapped spot to protect it from bitter, jealous losers.',
                 content: 'Recently I went to the store in my brand new Tesla cybertruck. I know there are lots of haters out there, so I wanted to make sure my truck was protected. So I parked it so it overlapped with two of those extra-wide handicapped spots. When I came out of the store with my beef jerky someone in a wheelchair was shouting at me. So tell me prhreddit, was I the jerk?',
@@ -144,8 +145,8 @@ async function main() {
             name: 'The History Channel',
             description: 'A fantastical reimagining of our past and present.',
             startDate: 'May 4, 2024 08:32:00',
-            members: [users['Phreddit Admin'], users.MarcoArelius, users.astyanax, users.outtheretruth47, users.bigfeet],
-            owner: users['Phreddit Admin'],
+            members: [users[args[2]], users.MarcoArelius, users.astyanax, users.outtheretruth47, users.bigfeet],
+            owner: users[args[2]],
             postIDs: [{
                 title: 'Remember when this was a HISTORY channel?',
                 content: 'Does anyone else remember when they used to show actual historical content on this channel and not just an endless stream of alien encounters, conspiracy theories, and cryptozoology? I do.\nBut, I am pretty sure I was abducted last night just as described in that show from last week, "Finding the Alien Within". Just thought I\'d let you all know.',
@@ -360,8 +361,8 @@ async function initializeUsers(users) {
             firstName: 'Phreddit',
             lastName: 'Admin',
             email: args[1],
-            displayName: 'Phreddit Admin',
-            password: args[2],
+            displayName: args[2],
+            password: args[3],
             reputation: 1000,
             isAdmin: true
         });
