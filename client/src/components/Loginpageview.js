@@ -1,16 +1,43 @@
+import axios from 'axios';
 import { useState } from 'react';
 import { HOME } from '../display.js';
 
 export default function Loginpageview(props) {
     const { setDisplay } = props;
 
+    const [errors, setErrors] = useState([false, false, false]);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
     async function handleSubmit(event) {
         event.preventDefault();
 
-        setDisplay(HOME);
+        const emailRegex = /(^[^\s@]+)@[^\s@]+\.[^\s@]+$/;
+
+        const emailEmptyError = email.trim() === '';
+        const emailFormatError = !emailRegex.test(email);
+
+        const passwordEmptyError = password.trim() === '';
+
+        setErrors([emailEmptyError, emailFormatError, passwordEmptyError, false]);
+
+        if (!emailEmptyError && !emailFormatError && !passwordEmptyError) {
+            try {
+                await axios.post('http://127.0.0.1:8000/users/login', {
+                    email,
+                    password
+                }, {
+                    withCredentials: true
+                });
+
+                setDisplay(HOME);
+            } catch (error) {
+                const { status } = error.response;
+                if (status === 401) {
+                    setErrors([emailEmptyError, emailFormatError, passwordEmptyError, true]);
+                }
+            }
+        }
     }
 
     return (
@@ -27,6 +54,8 @@ export default function Loginpageview(props) {
                 value={email}
                 onChange={event => setEmail(event.target.value)}
             />
+            {errors[0] && <p className='error'>Email should not be empty.</p>}
+            {errors[1] && <p className='error'>Email should be in a valid email format.</p>}
 
             <label htmlFor='password'>Password*</label>
             <input
@@ -38,6 +67,8 @@ export default function Loginpageview(props) {
                 value={password}
                 onChange={event => setPassword(event.target.value)}
             />
+            {errors[2] && <p className='error'>Password should not be empty.</p>}
+            {errors[3] && <p className='error'>Invalid email or password.</p>}
 
             <button className='btn'>Login</button>
         </form>

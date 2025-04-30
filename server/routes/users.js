@@ -70,7 +70,7 @@ router.post('/register', async (req, res) => {
         const displayNameNotUnique = existingUser ? true : false;
 
         if (emailNotUnique || displayNameNotUnique) {
-            res.status(400).json({ emailNotUnique, displayNameNotUnique });
+            return res.status(400).json({ emailNotUnique, displayNameNotUnique });
         }
 
         const saltRounds = 10;
@@ -103,7 +103,43 @@ router.post('/register', async (req, res) => {
 });
 
 router.post('/login', async (req, res) => {
+    try {
+        const { email, password } = req.body;
 
+        if (!email) {
+            return res.status(400).json('email is required.');
+        }
+
+        if (!password) {
+            return res.status(400).json('password is required.');
+        }
+
+        const existingUser = await User.findOne({ email });
+
+        if (!existingUser) {
+            return res.status(401).json('Invalid email or password.');
+        }
+
+        const isPasswordCorrect = await bcrypt.compare(password, existingUser.passwordHash);
+
+        if (!isPasswordCorrect) {
+            return res.status(401).json('Invalid email or password.');
+        }
+
+        const token = jwt.sign({ userID: existingUser._id }, JWT_SECRET, { expiresIn: 60000 * 60 * 24 });
+
+        res.cookie('token', token, {
+            httpOnly: true,
+            secure: false,
+            sameSite: 'lax',
+            maxAge: 60000 * 60 * 24
+        });
+
+        return res.status(200).json('User logged in successfully.');
+    } catch (error) {
+        console.err('Error logging in user: ', error);
+        return res.status(500).json('Error logging in user.');
+    }
 });
 
 module.exports = router;

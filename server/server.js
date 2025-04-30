@@ -16,7 +16,10 @@ const linkflairRoutes = require('./routes/linkflairs');
 const postRoutes = require('./routes/posts');
 const userRoutes = require('./routes/users.js');
 
-app.use(cors());
+app.use(cors({
+    origin: 'http://localhost:3000',
+    credentials: true
+}));
 
 app.use(cookieParser());
 
