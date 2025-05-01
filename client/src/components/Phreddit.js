@@ -52,6 +52,7 @@ export default function Phreddit() {
                     <Navbar
                         display={display}
                         displayCommunity={displayCommunity}
+                        clientInfo={clientInfo}
                         setDisplay={setDisplay}
                         setDisplayPosts={setDisplayPosts}
                         setDisplayCommunity={setDisplayCommunity} />

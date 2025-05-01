@@ -6,7 +6,7 @@ import '../stylesheets/Navbar.css';
 axios.defaults.withCredentials = true;
 
 export default function Navbar(props) {
-    const { display, displayCommunity } = props;
+    const { display, displayCommunity, clientInfo } = props;
     const { setDisplay, setDisplayPosts, setDisplayCommunity } = props;
 
     const [communities, setCommunities] = useState(null);
@@ -36,15 +36,17 @@ export default function Navbar(props) {
             <div id='communities_container'>
                 <p className='navbar_header'>COMMUNITIES</p>
                 <button
-                    className='navbar_btn community'
+                    className={clientInfo.isLoggedIn ? 'navbar_btn' : 'disabled_navbar_btn'}
                     style={{ background: display === NEWCOMMUNITY ? '#ff4500' : '' }}
                     onClick={() => {
-                        setDisplay(NEWCOMMUNITY);
+                        if (clientInfo.isLoggedIn) {
+                            setDisplay(NEWCOMMUNITY);
+                        }
                     }}>Create Community</button>
                 {!isLoading && communities.map(community => (
                     <button
                         key={community._id}
-                        className='navbar_btn community'
+                        className='navbar_btn'
                         style={{ background: (display === COMMUNITY && displayCommunity._id === community._id) ? '#ff4500' : '' }}
                         onClick={async () => {
                             const response = await axios.get(`http://localhost:8000/communities/${community._id}/posts/newest`)
