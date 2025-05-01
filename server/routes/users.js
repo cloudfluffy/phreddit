@@ -93,7 +93,7 @@ router.post('/register', async (req, res) => {
 
         const savedUser = await newUser.save();
 
-        const token = jwt.sign({ userID: savedUser._id }, JWT_SECRET, { expiresIn: 60000 * 60 * 24 });
+        const token = jwt.sign({ userId: savedUser._id }, JWT_SECRET, { expiresIn: 60000 * 60 * 24 });
 
         res.cookie('token', token, cookieConfig);
 
@@ -128,11 +128,11 @@ router.post('/login', async (req, res) => {
             return res.status(401).json('Invalid email or password.');
         }
 
-        const token = jwt.sign({ userID: existingUser._id }, JWT_SECRET, { expiresIn: 60000 * 60 * 24 });
+        const token = jwt.sign({ userId: existingUser._id }, JWT_SECRET, { expiresIn: 60000 * 60 * 24 });
 
         res.cookie('token', token, cookieConfig);
 
-        return res.status(200).json('User logged in successfully.');
+        return res.status(200).json(existingUser.displayName);
     } catch (error) {
         console.err('Error logging in user: ', error);
         return res.status(500).json('Error logging in user.');
@@ -144,7 +144,7 @@ router.get('/logout', (req, res) => {
     return res.status(200).json('Logged out successfully');
 });
 
-router.get('/loggedIn', (req, res) => {
+router.get('/loggedIn', async (req, res) => {
     const token = req.cookies.token;
 
     if (!token) {
@@ -152,11 +152,41 @@ router.get('/loggedIn', (req, res) => {
     }
 
     try {
-        jwt.verify(token, JWT_SECRET);
-        return res.json(true);
+        const verified = jwt.verify(token, JWT_SECRET);
+
+        const user = await User.findById(verified.userId);
+
+        if (!user) {
+            return res.status(200).json(false);
+        }
+
+        return res.status(200).json(true);
     } catch (error) {
         console.err('JSON web token verification failure: ', error);
         return res.status(200).json(false);
+    }
+});
+
+router.get('/info', async (req, res) => {
+    const token = req.cookies.token;
+
+    if (!token) {
+        return res.status(401).json('Unauthorized.');
+    }
+
+    try {
+        const verified = jwt.verify(token, JWT_SECRET);
+
+        const user = await User.findById(verified.userId);
+
+        if (!user) {
+            return res.status(401).json('Unauthorized.');
+        }
+
+        return res.status(200).json(user);
+    } catch (error) {
+        console.err('JSON web token verification failure: ', error);
+        return res.status(401).json('Unauthorized.');
     }
 });
 

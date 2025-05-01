@@ -5,7 +5,7 @@ import { WELCOME } from '../display.js';
 axios.defaults.withCredentials = true;
 
 export default function Newuserpageview(props) {
-    const { setDisplay } = props;
+    const { setDisplay, setClientInfo } = props;
 
     const [errors, setErrors] = useState([false, false, false, false, false, false, false, false, false, false, false, false, false, false]);
     const [firstName, setFirstName] = useState('');
@@ -52,6 +52,8 @@ export default function Newuserpageview(props) {
                     password,
                     confirmPassword
                 });
+
+                setClientInfo({ isLoggedIn: true, displayName: displayName });
 
                 setDisplay(WELCOME);
             } catch (error) {

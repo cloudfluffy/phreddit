@@ -5,19 +5,17 @@ import '../stylesheets/Banner.css';
 axios.defaults.withCredentials = true;
 
 export default function Banner(props) {
-    const { display } = props;
-    const { setDisplay, setDisplayPosts, setQuery } = props;
+    const { display, clientInfo } = props;
+    const { setDisplay, setDisplayPosts, setQuery, setClientInfo } = props;
 
     return (
         <div className='Banner'>
             <p
                 className='app_name'
                 onClick={async () => {
-                    const response = await axios.get('http://localhost:8000/posts/newest');
-                    setDisplayPosts(response.data);
-
                     setDisplay(WELCOME);
                 }}>phreddit</p>
+
             <form
                 className='search_form'
                 onSubmit={async (event) => {
@@ -37,12 +35,32 @@ export default function Banner(props) {
                 }}>
                 <input type='text' className='search_bar' placeholder='Search Phreddit...' name='query' />
             </form>
-            <button
-                className='btn'
-                style={{ background: display === NEWPOST ? '#ff4500' : '' }}
-                onClick={() => {
-                    setDisplay(NEWPOST)
-                }}>Create Post</button>
+
+            <div className='buttons'>
+                <button
+                    className={clientInfo.isLoggedIn ? 'btn' : 'disabled_btn'}
+                >{clientInfo.isLoggedIn ? clientInfo.displayName : 'Guest'}</button>
+
+                <button
+                    className={clientInfo.isLoggedIn ? 'btn' : 'disabled_btn'}
+                    style={{ background: display === NEWPOST ? '#ff4500' : '' }}
+                    onClick={() => {
+                        if (clientInfo.isLoggedIn) {
+                            setDisplay(NEWPOST)
+                        }
+                    }}>Create Post</button>
+
+                {clientInfo.isLoggedIn && <button
+                    className='btn'
+                    onClick={async () => {
+                        await axios.get('http://localhost:8000/users/logout');
+
+                        setClientInfo({ isLoggedIn: false, displayName: '' });
+
+                        setDisplay(WELCOME);
+                    }}
+                >Logout</button>}
+            </div>
         </div>
     );
 }

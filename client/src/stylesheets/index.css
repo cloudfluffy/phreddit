@@ -5,6 +5,8 @@
     --reddish_orange: #ff4500;
     --light_blue: #00aef3;
     --light_gray: #edeff1;
+    --greyed_out: #E0E0E0;
+    --muted: #6C757D;
     --gray: #dce0e4;
     --white: #fff;
     --black: #000;
@@ -20,7 +22,8 @@ hr {
     margin: 12px 0px;
 }
 
-.btn {
+.btn,
+.disabled_btn {
     width: fit-content;
     height: 40px;
     padding: 5px 10px;
@@ -29,6 +32,11 @@ hr {
     background-color: var(--light_gray);
     color: var(--black);
     font-size: 14px;
+}
+
+.disabled_btn {
+    background-color: var(--greyed_out);
+    color: var(--muted);
 }
 
 .btn:hover,

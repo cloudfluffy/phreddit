@@ -35,3 +35,8 @@
     outline-width: 3px;
     outline-color: var(--light_blue);
 }
+
+.Banner .buttons {
+    display: flex;
+    gap: 12px;
+}

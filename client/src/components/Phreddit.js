@@ -13,12 +13,26 @@ export default function Phreddit() {
     const [displayPosts, setDisplayPosts] = useState(null);
     const [displayCommunity, setDisplayCommunity] = useState(null);
     const [query, setQuery] = useState(null);
+    const [clientInfo, setClientInfo] = useState({ isLoggedIn: false, displayName: '' });
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         (async () => {
-            const response = await axios.get('http://localhost:8000/posts/newest');
-            setDisplayPosts(response.data);
+            const [displayPostsResponse, isLoggedInResponse] = await Promise.all([
+                axios.get('http://localhost:8000/posts/newest'),
+                axios.get('http://localhost:8000/users/loggedIn')
+            ]);
+
+            setDisplayPosts(displayPostsResponse.data);
+
+            let displayName = '';
+
+            if (isLoggedInResponse.data) {
+                const response = await axios.get('http://localhost:8000/users/info');
+                displayName = response.data.displayName;
+            }
+
+            setClientInfo({ isLoggedIn: isLoggedInResponse.data, displayName: displayName });
 
             setIsLoading(false);
         })();
@@ -29,9 +43,11 @@ export default function Phreddit() {
             {!isLoading && <>
                 <Banner
                     display={display}
+                    clientInfo={clientInfo}
                     setDisplay={setDisplay}
                     setDisplayPosts={setDisplayPosts}
-                    setQuery={setQuery} />
+                    setQuery={setQuery}
+                    setClientInfo={setClientInfo} />
                 <div className='container'>
                     <Navbar
                         display={display}
@@ -46,7 +62,8 @@ export default function Phreddit() {
                         query={query}
                         setDisplay={setDisplay}
                         setDisplayPosts={setDisplayPosts}
-                        setDisplayCommunity={setDisplayCommunity} />
+                        setDisplayCommunity={setDisplayCommunity}
+                        setClientInfo={setClientInfo} />
                 </div>
             </>}
         </div>

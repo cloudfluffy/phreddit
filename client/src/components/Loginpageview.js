@@ -5,7 +5,7 @@ import { HOME } from '../display.js';
 axios.defaults.withCredentials = true;
 
 export default function Loginpageview(props) {
-    const { setDisplay } = props;
+    const { setDisplay, setClientInfo } = props;
 
     const [errors, setErrors] = useState([false, false, false]);
     const [email, setEmail] = useState('');
@@ -25,10 +25,12 @@ export default function Loginpageview(props) {
 
         if (!emailEmptyError && !emailFormatError && !passwordEmptyError) {
             try {
-                await axios.post('http://localhost:8000/users/login', {
+                const response = await axios.post('http://localhost:8000/users/login', {
                     email,
                     password
                 });
+
+                setClientInfo({ isLoggedIn: true, displayName: response.data });
 
                 setDisplay(HOME);
             } catch (error) {

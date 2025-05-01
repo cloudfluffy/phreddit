@@ -15,7 +15,7 @@ import Welcomepageview from './Welcomepageview.js';
 
 export default function Main(props) {
     const { display, displayPosts, displayCommunity, query } = props;
-    const { setDisplay, setDisplayPosts, setDisplayCommunity } = props;
+    const { setDisplay, setDisplayPosts, setDisplayCommunity, setClientInfo } = props;
 
     const [displayPostID, setDisplayPostID] = useState(null);
     const [commentToID, setCommentToID] = useState(null);
@@ -69,10 +69,12 @@ export default function Main(props) {
 
             {display === LOGIN && <Loginpageview
                 setDisplay={setDisplay}
+                setClientInfo={setClientInfo}
             />}
 
             {display === NEWUSER && <Newuserpageview
                 setDisplay={setDisplay}
+                setClientInfo={setClientInfo}
             />}
 
             {display === USERPROFILE && <Userprofilepageview
