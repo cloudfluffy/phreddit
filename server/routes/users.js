@@ -17,7 +17,7 @@ const cookieConfig = {
 
 router.post('/register', async (req, res) => {
     try {
-        const { firstName, lastName, email, displayName, password, comfirmPassword } = req.body;
+        const { firstName, lastName, email, displayName, password, confirmPassword } = req.body;
         const emailRegex = /(^[^\s@]+)@[^\s@]+\.[^\s@]+$/;
 
         if (!firstName) {
@@ -40,16 +40,16 @@ router.post('/register', async (req, res) => {
             return res.status(400).json('password is required.');
         }
 
-        if (!comfirmPassword) {
-            return res.status(400).json('comfirmPassword is required.');
+        if (!confirmPassword) {
+            return res.status(400).json('confirmPassword is required.');
         }
 
         if (!emailRegex.test(email)) {
             return res.status(400).json('email is not in a valid email format.');
         }
 
-        if (password != comfirmPassword) {
-            return res.status(400).json('password and comfirmPassword do not match.');
+        if (password != confirmPassword) {
+            return res.status(400).json('password and confirmPassword do not match.');
         }
 
         const emailID = email.match(emailRegex)[1];

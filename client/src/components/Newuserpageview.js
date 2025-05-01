@@ -13,7 +13,7 @@ export default function Newuserpageview(props) {
     const [email, setEmail] = useState('');
     const [displayName, setDisplayName] = useState('');
     const [password, setPassword] = useState('');
-    const [comfirmPassword, setComfirmPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
 
     async function handleSubmit(event) {
         event.preventDefault();
@@ -34,15 +34,15 @@ export default function Newuserpageview(props) {
         const passwordEmptyError = password === '';
         const passwordContainsFirstNameError = firstNameEmptyError ? false : password.toLowerCase().includes(firstName.toLowerCase());
         const passwordContainsLastNameError = lastNameEmptyError ? false : password.toLowerCase().includes(lastName.toLowerCase());
-        const passwordContainsDisplayNameError = passwordEmptyError ? false : password.toLowerCase().includes(displayName.toLowerCase());
-        const passwordContainsEmailIDError = emailEmptyError ? false : password.toLowerCase().includes(emailID.toLowerCase());
+        const passwordContainsDisplayNameError = displayNameEmptyError ? false : password.toLowerCase().includes(displayName.toLowerCase());
+        const passwordContainsEmailIDError = emailEmptyError || emailFormatError ? false : password.toLowerCase().includes(emailID.toLowerCase());
 
-        const comfirmPasswordEmptyError = comfirmPassword === '';
-        const comfirmPasswordNotMatchError = comfirmPassword !== password;
+        const confirmPasswordEmptyError = confirmPassword === '';
+        const confirmPasswordNotMatchError = confirmPassword !== password;
 
-        setErrors([firstNameEmptyError, lastNameEmptyError, emailEmptyError, emailFormatError, false, displayNameEmptyError, false, passwordEmptyError, passwordContainsFirstNameError, passwordContainsLastNameError, passwordContainsDisplayNameError, passwordContainsEmailIDError, comfirmPasswordEmptyError, comfirmPasswordNotMatchError]);
+        setErrors([firstNameEmptyError, lastNameEmptyError, emailEmptyError, emailFormatError, false, displayNameEmptyError, false, passwordEmptyError, passwordContainsFirstNameError, passwordContainsLastNameError, passwordContainsDisplayNameError, passwordContainsEmailIDError, confirmPasswordEmptyError, confirmPasswordNotMatchError]);
 
-        if (!firstNameEmptyError && !lastNameEmptyError && !emailEmptyError && !emailFormatError && !displayNameEmptyError && !passwordEmptyError && !passwordContainsFirstNameError && !passwordContainsLastNameError && !passwordContainsDisplayNameError && !passwordContainsEmailIDError && !comfirmPasswordEmptyError && !comfirmPasswordNotMatchError) {
+        if (!firstNameEmptyError && !lastNameEmptyError && !emailEmptyError && !emailFormatError && !displayNameEmptyError && !passwordEmptyError && !passwordContainsFirstNameError && !passwordContainsLastNameError && !passwordContainsDisplayNameError && !passwordContainsEmailIDError && !confirmPasswordEmptyError && !confirmPasswordNotMatchError) {
             try {
                 await axios.post('http://localhost:8000/users/register', {
                     firstName,
@@ -50,14 +50,14 @@ export default function Newuserpageview(props) {
                     email,
                     displayName,
                     password,
-                    comfirmPassword
+                    confirmPassword
                 });
 
                 setDisplay(WELCOME);
             } catch (error) {
                 if (error.response.status === 400) {
                     const { emailNotUnique, displayNameNotUnique } = error.response.data;
-                    setErrors([firstNameEmptyError, lastNameEmptyError, emailEmptyError, emailFormatError, emailNotUnique, displayNameEmptyError, displayNameNotUnique, passwordEmptyError, passwordContainsFirstNameError, passwordContainsLastNameError, passwordContainsDisplayNameError, passwordContainsEmailIDError, comfirmPasswordEmptyError, comfirmPasswordNotMatchError]);
+                    setErrors([firstNameEmptyError, lastNameEmptyError, emailEmptyError, emailFormatError, emailNotUnique, displayNameEmptyError, displayNameNotUnique, passwordEmptyError, passwordContainsFirstNameError, passwordContainsLastNameError, passwordContainsDisplayNameError, passwordContainsEmailIDError, confirmPasswordEmptyError, confirmPasswordNotMatchError]);
                 }
             }
         }
@@ -140,18 +140,18 @@ export default function Newuserpageview(props) {
             {errors[10] && <p className='error'>The password should not contain the display name.</p>}
             {errors[11] && <p className='error'>The password should not contain the email ID.</p>}
 
-            <label htmlFor='comfirmPassword'>Comfirm Password*</label>
+            <label htmlFor='confirmPassword'>Confirm Password*</label>
             <input
-                id='comfirmPassword'
+                id='confirmPassword'
                 className='input_field'
-                placeholder='Comfirm Password*'
+                placeholder='Confirm Password*'
                 type='password'
-                name='comfirmPassword'
-                value={comfirmPassword}
-                onChange={event => setComfirmPassword(event.target.value)}
+                name='confirmPassword'
+                value={confirmPassword}
+                onChange={event => setConfirmPassword(event.target.value)}
             />
-            {errors[12] && <p className='error'>Comfirm password should not be empty.</p>}
-            {errors[13] && <p className='error'>Password and comfirm password should match.</p>}
+            {errors[12] && <p className='error'>Confirm password should not be empty.</p>}
+            {errors[13] && <p className='error'>Password and confirm password should match.</p>}
 
             <button className='btn'>Register</button>
         </form>
