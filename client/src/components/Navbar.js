@@ -3,6 +3,8 @@ import { useEffect, useState } from 'react';
 import { COMMUNITY, HOME, NEWCOMMUNITY } from '../display.js';
 import '../stylesheets/Navbar.css';
 
+axios.defaults.withCredentials = true;
+
 export default function Navbar(props) {
     const { display, displayCommunity } = props;
     const { setDisplay, setDisplayPosts, setDisplayCommunity } = props;
@@ -12,7 +14,7 @@ export default function Navbar(props) {
 
     useEffect(() => {
         (async () => {
-            const response = await axios.get('http://127.0.0.1:8000/communities');
+            const response = await axios.get('http://localhost:8000/communities');
             setCommunities(response.data);
 
             setIsLoading(false);
@@ -25,7 +27,7 @@ export default function Navbar(props) {
                 className='navbar_btn'
                 style={{ background: display === HOME ? '#ff4500' : '' }}
                 onClick={async () => {
-                    const response = await axios.get('http://127.0.0.1:8000/posts/newest')
+                    const response = await axios.get('http://localhost:8000/posts/newest')
                     setDisplayPosts(response.data);
 
                     setDisplay(HOME);
@@ -45,7 +47,7 @@ export default function Navbar(props) {
                         className='navbar_btn community'
                         style={{ background: (display === COMMUNITY && displayCommunity._id === community._id) ? '#ff4500' : '' }}
                         onClick={async () => {
-                            const response = await axios.get(`http://127.0.0.1:8000/communities/${community._id}/posts/newest`)
+                            const response = await axios.get(`http://localhost:8000/communities/${community._id}/posts/newest`)
                             setDisplayPosts(response.data);
 
                             setDisplayCommunity(community);

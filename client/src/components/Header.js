@@ -4,6 +4,8 @@ import '../stylesheets/Header.css';
 import getTimestamp from '../util/getTimestamp.js';
 import Content from './Content.js';
 
+axios.defaults.withCredentials = true;
+
 export default function Header(props) {
     const { title } = props;
     const { display, displayPosts, displayCommunity, query } = props;
@@ -19,13 +21,13 @@ export default function Header(props) {
                             className='btn'
                             onClick={async () => {
                                 if (display === HOME) {
-                                    const response = await axios('http://127.0.0.1:8000/posts/newest');
+                                    const response = await axios('http://localhost:8000/posts/newest');
                                     setDisplayPosts(response.data);
                                 } else if (display === COMMUNITY) {
-                                    const response = await axios(`http://127.0.0.1:8000/communities/${displayCommunity._id}/posts/newest`);
+                                    const response = await axios(`http://localhost:8000/communities/${displayCommunity._id}/posts/newest`);
                                     setDisplayPosts(response.data);
                                 } else if (display === SEARCHRESULTS) {
-                                    const response = await axios(`http://127.0.0.1:8000/posts/search/${query}/newest`);
+                                    const response = await axios(`http://localhost:8000/posts/search/${query}/newest`);
                                     setDisplayPosts(response.data);
                                 }
                             }}>Newest</button>
@@ -33,13 +35,13 @@ export default function Header(props) {
                             className='btn'
                             onClick={async () => {
                                 if (display === HOME) {
-                                    const response = await axios('http://127.0.0.1:8000/posts/oldest');
+                                    const response = await axios('http://localhost:8000/posts/oldest');
                                     setDisplayPosts(response.data);
                                 } else if (display === COMMUNITY) {
-                                    const response = await axios(`http://127.0.0.1:8000/communities/${displayCommunity._id}/posts/oldest`);
+                                    const response = await axios(`http://localhost:8000/communities/${displayCommunity._id}/posts/oldest`);
                                     setDisplayPosts(response.data);
                                 } else if (display === SEARCHRESULTS) {
-                                    const response = await axios(`http://127.0.0.1:8000/posts/search/${query}/oldest`);
+                                    const response = await axios(`http://localhost:8000/posts/search/${query}/oldest`);
                                     setDisplayPosts(response.data);
                                 }
                             }}>Oldest</button>
@@ -47,13 +49,13 @@ export default function Header(props) {
                             className='btn'
                             onClick={async () => {
                                 if (display === HOME) {
-                                    const response = await axios('http://127.0.0.1:8000/posts/active');
+                                    const response = await axios('http://localhost:8000/posts/active');
                                     setDisplayPosts(response.data);
                                 } else if (display === COMMUNITY) {
-                                    const response = await axios(`http://127.0.0.1:8000/communities/${displayCommunity._id}/posts/active`);
+                                    const response = await axios(`http://localhost:8000/communities/${displayCommunity._id}/posts/active`);
                                     setDisplayPosts(response.data);
                                 } else if (display === SEARCHRESULTS) {
-                                    const response = await axios(`http://127.0.0.1:8000/posts/search/${query}/active`);
+                                    const response = await axios(`http://localhost:8000/posts/search/${query}/active`);
                                     setDisplayPosts(response.data);
                                 }
                             }}>Active</button>

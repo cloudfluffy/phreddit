@@ -6,6 +6,8 @@ import countComments from '../util/countComments.js';
 import getTimestamp from '../util/getTimestamp.js';
 import Content from './Content.js';
 
+axios.defaults.withCredentials = true;
+
 export default function Post(props) {
     const { postID, showCommunity } = props;
     const { setDisplay, setDisplayPostID } = props;
@@ -18,13 +20,13 @@ export default function Post(props) {
         (async () => {
             if (showCommunity) {
                 const [postResponse, communityResponse] = await Promise.all([
-                    axios.get(`http://127.0.0.1:8000/posts/${postID}`),
-                    axios.get(`http://127.0.0.1:8000/posts/${postID}/community`)
+                    axios.get(`http://localhost:8000/posts/${postID}`),
+                    axios.get(`http://localhost:8000/posts/${postID}/community`)
                 ]);
                 setPost(postResponse.data);
                 setCommunity(communityResponse.data);
             } else {
-                const response = await axios.get(`http://127.0.0.1:8000/posts/${postID}`);
+                const response = await axios.get(`http://localhost:8000/posts/${postID}`);
                 setPost(response.data);
             }
 
@@ -38,7 +40,7 @@ export default function Post(props) {
                 className='Post'
                 tabIndex='0'
                 onClick={async () => {
-                    await axios.put(`http://127.0.0.1:8000/posts/${post._id}/views`);
+                    await axios.put(`http://localhost:8000/posts/${post._id}/views`);
 
                     setDisplayPostID(post._id);
 

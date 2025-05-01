@@ -2,6 +2,8 @@ import axios from 'axios';
 import { useState } from 'react';
 import { COMMUNITY } from '../display.js';
 
+axios.defaults.withCredentials = true;
+
 export default function Newcommunitypageview(props) {
     const { setDisplay, setDisplayPosts, setDisplayCommunity } = props;
 
@@ -43,7 +45,7 @@ export default function Newcommunitypageview(props) {
         setErrors([nameEmptyError, nameExceedError, hyperlinkNameEmptyError, hyperlinkProtocolError, descriptionEmptyError, descriptionExceedError, usernameError]);
 
         if (!nameEmptyError && !nameExceedError && !hyperlinkNameEmptyError && !hyperlinkProtocolError && !descriptionEmptyError && !descriptionExceedError && !usernameError) {
-            let response = await axios.post('http://127.0.0.1:8000/communities', {
+            let response = await axios.post('http://localhost:8000/communities', {
                 name,
                 description,
                 members: [username]
@@ -51,7 +53,7 @@ export default function Newcommunitypageview(props) {
 
             const community = response.data;
 
-            response = await axios.get(`http://127.0.0.1:8000/communities/${community._id}/posts/newest`);
+            response = await axios.get(`http://localhost:8000/communities/${community._id}/posts/newest`);
 
             setDisplayPosts(response.data);
 

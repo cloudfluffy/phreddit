@@ -8,6 +8,13 @@ const router = express.Router();
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
+const cookieConfig = {
+    httpOnly: true,
+    secure: false,
+    sameSite: 'lax',
+    maxAge: 60000 * 60 * 24
+};
+
 router.post('/register', async (req, res) => {
     try {
         const { firstName, lastName, email, displayName, password, comfirmPassword } = req.body;
@@ -86,14 +93,9 @@ router.post('/register', async (req, res) => {
 
         const savedUser = await newUser.save();
 
-        const token = jwt.sign({ userID: savedUser._id }, JWT_SECRET, { expiresIn: 60000 });
+        const token = jwt.sign({ userID: savedUser._id }, JWT_SECRET, { expiresIn: 60000 * 60 * 24 });
 
-        res.cookie('token', token, {
-            httpOnly: true,
-            secure: false,
-            sameSite: 'none',
-            maxAge: 60000
-        });
+        res.cookie('token', token, cookieConfig);
 
         return res.status(200).json('User registered successfully.');
     } catch (error) {
@@ -128,17 +130,28 @@ router.post('/login', async (req, res) => {
 
         const token = jwt.sign({ userID: existingUser._id }, JWT_SECRET, { expiresIn: 60000 * 60 * 24 });
 
-        res.cookie('token', token, {
-            httpOnly: true,
-            secure: false,
-            sameSite: 'lax',
-            maxAge: 60000 * 60 * 24
-        });
+        res.cookie('token', token, cookieConfig);
 
         return res.status(200).json('User logged in successfully.');
     } catch (error) {
         console.err('Error logging in user: ', error);
         return res.status(500).json('Error logging in user.');
+    }
+});
+
+router.get('/loggedIn', (req, res) => {
+    const token = req.cookies.token;
+
+    if (!token) {
+        return res.status(200).json(false);
+    }
+
+    try {
+        jwt.verify(token, JWT_SECRET);
+        return res.json(true);
+    } catch (error) {
+        console.err('JSON web token verification failure: ', error);
+        return res.status(200).json(false);
     }
 });
 

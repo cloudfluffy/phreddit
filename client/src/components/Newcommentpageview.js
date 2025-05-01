@@ -2,6 +2,8 @@ import axios from 'axios';
 import { useState } from 'react';
 import { POST } from '../display.js';
 
+axios.defaults.withCredentials = true;
+
 export default function Newcommentpageview(props) {
     const { commentToID } = props;
     const { setDisplay } = props;
@@ -40,7 +42,7 @@ export default function Newcommentpageview(props) {
         setErrors([hyperlinkNameEmptyError, hyperlinkProtocolError, contentEmptyError, contentExceedError, commentedByError]);
 
         if (!hyperlinkNameEmptyError && !hyperlinkProtocolError && !contentEmptyError && !contentExceedError && !commentedByError) {
-            await axios.post('http://127.0.0.1:8000/comments', {
+            await axios.post('http://localhost:8000/comments', {
                 content,
                 commentedBy,
                 commentToID

@@ -6,6 +6,8 @@ import Banner from './Banner.js';
 import Main from './Main.js';
 import Navbar from './Navbar.js';
 
+axios.defaults.withCredentials = true;
+
 export default function Phreddit() {
     const [display, setDisplay] = useState(WELCOME);
     const [displayPosts, setDisplayPosts] = useState(null);
@@ -15,7 +17,7 @@ export default function Phreddit() {
 
     useEffect(() => {
         (async () => {
-            const response = await axios.get('http://127.0.0.1:8000/posts/newest');
+            const response = await axios.get('http://localhost:8000/posts/newest');
             setDisplayPosts(response.data);
 
             setIsLoading(false);

@@ -2,6 +2,8 @@ import axios from 'axios';
 import { NEWPOST, SEARCHRESULTS, WELCOME } from '../display';
 import '../stylesheets/Banner.css';
 
+axios.defaults.withCredentials = true;
+
 export default function Banner(props) {
     const { display } = props;
     const { setDisplay, setDisplayPosts, setQuery } = props;
@@ -11,7 +13,7 @@ export default function Banner(props) {
             <p
                 className='app_name'
                 onClick={async () => {
-                    const response = await axios.get('http://127.0.0.1:8000/posts/newest');
+                    const response = await axios.get('http://localhost:8000/posts/newest');
                     setDisplayPosts(response.data);
 
                     setDisplay(WELCOME);
@@ -23,7 +25,7 @@ export default function Banner(props) {
                     const query = event.target.elements.query.value;
 
                     if (query.trim()) {
-                        const response = await axios.get(`http://127.0.0.1:8000/posts/search/${query}/newest`)
+                        const response = await axios.get(`http://localhost:8000/posts/search/${query}/newest`)
                         setDisplayPosts(response.data);
 
                         setQuery(query);

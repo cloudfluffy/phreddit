@@ -2,6 +2,8 @@ import axios from 'axios';
 import { useState } from 'react';
 import { WELCOME } from '../display.js';
 
+axios.defaults.withCredentials = true;
+
 export default function Newuserpageview(props) {
     const { setDisplay } = props;
 
@@ -42,7 +44,7 @@ export default function Newuserpageview(props) {
 
         if (!firstNameEmptyError && !lastNameEmptyError && !emailEmptyError && !emailFormatError && !displayNameEmptyError && !passwordEmptyError && !passwordContainsFirstNameError && !passwordContainsLastNameError && !passwordContainsDisplayNameError && !passwordContainsEmailIDError && !comfirmPasswordEmptyError && !comfirmPasswordNotMatchError) {
             try {
-                await axios.post('http://127.0.0.1:8000/users/register', {
+                await axios.post('http://localhost:8000/users/register', {
                     firstName,
                     lastName,
                     email,
@@ -53,8 +55,10 @@ export default function Newuserpageview(props) {
 
                 setDisplay(WELCOME);
             } catch (error) {
-                const { emailNotUnique, displayNameNotUnique } = error.response.data;
-                setErrors([firstNameEmptyError, lastNameEmptyError, emailEmptyError, emailFormatError, emailNotUnique, displayNameEmptyError, displayNameNotUnique, passwordEmptyError, passwordContainsFirstNameError, passwordContainsLastNameError, passwordContainsDisplayNameError, passwordContainsEmailIDError, comfirmPasswordEmptyError, comfirmPasswordNotMatchError]);
+                if (error.response.status === 400) {
+                    const { emailNotUnique, displayNameNotUnique } = error.response.data;
+                    setErrors([firstNameEmptyError, lastNameEmptyError, emailEmptyError, emailFormatError, emailNotUnique, displayNameEmptyError, displayNameNotUnique, passwordEmptyError, passwordContainsFirstNameError, passwordContainsLastNameError, passwordContainsDisplayNameError, passwordContainsEmailIDError, comfirmPasswordEmptyError, comfirmPasswordNotMatchError]);
+                }
             }
         }
     }

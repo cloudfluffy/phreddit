@@ -2,6 +2,8 @@ import axios from 'axios';
 import { useState } from 'react';
 import { HOME } from '../display.js';
 
+axios.defaults.withCredentials = true;
+
 export default function Loginpageview(props) {
     const { setDisplay } = props;
 
@@ -23,11 +25,9 @@ export default function Loginpageview(props) {
 
         if (!emailEmptyError && !emailFormatError && !passwordEmptyError) {
             try {
-                await axios.post('http://127.0.0.1:8000/users/login', {
+                await axios.post('http://localhost:8000/users/login', {
                     email,
                     password
-                }, {
-                    withCredentials: true
                 });
 
                 setDisplay(HOME);

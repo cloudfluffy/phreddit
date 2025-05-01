@@ -7,6 +7,8 @@ import getTimestamp from '../util/getTimestamp.js';
 import Comment from './Comment.js';
 import Content from './Content.js';
 
+axios.defaults.withCredentials = true;
+
 export default function Postpageview(props) {
     const { displayPostID } = props;
     const { setDisplay, setCommentToID } = props;
@@ -18,8 +20,8 @@ export default function Postpageview(props) {
     useEffect(() => {
         (async () => {
             const [postResponse, communityResponse] = await Promise.all([
-                axios.get(`http://127.0.0.1:8000/posts/${displayPostID}`),
-                axios.get(`http://127.0.0.1:8000/posts/${displayPostID}/community`)
+                axios.get(`http://localhost:8000/posts/${displayPostID}`),
+                axios.get(`http://localhost:8000/posts/${displayPostID}/community`)
             ]);
             setPost(postResponse.data);
             setCommunity(communityResponse.data);

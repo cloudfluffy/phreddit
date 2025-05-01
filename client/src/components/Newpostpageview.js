@@ -2,6 +2,8 @@ import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { HOME } from '../display.js';
 
+axios.defaults.withCredentials = true;
+
 export default function Newpostpageview(props) {
     const { setDisplay, setDisplayPosts } = props;
 
@@ -20,8 +22,8 @@ export default function Newpostpageview(props) {
     useEffect(() => {
         (async () => {
             const [linkflairsResponse, communitiesResponse] = await Promise.all([
-                axios.get('http://127.0.0.1:8000/linkflairs'),
-                axios.get('http://127.0.0.1:8000/communities')
+                axios.get('http://localhost:8000/linkflairs'),
+                axios.get('http://localhost:8000/communities')
             ])
             setLinkflairs(linkflairsResponse.data);
             setCommunities(communitiesResponse.data);
@@ -72,24 +74,24 @@ export default function Newpostpageview(props) {
             }
 
             if (newLinkFlair) {
-                const response = await axios.post('http://127.0.0.1:8000/linkflairs', {
+                const response = await axios.post('http://localhost:8000/linkflairs', {
                     content: newLinkFlair
                 });
                 linkFlairID = response.data;
             }
 
-            let response = await axios.post('http://127.0.0.1:8000/posts', {
+            let response = await axios.post('http://localhost:8000/posts', {
                 title,
                 content,
                 linkFlairID,
                 postedBy
             });
 
-            await axios.put(`http://127.0.0.1:8000/communities/${communityID}/posts`, {
+            await axios.put(`http://localhost:8000/communities/${communityID}/posts`, {
                 postID: response.data
             });
 
-            response = await axios.get(`http://127.0.0.1:8000/posts/newest`);
+            response = await axios.get(`http://localhost:8000/posts/newest`);
 
             setDisplayPosts(response.data);
 

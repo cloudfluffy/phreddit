@@ -28,7 +28,7 @@
 
 .Welcomepageview h2,
 .Welcomepageview .description {
-    width: 500px;
+    max-width: 500px;
 }
 
 .Welcomepageview .logins {
