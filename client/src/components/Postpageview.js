@@ -61,7 +61,7 @@ export default function Postpageview(props) {
             {!isLoading && <>
                 <div className='Postpageview'>
                     <p className='info'>{community.name} • {getTimestamp(post.postedDate)}</p>
-                    <p className='info'>{post.postedBy}</p>
+                    <p className='info'>{post.postedBy.displayName}</p>
                     <h2>{post.title}</h2>
                     {post.linkFlairID && <p className='linkflair'>{post.linkFlairID.content}</p>}
                     <Content className='content' content={post.content} />

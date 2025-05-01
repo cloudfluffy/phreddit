@@ -46,7 +46,7 @@ export default function Post(props) {
 
                     setDisplay(POST);
                 }}>
-                <p className='info'>{showCommunity && `${community.name} •`} {post.postedBy} • {getTimestamp(post.postedDate)}</p>
+                <p className='info'>{showCommunity && `${community.name} •`} {post.postedBy.displayName} • {getTimestamp(post.postedDate)}</p>
                 <h3 className='title'>{post.title}</h3>
                 {post.linkFlairID && <p className='linkflair'>{post.linkFlairID.content}</p>}
                 <Content className='content' content={post.content} limit={80} />

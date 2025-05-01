@@ -3,7 +3,7 @@ const express = require('express');
 const Community = require('../models/communities');
 const Post = require('../models/posts');
 
-const { newestPosts, oldestPosts, activePosts, populateCommentIDs, searchPosts } = require('../util');
+const { newestPosts, oldestPosts, activePosts, populateCommentIDs, populateUserDisplayNameForComment, searchPosts } = require('../util');
 
 const router = express.Router();
 
@@ -73,8 +73,14 @@ router.get('/active', async (req, res) => {
 
 router.get('/:postId', async (req, res) => {
     try {
-        let post = await Post.findOne({ _id: req.params.postId }).populate('linkFlairID');
+        let post = await Post.findOne({ _id: req.params.postId }).populate([{
+            path: 'linkFlairID'
+        }, {
+            path: 'postedBy',
+            select: 'displayName'
+        }]);
         await populateCommentIDs(post);
+        await Promise.all(post.commentIDs.map(commentID => populateUserDisplayNameForComment(commentID)));
         return res.status(200).json(post);
     } catch (error) {
         console.error('Error fetching post:', error);

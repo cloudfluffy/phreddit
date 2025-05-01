@@ -9,7 +9,7 @@ export default function Comment(props) {
 
     return (
         <div className='Comment' style={{ marginLeft: `${depth * 35}px` }}>
-            <p className='info'>{comment.commentedBy} • {getTimestamp(comment.commentedDate)}</p>
+            <p className='info'>{comment.commentedBy.displayName} • {getTimestamp(comment.commentedDate)}</p>
             <Content className='content' content={comment.content} />
             <button className='btn' onClick={() => {
                 setCommentToID({

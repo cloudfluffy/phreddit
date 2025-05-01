@@ -3,6 +3,11 @@ async function populateCommentIDs(toPopulate) {
     await Promise.all(toPopulate.commentIDs.map(commentID => populateCommentIDs(commentID)));
 };
 
+async function populateUserDisplayNameForComment(commentToPopulate) {
+    await commentToPopulate.populate({ path: 'commentedBy', select: 'displayName' });
+    await Promise.all(commentToPopulate.commentIDs.map(commentID => populateUserDisplayNameForComment(commentID)));
+}
+
 function newestPosts(posts) {
     const copy = Array.from(posts);
 
@@ -136,4 +141,4 @@ async function searchPosts(searchQuery, posts) {
     return searchResult;
 }
 
-module.exports = { populateCommentIDs, newestPosts, oldestPosts, activePosts, searchPosts };
+module.exports = { populateCommentIDs, populateUserDisplayNameForComment, newestPosts, oldestPosts, activePosts, searchPosts };
