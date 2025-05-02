@@ -24,9 +24,10 @@ export default function Newpostpageview(props) {
             const [linkflairsResponse, communitiesResponse] = await Promise.all([
                 axios.get('http://localhost:8000/linkflairs'),
                 axios.get('http://localhost:8000/communities')
-            ])
+            ]);
+
             setLinkflairs(linkflairsResponse.data);
-            setCommunities(communitiesResponse.data);
+            setCommunities([...communitiesResponse.data.joinedCommunities, ...communitiesResponse.data.otherCommunities]);
 
             setIsLoading(false);
         })();

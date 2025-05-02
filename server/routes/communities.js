@@ -1,15 +1,39 @@
+const jtw = require('jsonwebtoken');
 const express = require('express');
 
 const Community = require('../models/communities');
+const User = require('../models/users.js');
 
 const { newestPosts, oldestPosts, activePosts } = require('../util');
 
 const router = express.Router();
 
+const { JWT_SECRET } = require('../environment.js');
+
 router.get('/', async (req, res) => {
     try {
         const communities = await Community.find({});
-        return res.status(200).json(communities);
+        let joinedCommunities = [];
+        let otherCommunities = [];
+
+        const token = req.cookies.token;
+
+        if (token) {
+            try {
+                const verified = jtw.verify(token, JWT_SECRET);
+
+                const user = await User.findById(verified.userId);
+
+                if (user) {
+                    joinedCommunities = communities.filter(community => user.communityIDs.includes(community._id));
+                    otherCommunities = communities.filter(community => !user.communityIDs.includes(community._id));
+                }
+            } catch (error) {
+                console.log('JSON web token verification failure: ', error);
+            }
+        }
+
+        return res.status(200).json({ communities, joinedCommunities, otherCommunities });
     } catch (error) {
         console.error('Error fetching communities:', error);
         return res.status(500).json('Error fetching communities.');

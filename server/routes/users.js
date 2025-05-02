@@ -6,7 +6,7 @@ const User = require('../models/users.js');
 
 const router = express.Router();
 
-const JWT_SECRET = process.env.JWT_SECRET;
+const { JWT_SECRET } = require('../environment.js');
 
 const cookieConfig = {
     httpOnly: true,
