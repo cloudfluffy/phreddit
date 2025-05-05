@@ -12,7 +12,7 @@ const app = express();
 
 const commentRoutes = require('./routes/comments');
 const communityRoutes = require('./routes/communities');
-const linkflairRoutes = require('./routes/linkflairs');
+const linkFlairRoutes = require('./routes/linkflairs');
 const postRoutes = require('./routes/posts');
 const userRoutes = require('./routes/users.js');
 
@@ -29,7 +29,7 @@ app.use('/comments', commentRoutes);
 
 app.use('/communities', communityRoutes);
 
-app.use('/linkflairs', linkflairRoutes);
+app.use('/linkflairs', linkFlairRoutes);
 
 app.use('/posts', postRoutes);
 
@@ -42,14 +42,14 @@ const server = app.listen(8000, () => {
 process.on('SIGINT', () => {
     server.close(async error => {
         if (error) {
-            console.error('Error while closing the server:', error);
+            console.error('Error while closing the server: ', error);
             process.exit(1);
         }
 
         try {
             await mongoose.disconnect();
         } catch (error) {
-            console.error('Error while disconnecting MongoDB:', error);
+            console.error('Error while disconnecting MongoDB: ', error);
             process.exit(1);
         }
 

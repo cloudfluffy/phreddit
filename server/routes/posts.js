@@ -2,145 +2,235 @@ const express = require('express');
 
 const Community = require('../models/communities');
 const Post = require('../models/posts');
+const User = require('../models/users');
 
-const { newestPosts, oldestPosts, activePosts, populateCommentIDs, populateUserDisplayNameForComment, searchPosts } = require('../util');
+const { newestPosts, oldestPosts, activePosts, populateCommentIDs, populateUserDisplayNameForComment, authenticate, attachUserIfAuthenticated, retrievePosts, retrieveQueryPosts } = require('../util');
 
 const router = express.Router();
 
-router.post('/', async (req, res) => {
+router.post('/', authenticate, async (req, res) => {
     try {
-        const { title, content, linkFlairID, postedBy } = req.body;
+        const { user } = req;
+        const { title, content, communityID, linkFlairID } = req.body;
 
-        if (!title) {
-            return res.status(400).json('title is required.');
+        if (!title || !content || !communityID) {
+            return res.status(400).json({ message: 'Title, content, and community ID are required.' });
         }
 
-        if (!content) {
-            return res.status(400).json('content is required.');
-        }
-
-        if (!linkFlairID) {
-            return res.status(400).json('linkFlairID is required.');
-        }
-
-        if (!postedBy) {
-            return res.status(400).json('postedBy (user ID) is required.');
-        }
-
-        const post = new Post({ title, content, linkFlairID, postedBy });
+        const post = new Post({
+            title,
+            content,
+            communityID,
+            postedBy: user,
+            linkFlairID
+        });
 
         const savedPost = await post.save();
 
-        return res.status(200).json(savedPost._id);
+        await Promise.all([
+            Community.updateOne({ _id: communityID }, { $push: { postIDs: savedPost } }),
+            User.updateOne({ _id: user._id }, { $push: { postIDs: savedPost } })
+        ])
+
+        return res.status(201).json({ message: 'Post created successfully.', postID: savedPost._id });
     } catch (error) {
-        console.error('Error creating post:', error);
-        return res.status(500).json('Error creating post.');
+        console.error('Error at POST /posts: ', error);
+        return res.status(500).json({ message: 'Internal server error while creating post.' });
     }
 });
 
-router.get('/newest', async (req, res) => {
+router.get('/newest', attachUserIfAuthenticated, async (req, res) => {
     try {
-        let posts = await Post.find({});
-        posts = newestPosts(posts);
-        return res.status(200).json(posts);
+        return retrievePosts(req, res, newestPosts);
     } catch (error) {
-        console.error('Error fetching posts:', error);
-        return res.status(500).json('Error fetching posts.');
+        console.error('Error at GET /posts/newest: ', error);
+        return res.status(500).json({ message: 'Internal server error while retrieving posts.' });
     }
 });
 
 router.get('/oldest', async (req, res) => {
     try {
-        let posts = await Post.find({});
-        posts = oldestPosts(posts);
-        return res.status(200).json(posts);
+        return retrievePosts(req, res, oldestPosts);
     } catch (error) {
-        console.error('Error fetching posts:', error);
-        return res.status(500).json('Error fetching posts.');
+        console.error('Error at GET /posts/oldest: ', error);
+        return res.status(500).json({ message: 'Internal server error while retrieving posts.' });
     }
 });
 
 router.get('/active', async (req, res) => {
     try {
-        let posts = await Post.find({});
-        posts = await activePosts(posts);
-        return res.status(200).json(posts);
+        return retrievePosts(req, res, activePosts);
     } catch (error) {
-        console.error('Error fetching posts:', error);
-        return res.status(500).json('Error fetching posts.');
-    }
-});
-
-router.get('/:postId', async (req, res) => {
-    try {
-        let post = await Post.findOne({ _id: req.params.postId }).populate([{
-            path: 'linkFlairID'
-        }, {
-            path: 'postedBy',
-            select: 'displayName'
-        }]);
-        await populateCommentIDs(post);
-        await Promise.all(post.commentIDs.map(commentID => populateUserDisplayNameForComment(commentID)));
-        return res.status(200).json(post);
-    } catch (error) {
-        console.error('Error fetching post:', error);
-        return res.status(500).json('Error fetching post.');
-    }
-});
-
-router.get('/:postId/community', async (req, res) => {
-    try {
-        const community = await Community.findOne({ postIDs: req.params.postId });
-        return res.status(200).json(community);
-    } catch (error) {
-        console.error('Error fetching community:', error);
-        return res.status(500).json('Error fetching community.');
-    }
-});
-
-router.put('/:postId/views', async (req, res) => {
-    try {
-        await Post.updateOne({ _id: req.params.postId }, { $inc: { views: 1 } });
-        return res.status(200).json('Post views incremented successfully.');
-    } catch (error) {
-        console.error('Error incrementing post views:', error);
-        return res.status(500).json('Error incrementing post views.');
+        console.error('Error at GET /posts/active: ', error);
+        return res.status(500).json({ message: 'Internal server error while retrieving posts.' });
     }
 });
 
 router.get('/search/:query/newest', async (req, res) => {
     try {
-        let posts = await Post.find({});
-        posts = await searchPosts(req.params.query, posts);
-        posts = newestPosts(posts);
-        return res.status(200).json(posts);
+        return retrieveQueryPosts(req, res, newestPosts);
     } catch (error) {
-        console.error('Error fetching posts:', error);
-        return res.status(500).json('Error fetching posts.');
+        console.error('Error at GET /posts/search/:query/newest: ', error);
+        return res.status(500).json({ message: 'Internal server error while retrieving posts.' });
     }
 });
 
 router.get('/search/:query/oldest', async (req, res) => {
     try {
-        let posts = await Post.find({});
-        posts = await searchPosts(req.params.query, posts);
-        posts = oldestPosts(posts);
-        return res.status(200).json(posts);
+        return retrieveQueryPosts(req, res, oldestPosts);
     } catch (error) {
-        console.error('Error fetching posts:', error);
-        return res.status(500).json('Error fetching posts.');
+        console.error('Error at GET /posts/search/:query/oldest: ', error);
+        return res.status(500).json({ message: 'Internal server error while retrieving posts.' });
     }
 });
 
 router.get('/search/:query/active', async (req, res) => {
     try {
-        let posts = await Post.find({});
-        posts = await searchPosts(req.params.query, posts);
-        posts = await activePosts(posts);
-        return res.status(200).json(posts);
+        return retrieveQueryPosts(req, res, activePosts);
     } catch (error) {
-        console.error('Error fetching posts:', error);
-        return res.status(500).json('Error fetching posts.');
+        console.error('Error at GET /posts/search/:query/active: ', error);
+        return res.status(500).json({ message: 'Internal server error while retrieving posts.' });
+    }
+});
+
+router.get('/:postId', async (req, res) => {
+    try {
+        const { postId } = req.params;
+
+        const post = await Post.findOne({ _id: postId }).populate([{
+            path: 'linkFlairID'
+        }, {
+            path: 'postedBy',
+            select: 'displayName'
+        }]);
+
+        await populateCommentIDs(post);
+        await Promise.all(post.commentIDs.map(commentID => populateUserDisplayNameForComment(commentID)));
+
+        return res.status(200).json({ post });
+    } catch (error) {
+        console.error('Error at GET /posts/:postId: ', error);
+        return res.status(500).json({ message: 'Internal server error while retrieving post.' });
+    }
+});
+
+router.get('/:postId/community', async (req, res) => {
+    try {
+        const { postId } = req.params;
+
+        const community = await Community.findOne({ postIDs: postId });
+
+        return res.status(200).json({ community });
+    } catch (error) {
+        console.error('Error at GET /posts/:postId/community: ', error);
+        return res.status(500).json({ message: 'Internal server error while retrieving community.' });
+    }
+});
+
+router.put('/:postId/views', async (req, res) => {
+    try {
+        const { postId } = req.params;
+
+        await Post.updateOne({ _id: postId }, { $inc: { views: 1 } });
+
+        return res.status(200).json({ message: 'Post views incremented successfully.' });
+    } catch (error) {
+        console.error('Error at PUT /posts/:postId/views: ', error);
+        return res.status(500).json({ message: 'Internal server error while incrementing post views.' });
+    }
+});
+
+router.put('/:postId/upvote', authenticate, async (req, res) => {
+    try {
+        const { user } = req;
+        const { postId } = req.params;
+
+        if (user.reputation < 50) {
+            return res.status(403).json({ message: 'Users with a reputation below 50 are unable to vote.' });
+        }
+
+        const post = await Post.findById(postId);
+
+        if (!post) {
+            return res.status(400).json({ message: 'Post does not exist.' });
+        }
+
+        if (user.upvotedPostIDs.includes(post._id)) {
+            await Promise.all([
+                User.updateOne({ _id: user._id }, { $pull: { upvotedPostIDs: post } }),
+                Post.updateOne({ _id: post._id }, { $inc: { voteCount: -1 } }),
+                User.updateOne({ _id: post.postedBy }, { $inc: { reputation: -5 } })
+            ]);
+        } else {
+            if (user.downvotedPostIDs.includes(post._id)) {
+                await Promise.all([
+                    User.updateOne({ _id: user._id }, {
+                        $push: { upvotedPostIDs: post },
+                        $pull: { downvotedPostIDs: post }
+                    }),
+                    Post.updateOne({ _id: post._id }, { $inc: { voteCount: 2 } }),
+                    User.updateOne({ _id: post.postedBy }, { $inc: { reputation: 15 } })
+                ]);
+            } else {
+                await Promise.all([
+                    User.updateOne({ _id: user._id }, { $push: { upvotedPostIDs: post } }),
+                    Post.updateOne({ _id: post._id }, { $inc: { voteCount: 1 } }),
+                    User.updateOne({ _id: post.postedBy }, { $inc: { reputation: 5 } })
+                ]);
+            }
+        }
+
+        return res.status(200).json({ message: 'Successfully processed post upvote.' });
+    } catch (error) {
+        console.error('Error at PUT /posts/:postId/upvote: ', error);
+        return res.status(500).json({ message: 'Internal server error while processing post upvote.' });
+    }
+});
+
+router.put('/:postId/downvote', authenticate, async (req, res) => {
+    try {
+        const { user } = req;
+        const { postId } = req.params;
+
+        if (user.reputation < 50) {
+            return res.status(403).json({ message: 'Users with a reputation below 50 are unable to vote.' });
+        }
+
+        const post = await Post.findById(postId);
+
+        if (!post) {
+            return res.status(400).json({ message: 'Post does not exist.' });
+        }
+
+        if (user.downvotedPostIDs.includes(post._id)) {
+            await Promise.all([
+                User.updateOne({ _id: user._id }, { $pull: { downvotedPostIDs: post } }),
+                Post.updateOne({ _id: post._id }, { $inc: { voteCount: 1 } }),
+                User.updateOne({ _id: post.postedBy }, { $inc: { reputation: 10 } })
+            ]);
+        } else {
+            if (user.upvotedPostIDs.includes(post._id)) {
+                await Promise.all([
+                    User.updateOne({ _id: user._id }, {
+                        $push: { downvotedPostIDs: post },
+                        $pull: { upvotedPostIDs: post }
+                    }),
+                    Post.updateOne({ _id: post._id }, { $inc: { voteCount: -2 } }),
+                    User.updateOne({ _id: post.postedBy }, { $inc: { reputation: -15 } })
+                ]);
+            } else {
+                await Promise.all([
+                    User.updateOne({ _id: user._id }, { $push: { downvotedPostIDs: post._id } }),
+                    Post.updateOne({ _id: post._id }, { $inc: { voteCount: -1 } }),
+                    User.updateOne({ _id: post.postedBy }, { $inc: { reputation: -10 } })
+                ]);
+            }
+        }
+
+        return res.status(200).json({ message: 'Successfully processed post downvote.' });
+    } catch (error) {
+        console.error('Error at PUT /posts/:postId/downvote: ', error);
+        return res.status(500).json({ message: 'Internal server error while processing post downvote.' });
     }
 });
 

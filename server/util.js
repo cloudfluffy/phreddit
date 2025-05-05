@@ -1,3 +1,10 @@
+const jwt = require('jsonwebtoken');
+
+const Post = require('./models/posts');
+const User = require('./models/users');
+
+const { JWT_SECRET } = require('./environment');
+
 async function populateCommentIDs(toPopulate) {
     await toPopulate.populate('commentIDs');
     await Promise.all(toPopulate.commentIDs.map(commentID => populateCommentIDs(commentID)));
@@ -141,4 +148,114 @@ async function searchPosts(searchQuery, posts) {
     return searchResult;
 }
 
-module.exports = { populateCommentIDs, populateUserDisplayNameForComment, newestPosts, oldestPosts, activePosts, searchPosts };
+async function authenticate(req, res, next) {
+    const token = req.cookies.token;
+
+    if (!token) {
+        return res.status(401).json({ message: 'Request denied. No token provided.' });
+    }
+
+    try {
+        const { userId } = jwt.verify(token, JWT_SECRET);
+
+        try {
+            const user = await User.findById(userId);
+
+            if (!user) {
+                return res.status(401).json({ message: 'Request denied. User not found.' });
+            }
+
+            req.user = user;
+
+            return next();
+        } catch (error) {
+            console.error('Error at authenticate: ', error);
+            return res.status(500).json({ message: 'Internal server error while retrieving user.' });
+        }
+    } catch (error) {
+        console.log('JWT verification failed at authenticate: ', error);
+        return res.status(401).json({ message: 'Request denied. Invalid or expired token.' });
+    }
+}
+
+async function attachUserIfAuthenticated(req, res, next) {
+    const token = req.cookies.token;
+
+    if (token) {
+        try {
+            const { userId } = jwt.verify(token, JWT_SECRET);
+
+            try {
+                const user = await User.findById(userId);
+
+                if (user) {
+                    req.user = user;
+                }
+            } catch (error) {
+                console.error('Error at attachUserIfAuthenticated: ', error);
+                return res.status(500).json({ message: 'Internal server error while retrieving user.' });
+            }
+        } catch (error) {
+            console.error('JWT verification failed at attachUserIfAuthenticated: ', error);
+        }
+    }
+
+    return next();
+}
+
+async function retrievePosts(req, res, sort) {
+    const { user } = req;
+
+    let posts = await Post.find({});
+    posts = sort(posts);
+
+    let postsFromJoinedCommunities = [];
+    let postsFromOtherCommunities = [];
+
+    if (user) {
+        postsFromJoinedCommunities = posts.filter(post => user.communityIDs.includes(post.communityID));
+        postsFromOtherCommunities = posts.filter(post => !user.communityIDs.includes(post.communityID));
+    }
+
+    return res.status(200).json({
+        posts,
+        postsFromJoinedCommunities,
+        postsFromOtherCommunities
+    });
+}
+
+async function retrieveQueryPosts(req, res, sort) {
+    const { user } = req;
+    const { query } = req.params;
+
+    let posts = await Post.find({});
+    posts = await searchPosts(query, posts);
+    posts = sort(posts);
+
+    let postsFromJoinedCommunities = [];
+    let postsFromOtherCommunities = [];
+
+    if (user) {
+        postsFromJoinedCommunities = posts.filter(post => user.communityIDs.includes(post.communityID));
+        postsFromOtherCommunities = posts.filter(post => !user.communityIDs.includes(post.communityID));
+    }
+
+    return res.status(200).json({
+        posts,
+        postsFromJoinedCommunities,
+        postsFromOtherCommunities
+    });
+}
+
+module.exports = {
+    populateCommentIDs,
+    populateUserDisplayNameForComment,
+    newestPosts,
+    oldestPosts,
+    activePosts,
+    searchPosts,
+    authenticate,
+    attachUserIfAuthenticated,
+    retrievePosts,
+    retrieveQueryPosts
+};

@@ -2,34 +2,35 @@ const express = require('express');
 
 const LinkFlair = require('../models/linkflairs');
 
+const { authenticate } = require('../util');
+
 const router = express.Router();
 
 router.get('/', async (req, res) => {
     try {
-        const linkFlairs = await LinkFlair.find({});
-        return res.status(200).json(linkFlairs);
+        const linkFlairs = await LinkFlair.find({}).sort({ content: 1 });
+        return res.status(200).json({ linkFlairs });
     } catch (error) {
-        console.error('Error fetching link flairs:', error);
-        return res.status(500).json('Error fetching link flairs.');
+        console.error('Error at GET /linkflairs: ', error);
+        return res.status(500).json({ message: 'Internal server error while retrieving link flairs.' });
     }
 });
 
-router.post('/', async (req, res) => {
+router.post('/', authenticate, async (req, res) => {
     try {
         const { content } = req.body;
 
         if (!content) {
-            return res.status(400).json('content is required.');
+            return res.status(400).json({ message: 'Content is required.' });
         }
 
         const linkFlair = new LinkFlair({ content });
-
         const savedLinkFlair = await linkFlair.save();
 
-        return res.status(200).json(savedLinkFlair._id);
+        return res.status(201).json({ linkFlairID: savedLinkFlair._id });
     } catch (error) {
-        console.error('Error creating link flair:', error);
-        return res.status(500).json('Error creating link flair.');
+        console.error('Error at POST /linkflairs: ', error);
+        return res.status(500).json({ message: 'Internal server error while creating link flair.' });
     }
 });
 

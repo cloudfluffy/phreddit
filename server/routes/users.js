@@ -2,11 +2,13 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const express = require('express');
 
-const User = require('../models/users.js');
+const User = require('../models/users');
+
+const { authenticate, attachUserIfAuthenticated } = require('../util');
 
 const router = express.Router();
 
-const { JWT_SECRET } = require('../environment.js');
+const { JWT_SECRET } = require('../environment');
 
 const cookieConfig = {
     httpOnly: true,
@@ -20,64 +22,46 @@ router.post('/register', async (req, res) => {
         const { firstName, lastName, email, displayName, password, confirmPassword } = req.body;
         const emailRegex = /(^[^\s@]+)@[^\s@]+\.[^\s@]+$/;
 
-        if (!firstName) {
-            return res.status(400).json('firstName is required.');
-        }
-
-        if (!lastName) {
-            return res.status(400).json('lastName is required.');
-        }
-
-        if (!email) {
-            return res.status(400).json('email is required.');
-        }
-
-        if (!displayName) {
-            return res.status(400).json('displayName is required.');
-        }
-
-        if (!password) {
-            return res.status(400).json('password is required.');
-        }
-
-        if (!confirmPassword) {
-            return res.status(400).json('confirmPassword is required.');
+        if (!firstName || !lastName || !email || !displayName || !password || !confirmPassword) {
+            return res.status(400).json({ message: 'All fields are required.' })
         }
 
         if (!emailRegex.test(email)) {
-            return res.status(400).json('email is not in a valid email format.');
+            return res.status(400).json({ message: 'Invalid email format.' });
         }
 
         if (password != confirmPassword) {
-            return res.status(400).json('password and confirmPassword do not match.');
+            return res.status(400).json({ message: 'Password and confirmation do not match.' });
         }
 
-        const emailID = email.match(emailRegex)[1];
+        const emailId = email.match(emailRegex)[1];
 
         if (password.toLowerCase().includes(firstName.toLowerCase())) {
-            return res.status(400).json('The password should not contain the first name.');
+            return res.status(400).json({ message: 'The password should not contain your first name.' });
         }
 
         if (password.toLowerCase().includes(lastName.toLowerCase())) {
-            return res.status(400).json('The password should not contain the last name.');
+            return res.status(400).json({ message: 'The password should not contain your last name.' });
         }
 
         if (password.toLowerCase().includes(displayName.toLowerCase())) {
-            return res.status(400).json('The password should not contain the display name.');
+            return res.status(400).json({ message: 'The password should not contain your display name.' });
         }
 
-        if (password.toLowerCase().includes(emailID.toLowerCase())) {
-            return res.status(400).json('The password should not contain the emailID.');
+        if (password.toLowerCase().includes(emailId.toLowerCase())) {
+            return res.status(400).json({ message: 'The password should not contain your email ID.' });
         }
 
-        let existingUser = await User.findOne({ email });
-        const emailNotUnique = existingUser ? true : false;
+        const [existingUserEmail, existingUserDisplayName] = await Promise.all([
+            User.findOne({ email }),
+            User.findOne({ displayName })
+        ]);
 
-        existingUser = await User.findOne({ displayName });
-        const displayNameNotUnique = existingUser ? true : false;
-
-        if (emailNotUnique || displayNameNotUnique) {
-            return res.status(400).json({ emailNotUnique, displayNameNotUnique });
+        if (existingUserEmail || existingUserDisplayName) {
+            return res.status(400).json({
+                emailNotUnique: existingUserEmail ? true : false,
+                displayNameNotUnique: existingUserDisplayName ? true : false
+            });
         }
 
         const saltRounds = 10;
@@ -97,10 +81,10 @@ router.post('/register', async (req, res) => {
 
         res.cookie('token', token, cookieConfig);
 
-        return res.status(200).json('User registered successfully.');
+        return res.status(201).json({ message: 'User registered successfully.', clientInfo: savedUser });
     } catch (error) {
-        console.err('Error registering user: ', error);
-        return res.status(500).json('Error registering user.');
+        console.error('Error at POST /users/register: ', error);
+        return res.status(500).json({ message: 'Internal server error while registering user.' });
     }
 });
 
@@ -108,86 +92,49 @@ router.post('/login', async (req, res) => {
     try {
         const { email, password } = req.body;
 
-        if (!email) {
-            return res.status(400).json('email is required.');
-        }
-
-        if (!password) {
-            return res.status(400).json('password is required.');
+        if (!email || !password) {
+            return res.status(400).json({ message: 'All fields are required.' });
         }
 
         const existingUser = await User.findOne({ email });
 
         if (!existingUser) {
-            return res.status(401).json('Invalid email or password.');
+            return res.status(401).json({ message: 'Invalid email or password.' });
         }
 
         const isPasswordCorrect = await bcrypt.compare(password, existingUser.passwordHash);
 
         if (!isPasswordCorrect) {
-            return res.status(401).json('Invalid email or password.');
+            return res.status(401).json({ message: 'Invalid email or password.' });
         }
 
         const token = jwt.sign({ userId: existingUser._id }, JWT_SECRET, { expiresIn: 60000 * 60 * 24 });
 
         res.cookie('token', token, cookieConfig);
 
-        return res.status(200).json(existingUser.displayName);
+        return res.status(200).json({ message: 'Logged in successfully.', clientInfo: existingUser });
     } catch (error) {
-        console.err('Error logging in user: ', error);
-        return res.status(500).json('Error logging in user.');
+        console.error('Error at POST /users/login: ', error);
+        return res.status(500).json({ message: 'Internal server error while logging in user.' });
     }
 });
 
 router.get('/logout', (req, res) => {
-    res.cookie('token', '', cookieConfig);
-    return res.status(200).json('Logged out successfully');
+    res.cookie('token', '', { ...cookieConfig, expires: new Date(0) });
+    return res.status(200).json({ message: 'Logged out successfully' });
 });
 
-router.get('/loggedIn', async (req, res) => {
-    const token = req.cookies.token;
-
-    if (!token) {
-        return res.status(200).json(false);
-    }
-
-    try {
-        const verified = jwt.verify(token, JWT_SECRET);
-
-        const user = await User.findById(verified.userId);
-
-        if (!user) {
-            return res.status(200).json(false);
-        }
-
-        return res.status(200).json(true);
-    } catch (error) {
-        console.err('JSON web token verification failure: ', error);
-        return res.status(200).json(false);
-    }
+router.get('/loggedIn', attachUserIfAuthenticated, async (req, res) => {
+    const { user } = req;
+    return res.status(200).json({
+        isLoggedIn: user ? true : false,
+        clientInfo: user
+    });
 });
 
-router.get('/info', async (req, res) => {
-    const token = req.cookies.token;
-
-    if (!token) {
-        return res.status(401).json('Unauthorized.');
-    }
-
-    try {
-        const verified = jwt.verify(token, JWT_SECRET);
-
-        const user = await User.findById(verified.userId);
-
-        if (!user) {
-            return res.status(401).json('Unauthorized.');
-        }
-
-        return res.status(200).json(user);
-    } catch (error) {
-        console.err('JSON web token verification failure: ', error);
-        return res.status(401).json('Unauthorized.');
-    }
+router.get('/info', authenticate, async (req, res) => {
+    const { user } = req;
+    return res.status(200).json({ clientInfo: user });
 });
 
 module.exports = router;
