@@ -98,7 +98,8 @@ router.get('/:postId', async (req, res) => {
         const { postId } = req.params;
 
         const post = await Post.findOne({ _id: postId }).populate([{
-            path: 'communityID'
+            path: 'communityID',
+            select: 'name'
         }, {
             path: 'postedBy',
             select: 'displayName'
