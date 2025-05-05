@@ -116,24 +116,6 @@ router.post('/', authenticate, async (req, res) => {
     }
 });
 
-router.put('/:communityId/posts', async (req, res) => {
-    try {
-        const { communityId } = req.params;
-        const { postID } = req.body;
-
-        if (!postID) {
-            return res.status(400).json({ message: 'Post ID is required.' });
-        }
-
-        await Community.updateOne({ _id: communityId }, { $push: { postIDs: postID } });
-
-        return res.status(200).json({ message: 'Post added to the community successfully.' });
-    } catch (error) {
-        console.error('Error at PUT /communities/:communityId/posts: ', error);
-        return res.status(500).json({ message: 'Internal server error while adding post to the community.' });
-    }
-});
-
 router.put('/:communityId/join', authenticate, async (req, res) => {
     try {
         const { user } = req;
