@@ -48,7 +48,7 @@ router.get('/newest', attachUserIfAuthenticated, async (req, res) => {
     }
 });
 
-router.get('/oldest', async (req, res) => {
+router.get('/oldest', attachUserIfAuthenticated, async (req, res) => {
     try {
         return retrievePosts(req, res, oldestPosts);
     } catch (error) {
@@ -57,7 +57,7 @@ router.get('/oldest', async (req, res) => {
     }
 });
 
-router.get('/active', async (req, res) => {
+router.get('/active', attachUserIfAuthenticated, async (req, res) => {
     try {
         return retrievePosts(req, res, activePosts);
     } catch (error) {
@@ -66,7 +66,7 @@ router.get('/active', async (req, res) => {
     }
 });
 
-router.get('/search/:query/newest', async (req, res) => {
+router.get('/search/:query/newest', attachUserIfAuthenticated, async (req, res) => {
     try {
         return retrieveQueryPosts(req, res, newestPosts);
     } catch (error) {
@@ -75,7 +75,7 @@ router.get('/search/:query/newest', async (req, res) => {
     }
 });
 
-router.get('/search/:query/oldest', async (req, res) => {
+router.get('/search/:query/oldest', attachUserIfAuthenticated, async (req, res) => {
     try {
         return retrieveQueryPosts(req, res, oldestPosts);
     } catch (error) {
@@ -84,7 +84,7 @@ router.get('/search/:query/oldest', async (req, res) => {
     }
 });
 
-router.get('/search/:query/active', async (req, res) => {
+router.get('/search/:query/active', attachUserIfAuthenticated, async (req, res) => {
     try {
         return retrieveQueryPosts(req, res, activePosts);
     } catch (error) {
@@ -98,10 +98,12 @@ router.get('/:postId', async (req, res) => {
         const { postId } = req.params;
 
         const post = await Post.findOne({ _id: postId }).populate([{
-            path: 'linkFlairID'
+            path: 'communityID'
         }, {
             path: 'postedBy',
             select: 'displayName'
+        }, {
+            path: 'linkFlairID'
         }]);
 
         await populateCommentIDs(post);
@@ -111,19 +113,6 @@ router.get('/:postId', async (req, res) => {
     } catch (error) {
         console.error('Error at GET /posts/:postId: ', error);
         return res.status(500).json({ message: 'Internal server error while retrieving post.' });
-    }
-});
-
-router.get('/:postId/community', async (req, res) => {
-    try {
-        const { postId } = req.params;
-
-        const community = await Community.findOne({ postIDs: postId });
-
-        return res.status(200).json({ community });
-    } catch (error) {
-        console.error('Error at GET /posts/:postId/community: ', error);
-        return res.status(500).json({ message: 'Internal server error while retrieving community.' });
     }
 });
 
