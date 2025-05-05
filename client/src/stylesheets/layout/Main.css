@@ -1,0 +1,5 @@
+.Main {
+    flex: 1;
+    overflow: auto;
+    padding: 12px 24px;
+}

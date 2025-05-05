@@ -107,7 +107,7 @@ router.post('/', authenticate, async (req, res) => {
 
         const savedCommunity = await community.save();
 
-        await User.updateOne({ _id: user._id }, { $push: { communityIDs: savedCommunity } });
+        await User.updateOne({ _id: user._id }, { $push: { communityIDs: savedCommunity._id } });
 
         return res.status(201).json({ message: 'Community created successfully.', community: savedCommunity });
     } catch (error) {
@@ -133,7 +133,7 @@ router.put('/:communityId/join', authenticate, async (req, res) => {
 
         await Promise.all([
             Community.updateOne({ _id: community._id }, { $push: { members: user } }),
-            User.updateOne({ _id: user._id }, { $push: { communityIDs: community } })
+            User.updateOne({ _id: user._id }, { $push: { communityIDs: community._id } })
         ])
 
         return res.status(200).json({ message: 'Successfully added user to the community.' });

@@ -207,7 +207,7 @@ async function retrievePosts(req, res, sort) {
     const { user } = req;
 
     let posts = await Post.find({});
-    posts = sort(posts);
+    posts = await sort(posts);
 
     let postsFromJoinedCommunities = [];
     let postsFromOtherCommunities = [];
@@ -230,7 +230,7 @@ async function retrieveQueryPosts(req, res, sort) {
 
     let posts = await Post.find({});
     posts = await searchPosts(query, posts);
-    posts = sort(posts);
+    posts = await sort(posts);
 
     let postsFromJoinedCommunities = [];
     let postsFromOtherCommunities = [];

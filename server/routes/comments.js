@@ -19,20 +19,20 @@ router.post('/', authenticate, async (req, res) => {
 
         const comment = new Comment({
             content,
-            commentedBy: user
+            commentedBy: user._id
         });
 
         const savedComment = await comment.save();
 
         if (commentToID.isPost) {
             await Promise.all([
-                Post.findOneAndUpdate({ _id: commentToID._id }, { $push: { commentIDs: savedComment } }),
-                User.updateOne({ _id: user._id }, { $push: { commentIDs: savedComment } })
+                Post.findOneAndUpdate({ _id: commentToID._id }, { $push: { commentIDs: savedComment._id } }),
+                User.updateOne({ _id: user._id }, { $push: { commentIDs: savedComment._id } })
             ]);
         } else {
             await Promise.all([
-                Comment.findOneAndUpdate({ _id: commentToID._id }, { $push: { commentIDs: savedComment } }),
-                User.updateOne({ _id: user._id }, { $push: { commentIDs: savedComment } })
+                Comment.findOneAndUpdate({ _id: commentToID._id }, { $push: { commentIDs: savedComment._id } }),
+                User.updateOne({ _id: user._id }, { $push: { commentIDs: savedComment._id } })
             ])
         }
 
@@ -60,7 +60,7 @@ router.put('/:commentId/upvote', authenticate, async (req, res) => {
 
         if (user.upvotedCommentIDs.includes(comment._id)) {
             await Promise.all([
-                User.updateOne({ _id: user._id }, { $pull: { upvotedCommentIDs: comment } }),
+                User.updateOne({ _id: user._id }, { $pull: { upvotedCommentIDs: comment._id } }),
                 Comment.updateOne({ _id: comment._id }, { $inc: { voteCount: -1 } }),
                 User.updateOne({ _id: comment.commentedBy }, { $inc: { reputation: -5 } })
             ]);
@@ -68,15 +68,15 @@ router.put('/:commentId/upvote', authenticate, async (req, res) => {
             if (user.downvotedCommentIDs.includes(comment._id)) {
                 await Promise.all([
                     User.updateOne({ _id: user._id }, {
-                        $push: { upvotedCommentIDs: comment },
-                        $pull: { downvotedCommentIDs: comment }
+                        $push: { upvotedCommentIDs: comment._id },
+                        $pull: { downvotedCommentIDs: comment._id }
                     }),
                     Comment.updateOne({ _id: comment._id }, { $inc: { voteCount: 2 } }),
                     User.updateOne({ _id: comment.commentedBy }, { $inc: { reputation: 15 } })
                 ]);
             } else {
                 await Promise.all([
-                    User.updateOne({ _id: user._id }, { $push: { upvotedCommentIDs: comment } }),
+                    User.updateOne({ _id: user._id }, { $push: { upvotedCommentIDs: comment._id } }),
                     Comment.updateOne({ _id: comment._id }, { $inc: { voteCount: 1 } }),
                     User.updateOne({ _id: comment.commentedBy }, { $inc: { reputation: 5 } })
                 ]);
@@ -107,7 +107,7 @@ router.put('/:commentId/downvote', authenticate, async (req, res) => {
 
         if (user.downvotedCommentIDs.includes(comment._id)) {
             await Promise.all([
-                User.updateOne({ _id: user._id }, { $pull: { downvotedCommentIDs: comment } }),
+                User.updateOne({ _id: user._id }, { $pull: { downvotedCommentIDs: comment._id } }),
                 Comment.updateOne({ _id: comment._id }, { $inc: { voteCount: 1 } }),
                 User.updateOne({ _id: comment.commentedBy }, { $inc: { reputation: 10 } })
             ]);
@@ -115,15 +115,15 @@ router.put('/:commentId/downvote', authenticate, async (req, res) => {
             if (user.upvotedCommentIDs.includes(comment._id)) {
                 await Promise.all([
                     User.updateOne({ _id: user._id }, {
-                        $push: { downvotedCommentIDs: comment },
-                        $pull: { upvotedCommentIDs: comment }
+                        $push: { downvotedCommentIDs: comment._id },
+                        $pull: { upvotedCommentIDs: comment._id }
                     }),
                     Comment.updateOne({ _id: comment._id }, { $inc: { voteCount: -2 } }),
                     User.updateOne({ _id: comment.commentedBy }, { $inc: { reputation: -15 } })
                 ]);
             } else {
                 await Promise.all([
-                    User.updateOne({ _id: user._id }, { $push: { downvotedCommentIDs: comment } }),
+                    User.updateOne({ _id: user._id }, { $push: { downvotedCommentIDs: comment._id } }),
                     Comment.updateOne({ _id: comment._id }, { $inc: { voteCount: -1 } }),
                     User.updateOne({ _id: comment.commentedBy }, { $inc: { reputation: -10 } })
                 ]);

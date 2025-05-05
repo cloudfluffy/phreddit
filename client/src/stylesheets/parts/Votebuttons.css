@@ -1,0 +1,61 @@
+.Votebuttons {
+    background-color: var(--light_gray);
+    border-radius: 30px;
+    height: 20px;
+    font-size: 12px;
+}
+
+.Votebuttons button {
+    width: fit-content;
+    border: none;
+    border-radius: 30px;
+    background-color: var(--light_gray);
+}
+
+.Votebuttons .upvote:hover,
+.Votebuttons .upvote:focus-visible {
+    background-color: var(--reddish_orange);
+    outline-color: var(--reddish_orange);
+    color: var(--light_gray);
+    cursor: pointer;
+}
+
+.Votebuttons .downvote:hover,
+.Votebuttons .downvote:focus-visible {
+    background-color: #6A5CFF;
+    outline-color: #6A5CFF;
+    color: var(--light_gray);
+    cursor: pointer;
+}
+
+.Votebuttons.upvoted,
+.Votebuttons.upvoted .upvote,
+.Votebuttons.upvoted .downvote {
+    background-color: var(--reddish_orange);
+    color: var(--light_gray);
+}
+
+.Votebuttons.upvoted .upvote:hover,
+.Votebuttons.upvoted .downvote:hover {
+    background-color: var(--dark_reddish_orange);
+}
+
+.Votebuttons.downvoted,
+.Votebuttons.downvoted .upvote,
+.Votebuttons.downvoted .downvote {
+    background-color: var(--purple);
+    color: var(--light_gray);
+}
+
+.Votebuttons.downvoted .upvote:hover,
+.Votebuttons.downvoted .downvote:hover {
+    background-color: var(--dark_purple);
+}
+
+.Votebuttons.disable,
+.Votebuttons.disable .upvote,
+.Votebuttons.disable .downvote {
+    background-color: var(--greyed_out);
+    color: var(--muted);
+    cursor: default;
+}

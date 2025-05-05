@@ -1,0 +1,23 @@
+.Postpageview>* {
+    margin: 8px 0px;
+}
+
+.Postpageview .info,
+.Postpageview .infos {
+    font-size: 12px;
+}
+
+.Postpageview .content p {
+    font-size: 14px;
+    margin-bottom: 16px;
+}
+
+.Postpageview .content p:last-child {
+    margin-bottom: 8px;
+}
+
+.Postpageview .infos {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}

@@ -75,13 +75,9 @@ router.post('/register', async (req, res) => {
             passwordHash
         });
 
-        const savedUser = await newUser.save();
+        await newUser.save();
 
-        const token = jwt.sign({ userId: savedUser._id }, JWT_SECRET, { expiresIn: 60000 * 60 * 24 });
-
-        res.cookie('token', token, cookieConfig);
-
-        return res.status(201).json({ message: 'User registered successfully.', clientInfo: savedUser });
+        return res.status(201).json({ message: 'User registered successfully.' });
     } catch (error) {
         console.error('Error at POST /users/register: ', error);
         return res.status(500).json({ message: 'Internal server error while registering user.' });

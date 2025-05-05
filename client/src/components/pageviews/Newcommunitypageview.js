@@ -1,0 +1,104 @@
+import axios from 'axios';
+import { useState } from 'react';
+import { COMMUNITY } from '../../display.js';
+import Button from '../parts/Button.js';
+
+axios.defaults.withCredentials = true;
+
+export default function Newcommunitypageview(props) {
+    const { setDisplay, setDisplayPosts, setClientInfo, setDisplayCommunity } = props;
+
+    const [errors, setErrors] = useState([false, false, false, false, false, false]);
+    const [name, setName] = useState('');
+    const [description, setDescription] = useState('');
+
+    async function handleSubmit(event) {
+        event.preventDefault();
+
+        const nameEmptyError = name.trim() === '';
+        const nameExceedError = name.trim().length > 100;
+
+        const hyperlinkRegex = /\[(.*?)\]\((.*?)\)/g;
+        let hyperlinkNameEmptyError = false;
+        let hyperlinkProtocolError = false;
+        let match;
+
+        while ((match = hyperlinkRegex.exec(description)) !== null) {
+            if (hyperlinkNameEmptyError && hyperlinkProtocolError) {
+                break;
+            }
+
+            if (!match[1].trim()) {
+                hyperlinkNameEmptyError = true;
+            }
+
+            if (!match[2].match(/^https?:\/\//)) {
+                hyperlinkProtocolError = true;
+            }
+        }
+
+        const descriptionLength = description.replaceAll(hyperlinkRegex, '$1').replaceAll(/\s*\n\s*/g, '').trim().length;
+        const descriptionEmptyError = descriptionLength === 0;
+        const descriptionExceedError = descriptionLength > 500;
+
+        setErrors([nameEmptyError, nameExceedError, false, hyperlinkNameEmptyError, hyperlinkProtocolError, descriptionEmptyError, descriptionExceedError]);
+
+        if (!nameEmptyError && !nameExceedError && !hyperlinkNameEmptyError && !hyperlinkProtocolError && !descriptionEmptyError && !descriptionExceedError) {
+            try {
+                const { data: { community } } = await axios.post('http://localhost:8000/communities', {
+                    name,
+                    description
+                });
+
+                setDisplayCommunity(community);
+
+                const [{ data: { posts } }, { data: { clientInfo } }] = await Promise.all([
+                    axios.get(`http://localhost:8000/communities/${community._id}/posts/newest`),
+                    axios.get('http://localhost:8000/users/info')
+                ])
+
+                setDisplayPosts(posts);
+                setClientInfo(clientInfo);
+
+                setDisplay(COMMUNITY);
+            } catch (error) {
+                setErrors([nameEmptyError, nameExceedError, true, hyperlinkNameEmptyError, hyperlinkProtocolError, descriptionEmptyError, descriptionExceedError]);
+            }
+        }
+    }
+
+    return (
+        <form id='create_form' onSubmit={handleSubmit}>
+            <h2 id='create_form_title'>Create Community</h2>
+
+            <label htmlFor='name'>Community Name*</label>
+            <input
+                id='name'
+                className='input_field'
+                placeholder='Community Name*'
+                type='text'
+                name='name'
+                value={name}
+                onChange={event => setName(event.target.value)} />
+            {errors[0] && <p className='error'>The community name should not be empty.</p>}
+            {errors[1] && <p className='error'>The community name should not exceed 100 characters in length.</p>}
+            {errors[2] && <p className='error'>Community name already in use.</p>}
+
+            <label htmlFor='description'>Description*</label>
+            <textarea
+                id='description'
+                className='input_field'
+                placeholder='Description*'
+                name='description'
+                value={description}
+                onChange={event => setDescription(event.target.value)}></textarea>
+            {errors[3] && <p className='error'>The hyperlink name should not be empty.</p>}
+            {errors[4] && <p className='error'>The URL should start with "https://" or "http://".</p>}
+            {errors[5] && <p className='error'>The description should not be empty.</p>}
+            {errors[6] && <p className='error'>The description should not exceed 500 characters in length.</p>}
+
+            <Button
+                content='Engender Community' />
+        </form>
+    );
+}

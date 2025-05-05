@@ -22,17 +22,17 @@ router.post('/', authenticate, async (req, res) => {
             content,
             communityID,
             postedBy: user,
-            linkFlairID
+            linkFlairID: linkFlairID || null
         });
 
         const savedPost = await post.save();
 
         await Promise.all([
-            Community.updateOne({ _id: communityID }, { $push: { postIDs: savedPost } }),
-            User.updateOne({ _id: user._id }, { $push: { postIDs: savedPost } })
+            Community.updateOne({ _id: communityID }, { $push: { postIDs: savedPost._id } }),
+            User.updateOne({ _id: user._id }, { $push: { postIDs: savedPost._id } })
         ])
 
-        return res.status(201).json({ message: 'Post created successfully.', postID: savedPost._id });
+        return res.status(201).json({ message: 'Post created successfully.' });
     } catch (error) {
         console.error('Error at POST /posts: ', error);
         return res.status(500).json({ message: 'Internal server error while creating post.' });
@@ -99,7 +99,7 @@ router.get('/:postId', async (req, res) => {
 
         const post = await Post.findOne({ _id: postId }).populate([{
             path: 'communityID',
-            select: 'name'
+            select: 'name members'
         }, {
             path: 'postedBy',
             select: 'displayName'
@@ -147,7 +147,7 @@ router.put('/:postId/upvote', authenticate, async (req, res) => {
 
         if (user.upvotedPostIDs.includes(post._id)) {
             await Promise.all([
-                User.updateOne({ _id: user._id }, { $pull: { upvotedPostIDs: post } }),
+                User.updateOne({ _id: user._id }, { $pull: { upvotedPostIDs: post._id } }),
                 Post.updateOne({ _id: post._id }, { $inc: { voteCount: -1 } }),
                 User.updateOne({ _id: post.postedBy }, { $inc: { reputation: -5 } })
             ]);
@@ -155,15 +155,15 @@ router.put('/:postId/upvote', authenticate, async (req, res) => {
             if (user.downvotedPostIDs.includes(post._id)) {
                 await Promise.all([
                     User.updateOne({ _id: user._id }, {
-                        $push: { upvotedPostIDs: post },
-                        $pull: { downvotedPostIDs: post }
+                        $push: { upvotedPostIDs: post._id },
+                        $pull: { downvotedPostIDs: post._id }
                     }),
                     Post.updateOne({ _id: post._id }, { $inc: { voteCount: 2 } }),
                     User.updateOne({ _id: post.postedBy }, { $inc: { reputation: 15 } })
                 ]);
             } else {
                 await Promise.all([
-                    User.updateOne({ _id: user._id }, { $push: { upvotedPostIDs: post } }),
+                    User.updateOne({ _id: user._id }, { $push: { upvotedPostIDs: post._id } }),
                     Post.updateOne({ _id: post._id }, { $inc: { voteCount: 1 } }),
                     User.updateOne({ _id: post.postedBy }, { $inc: { reputation: 5 } })
                 ]);
@@ -194,7 +194,7 @@ router.put('/:postId/downvote', authenticate, async (req, res) => {
 
         if (user.downvotedPostIDs.includes(post._id)) {
             await Promise.all([
-                User.updateOne({ _id: user._id }, { $pull: { downvotedPostIDs: post } }),
+                User.updateOne({ _id: user._id }, { $pull: { downvotedPostIDs: post._id } }),
                 Post.updateOne({ _id: post._id }, { $inc: { voteCount: 1 } }),
                 User.updateOne({ _id: post.postedBy }, { $inc: { reputation: 10 } })
             ]);
@@ -202,8 +202,8 @@ router.put('/:postId/downvote', authenticate, async (req, res) => {
             if (user.upvotedPostIDs.includes(post._id)) {
                 await Promise.all([
                     User.updateOne({ _id: user._id }, {
-                        $push: { downvotedPostIDs: post },
-                        $pull: { upvotedPostIDs: post }
+                        $push: { downvotedPostIDs: post._id },
+                        $pull: { upvotedPostIDs: post._id }
                     }),
                     Post.updateOne({ _id: post._id }, { $inc: { voteCount: -2 } }),
                     User.updateOne({ _id: post.postedBy }, { $inc: { reputation: -15 } })

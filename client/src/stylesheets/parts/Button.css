@@ -1,0 +1,59 @@
+.Button {
+    width: fit-content;
+    height: 40px;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 30px;
+    background-color: var(--light_gray);
+    font-size: 14px;
+}
+
+.Button:hover,
+.Button:focus-visible {
+    background-color: var(--reddish_orange);
+    outline-color: var(--reddish_orange);
+    color: var(--light_gray);
+    cursor: pointer;
+}
+
+.Button.disable {
+    background-color: var(--greyed_out);
+    color: var(--muted);
+}
+
+.Button.disable:hover {
+    background-color: var(--greyed_out);
+    outline-color: var(--greyed_out);
+    color: var(--muted);
+    cursor: default;
+}
+
+.Button.active {
+    background-color: var(--reddish_orange);
+    color: var(--light_gray);
+}
+
+.Button.navbar {
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
+    width: 100%;
+    border-radius: 8px;
+    padding: 4px 16px;
+}
+
+.Button.big {
+    font-size: 18px;
+}
+
+.Button.form {
+    align-self: flex-end;
+    font-size: 14px;
+}
+
+.Button.small {
+    font-size: 12px;
+    height: 20px;
+    padding-top: 0px;
+    padding-bottom: 0px;
+}

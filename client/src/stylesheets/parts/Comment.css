@@ -1,0 +1,20 @@
+.Comment {
+    margin: 20px 0px;
+}
+
+.Comment>* {
+    margin: 5px 0px;
+}
+
+.Comment .info {
+    font-size: 12px;
+}
+
+.Comment .content {
+    font-size: 14px;
+}
+
+.Comment .buttons {
+    display: flex;
+    gap: 12px;
+}

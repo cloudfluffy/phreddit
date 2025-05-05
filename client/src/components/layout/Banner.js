@@ -1,0 +1,66 @@
+import axios from 'axios';
+import { NEWPOST, SEARCHRESULTS, WELCOME } from '../../display.js';
+import '../../stylesheets/layout/Banner.css';
+import Button from '../parts/Button.js';
+
+axios.defaults.withCredentials = true;
+
+export default function Banner(props) {
+    const { display, clientInfo } = props;
+    const { setDisplay, setDisplayPosts, setDisplayPostsFromJoinedCommunities, setDisplayPostsFromOtherCommunities, setQuery, setClientInfo } = props;
+
+    return (
+        <div className='Banner'>
+            <p
+                className='app_name'
+                onClick={() => setDisplay(WELCOME)}
+            >phreddit</p>
+
+            <form
+                className='search_form'
+                onSubmit={async event => {
+                    event.preventDefault();
+
+                    const query = event.target.elements.query.value;
+
+                    if (query.trim()) {
+                        const { data: { posts, postsFromJoinedCommunities, postsFromOtherCommunities } } = await axios.get(`http://localhost:8000/posts/search/${query}/newest`);
+
+                        setDisplayPosts(posts);
+                        setDisplayPostsFromJoinedCommunities(postsFromJoinedCommunities);
+                        setDisplayPostsFromOtherCommunities(postsFromOtherCommunities);
+
+                        setQuery(query);
+
+                        setDisplay(SEARCHRESULTS);
+                    }
+
+                    event.target.elements.query.value = '';
+                }}>
+                <input type='text' className='search_bar' placeholder='Search Phreddit...' name='query' />
+            </form>
+
+            <div className='buttons'>
+                <Button
+                    disable={!clientInfo}
+                    content={clientInfo ? clientInfo.displayName : 'Guest'} />
+
+                <Button
+                    disable={!clientInfo}
+                    active={display === NEWPOST}
+                    content='Create Post'
+                    onClick={() => setDisplay(NEWPOST)} />
+
+                {clientInfo && <Button
+                    content='Logout'
+                    onClick={async () => {
+                        await axios.get('http://localhost:8000/users/logout');
+
+                        setClientInfo(null);
+
+                        setDisplay(WELCOME);
+                    }} />}
+            </div>
+        </div>
+    );
+}

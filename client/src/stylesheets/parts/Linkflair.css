@@ -1,0 +1,7 @@
+.Linkflair {
+    font-size: 12px;
+    width: fit-content;
+    padding: 0px 10px;
+    border-radius: 30px;
+    background-color: var(--light_gray);
+}

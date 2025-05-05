@@ -1,0 +1,32 @@
+.Post {
+    padding: 4px 16px;
+    border-bottom: 1px dotted var(--black);
+    border-radius: 16px;
+    margin: 4px 0px;
+}
+
+.Post:hover,
+.Post:focus-visible {
+    background-color: var(--off_white);
+    outline: none;
+    cursor: pointer;
+}
+
+.Post>* {
+    margin: 5px 0px;
+}
+
+.Post .title {
+    font-size: 18px;
+}
+
+.Post .infos {
+    display: flex;
+    gap: 12px;
+}
+
+.Post .infos,
+.Post .info,
+.Post .content {
+    font-size: 12px;
+}

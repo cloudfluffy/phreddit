@@ -1,0 +1,17 @@
+.Header .top_line {
+    display: flex;
+    justify-content: space-between;
+}
+
+.Header .title {
+    display: inline;
+}
+
+.Header .buttons {
+    display: flex;
+    gap: 12px;
+}
+
+.Header p {
+    font-size: 14px;
+}
