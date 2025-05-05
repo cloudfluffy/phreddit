@@ -126,10 +126,7 @@ router.get('/logout', (req, res) => {
 
 router.get('/loggedIn', attachUserIfAuthenticated, async (req, res) => {
     const { user } = req;
-    return res.status(200).json({
-        isLoggedIn: user ? true : false,
-        clientInfo: user
-    });
+    return res.status(200).json({ clientInfo: user });
 });
 
 router.get('/info', authenticate, async (req, res) => {
