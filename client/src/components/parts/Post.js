@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { POST } from '../../display.js';
-import '../../stylesheets/parts/post?.css';
+import '../../stylesheets/parts/Post.css';
 import countComments from '../../util/countComments.js';
 import errorFlash from '../../util/errorFlash.js';
 import getTimestamp from '../../util/getTimestamp.js';

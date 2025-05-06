@@ -161,7 +161,7 @@ export default function Newuserpageview(props) {
 
             <Button
                 type='form'
-                content='Register' />
+                content='Sign Up' />
         </form>
     );
 }
