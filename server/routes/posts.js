@@ -110,7 +110,7 @@ router.get('/:postId', async (req, res) => {
         await populateCommentIDs(post);
         await Promise.all(post.commentIDs.map(commentID => populateUserDisplayNameForComment(commentID)));
 
-        return res.status(200).json({ message: 'Successfully retrieved post.'.post });
+        return res.status(200).json({ message: 'Successfully retrieved post.', post });
     } catch (error) {
         console.error('Error at GET /posts/:postId: ', error);
         return res.status(500).json({ message: 'Internal server error while retrieving post.' });
