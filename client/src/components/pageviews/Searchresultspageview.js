@@ -26,7 +26,7 @@ export default function Searchresultspageview(props) {
 
             setIsLoading(false);
         })();
-    }, []);
+    }, [query]);
 
     return (
         <>
