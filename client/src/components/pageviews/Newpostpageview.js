@@ -1,12 +1,13 @@
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { HOME } from '../../display.js';
+import errorFlash from '../../util/errorFlash.js';
 import Button from '../parts/Button.js';
 
 axios.defaults.withCredentials = true;
 
 export default function Newpostpageview(props) {
-    const { setDisplay, setDisplayPosts, setDisplayPostsFromJoinedCommunities, setDisplayPostsFromOtherCommunities, setClientInfo } = props;
+    const { setDisplay, setClientInfo, setFlash } = props;
 
     const [errors, setErrors] = useState([false, false, false, false, false, false, false, false]);
     const [communityID, setCommunityID] = useState('');
@@ -15,19 +16,23 @@ export default function Newpostpageview(props) {
     const [newLinkFlair, setNewLinkFlair] = useState('');
     const [content, setContent] = useState('');
 
-    const [linkflairs, setLinkflairs] = useState(null);
-    const [communities, setCommunities] = useState(null);
+    const [linkflairs, setLinkflairs] = useState([]);
+    const [communities, setCommunities] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         (async () => {
-            const [{ data: { linkFlairs } }, { data: { joinedCommunities, otherCommunities } }] = await Promise.all([
-                axios.get('http://localhost:8000/linkflairs'),
-                axios.get('http://localhost:8000/communities')
-            ]);
+            try {
+                const [{ data: { linkFlairs } }, { data: { joinedCommunities, otherCommunities } }] = await Promise.all([
+                    axios.get('http://localhost:8000/linkflairs'),
+                    axios.get('http://localhost:8000/communities')
+                ]);
 
-            setLinkflairs(linkFlairs);
-            setCommunities([...joinedCommunities, ...otherCommunities]);
+                setLinkflairs(linkFlairs);
+                setCommunities([...joinedCommunities, ...otherCommunities]);
+            } catch (error) {
+                errorFlash(error, setFlash);
+            }
 
             setIsLoading(false);
         })();
@@ -67,37 +72,37 @@ export default function Newpostpageview(props) {
         setErrors([communityIDError, titleEmptyError, titleExceedError, linkFlairChoiceConflictError, newLinkFlairExceedError, contentError, hyperlinkNameEmptyError, hyperlinkProtocolError]);
 
         if (!communityIDError && !titleEmptyError && !titleExceedError && !linkFlairChoiceConflictError && !newLinkFlairExceedError && !contentError && !hyperlinkNameEmptyError && !hyperlinkProtocolError) {
-            let linkFlairID = '';
+            try {
+                let linkFlairID = '';
 
-            if (existingLinkFlair) {
-                linkFlairID = existingLinkFlair;
-            }
+                if (existingLinkFlair) {
+                    linkFlairID = existingLinkFlair;
+                }
 
-            if (newLinkFlair) {
-                const response = await axios.post('http://localhost:8000/linkflairs', {
-                    content: newLinkFlair
+                if (newLinkFlair) {
+                    const response = await axios.post('http://localhost:8000/linkflairs', {
+                        content: newLinkFlair
+                    });
+                    linkFlairID = response.data.linkFlairID;
+                }
+
+                const { data: { message } } = await axios.post('http://localhost:8000/posts', {
+                    title,
+                    content,
+                    linkFlairID,
+                    communityID
                 });
-                linkFlairID = response.data.linkFlairID;
+
+                const { data: { clientInfo } } = await axios.get('http://localhost:8000/users/info');
+
+                setClientInfo(clientInfo);
+
+                setDisplay(HOME);
+
+                setFlash({ isSuccess: true, message });
+            } catch (error) {
+                errorFlash(error, setFlash);
             }
-
-            await axios.post('http://localhost:8000/posts', {
-                title,
-                content,
-                linkFlairID,
-                communityID
-            });
-
-            const [{ data: { posts, postsFromJoinedCommunities, postsFromOtherCommunities } }, { data: { clientInfo } }] = await Promise.all([
-                axios.get('http://localhost:8000/posts/newest'),
-                axios.get('http://localhost:8000/users/info')
-            ]);
-
-            setDisplayPosts(posts);
-            setDisplayPostsFromJoinedCommunities(postsFromJoinedCommunities);
-            setDisplayPostsFromOtherCommunities(postsFromOtherCommunities);
-            setClientInfo(clientInfo);
-
-            setDisplay(HOME);
         }
     }
 
@@ -115,7 +120,7 @@ export default function Newpostpageview(props) {
                         value={communityID}
                         onChange={event => setCommunityID(event.target.value)}>
                         <option value=''>Select a Community*</option>
-                        {communities.map(({ _id, name }) => (
+                        {communities?.map(({ _id, name }) => (
                             <option key={_id} value={_id}>{name}</option>
                         ))}
                     </select>
@@ -143,7 +148,7 @@ export default function Newpostpageview(props) {
                                 value={existingLinkFlair}
                                 onChange={event => setExistingLinkFlair(event.target.value)}>
                                 <option value=''>Select a Link Flair</option>
-                                {linkflairs.map(({ _id, content }) => (
+                                {linkflairs?.map(({ _id, content }) => (
                                     <option key={_id} value={_id}>{content}</option>
                                 ))}
                             </select>

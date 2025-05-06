@@ -1,13 +1,14 @@
 import axios from 'axios';
-import { NEWPOST, SEARCHRESULTS, WELCOME } from '../../display.js';
+import { NEWPOST, SEARCHRESULTS, USERPROFILE, WELCOME } from '../../display.js';
 import '../../stylesheets/layout/Banner.css';
+import errorFlash from '../../util/errorFlash.js';
 import Button from '../parts/Button.js';
 
 axios.defaults.withCredentials = true;
 
 export default function Banner(props) {
     const { display, clientInfo } = props;
-    const { setDisplay, setDisplayPosts, setDisplayPostsFromJoinedCommunities, setDisplayPostsFromOtherCommunities, setQuery, setClientInfo } = props;
+    const { setDisplay, setQuery, setClientInfo, setFlash } = props;
 
     return (
         <div className='Banner'>
@@ -24,14 +25,7 @@ export default function Banner(props) {
                     const query = event.target.elements.query.value;
 
                     if (query.trim()) {
-                        const { data: { posts, postsFromJoinedCommunities, postsFromOtherCommunities } } = await axios.get(`http://localhost:8000/posts/search/${query}/newest`);
-
-                        setDisplayPosts(posts);
-                        setDisplayPostsFromJoinedCommunities(postsFromJoinedCommunities);
-                        setDisplayPostsFromOtherCommunities(postsFromOtherCommunities);
-
                         setQuery(query);
-
                         setDisplay(SEARCHRESULTS);
                     }
 
@@ -43,6 +37,7 @@ export default function Banner(props) {
             <div className='buttons'>
                 <Button
                     disable={!clientInfo}
+                    active={display === USERPROFILE}
                     content={clientInfo ? clientInfo.displayName : 'Guest'} />
 
                 <Button
@@ -54,11 +49,17 @@ export default function Banner(props) {
                 {clientInfo && <Button
                     content='Logout'
                     onClick={async () => {
-                        await axios.get('http://localhost:8000/users/logout');
+                        try {
+                            const { data: { message } } = await axios.get('http://localhost:8000/users/logout');
 
-                        setClientInfo(null);
+                            setClientInfo(null);
 
-                        setDisplay(WELCOME);
+                            setDisplay(WELCOME);
+
+                            setFlash({ isSuccess: true, message })
+                        } catch (error) {
+                            errorFlash(error, setFlash);
+                        }
                     }} />}
             </div>
         </div>

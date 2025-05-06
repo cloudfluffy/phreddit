@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { NEWCOMMENT } from '../../display.js';
 import '../../stylesheets/pageviews/Postpageview.css';
 import countComments from '../../util/countComments.js';
+import errorFlash from '../../util/errorFlash.js';
 import getTimestamp from '../../util/getTimestamp.js';
 import Button from '../parts/Button.js';
 import Comment from '../parts/Comment.js';
@@ -14,22 +15,30 @@ axios.defaults.withCredentials = true;
 
 export default function Postpageview(props) {
     const { displayPostID, clientInfo } = props;
-    const { setDisplay, setClientInfo, setCommentToID } = props;
+    const { setDisplay, setClientInfo, setCommentToID, setFlash } = props;
 
     const [post, setPost] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         (async () => {
-            const { data: { post } } = await axios.get(`http://localhost:8000/posts/${displayPostID}`);
+            try {
+                const { data: { post } } = await axios.get(`http://localhost:8000/posts/${displayPostID}`);
 
-            setPost(post);
+                setPost(post);
+            } catch (error) {
+                errorFlash(error, setFlash);
+            }
 
             setIsLoading(false);
         })();
     }, [clientInfo]);
 
     function renderComments(commentIDs, depth, comments) {
+        if (!commentIDs) {
+            return;
+        }
+
         commentIDs.sort((a, b) => {
             a = new Date(a.commentedDate);
             b = new Date(b.commentedDate);
@@ -50,7 +59,8 @@ export default function Postpageview(props) {
                 clientInfo={clientInfo}
                 setDisplay={setDisplay}
                 setClientInfo={setClientInfo}
-                setCommentToID={setCommentToID} />);
+                setCommentToID={setCommentToID}
+                setFlash={setFlash} />);
             renderComments(commentID.commentIDs, depth + 1, comments);
         }
 
@@ -61,17 +71,18 @@ export default function Postpageview(props) {
         <>
             {!isLoading && <>
                 <div className='Postpageview'>
-                    <p className='info'>{post.communityID.name} • {getTimestamp(post.postedDate)}</p>
-                    <p className='info'>{post.postedBy.displayName}</p>
-                    <h2>{post.title}</h2>
-                    {post.linkFlairID && <Linkflair content={post.linkFlairID.content} />}
-                    <Content className='content' content={post.content} />
+                    <p className='info'>{post?.communityID?.name} • {getTimestamp(post?.postedDate)}</p>
+                    <p className='info'>{post?.postedBy?.displayName}</p>
+                    <h2>{post?.title}</h2>
+                    {post?.linkFlairID && <Linkflair content={post?.linkFlairID?.content} />}
+                    <Content className='content' content={post?.content} />
                     <div className='infos'>
                         <Votebuttons
                             isPost={true}
                             votable={post}
                             clientInfo={clientInfo}
-                            setClientInfo={setClientInfo} />
+                            setClientInfo={setClientInfo}
+                            setFlash={setFlash} />
 
                         <Button
                             disable={!clientInfo}
@@ -79,19 +90,19 @@ export default function Postpageview(props) {
                             content='Add a Comment'
                             onClick={() => {
                                 setCommentToID({
-                                    _id: post._id,
+                                    _id: post?._id,
                                     isPost: true
                                 });
 
                                 setDisplay(NEWCOMMENT);
                             }} />
 
-                        <p>{post.views} view(s)</p>
-                        <p>{countComments(post.commentIDs)} comment(s)</p>
+                        <p>{post?.views} view(s)</p>
+                        <p>{countComments(post?.commentIDs)} comment(s)</p>
                     </div>
                 </div>
                 <hr />
-                {renderComments(post.commentIDs, 0, [])}
+                {renderComments(post?.commentIDs, 0, [])}
             </>
             }
         </>

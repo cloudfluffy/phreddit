@@ -15,7 +15,7 @@ import Welcomepageview from '../pageviews/Welcomepageview.js';
 
 export default function Main(props) {
     const { display, displayPosts, displayPostsFromJoinedCommunities, displayPostsFromOtherCommunities, displayCommunity, query, clientInfo } = props;
-    const { setDisplay, setDisplayPosts, setDisplayPostsFromJoinedCommunities, setDisplayPostsFromOtherCommunities, setDisplayCommunity, setClientInfo } = props;
+    const { setDisplay, setDisplayPosts, setDisplayPostsFromJoinedCommunities, setDisplayPostsFromOtherCommunities, setDisplayCommunity, setClientInfo, setFlash } = props;
 
     const [displayPostID, setDisplayPostID] = useState(null);
     const [commentToID, setCommentToID] = useState(null);
@@ -33,7 +33,8 @@ export default function Main(props) {
                 setDisplayPostsFromJoinedCommunities={setDisplayPostsFromJoinedCommunities}
                 setDisplayPostsFromOtherCommunities={setDisplayPostsFromOtherCommunities}
                 setClientInfo={setClientInfo}
-                setDisplayPostID={setDisplayPostID} />}
+                setDisplayPostID={setDisplayPostID}
+                setFlash={setFlash} />}
 
             {display === COMMUNITY && <Communitypageview
                 display={display}
@@ -44,7 +45,8 @@ export default function Main(props) {
                 setDisplayPosts={setDisplayPosts}
                 setDisplayCommunity={setDisplayCommunity}
                 setClientInfo={setClientInfo}
-                setDisplayPostID={setDisplayPostID} />}
+                setDisplayPostID={setDisplayPostID}
+                setFlash={setFlash} />}
 
             {display === SEARCHRESULTS && <Searchresultspageview
                 display={display}
@@ -58,53 +60,50 @@ export default function Main(props) {
                 setDisplayPostsFromJoinedCommunities={setDisplayPostsFromJoinedCommunities}
                 setDisplayPostsFromOtherCommunities={setDisplayPostsFromOtherCommunities}
                 setClientInfo={setClientInfo}
-                setDisplayPostID={setDisplayPostID} />}
+                setDisplayPostID={setDisplayPostID}
+                setFlash={setFlash} />}
 
             {display === POST && <Postpageview
                 displayPostID={displayPostID}
                 clientInfo={clientInfo}
                 setDisplay={setDisplay}
                 setClientInfo={setClientInfo}
-                setCommentToID={setCommentToID} />}
+                setCommentToID={setCommentToID}
+                setFlash={setFlash} />}
 
             {display === NEWCOMMUNITY && <Newcommunitypageview
                 setDisplay={setDisplay}
-                setDisplayPosts={setDisplayPosts}
                 setClientInfo={setClientInfo}
-                setDisplayCommunity={setDisplayCommunity} />}
+                setDisplayCommunity={setDisplayCommunity}
+                setFlash={setFlash} />}
 
             {display === NEWCOMMENT && <Newcommentpageview
                 commentToID={commentToID}
-                setDisplay={setDisplay} />}
+                setDisplay={setDisplay}
+                setClientInfo={setClientInfo}
+                setFlash={setFlash} />}
 
             {display === NEWPOST && <Newpostpageview
                 setDisplay={setDisplay}
-                setDisplayPosts={setDisplayPosts}
-                setDisplayPostsFromJoinedCommunities={setDisplayPostsFromJoinedCommunities}
-                setDisplayPostsFromOtherCommunities={setDisplayPostsFromOtherCommunities}
-                setClientInfo={setClientInfo} />}
+                setClientInfo={setClientInfo}
+                setFlash={setFlash} />}
 
             {display === WELCOME && <Welcomepageview
                 clientInfo={clientInfo}
-                setDisplay={setDisplay}
-            />}
+                setDisplay={setDisplay} />}
 
             {display === LOGIN && <Loginpageview
                 setDisplay={setDisplay}
-                setDisplayPosts={setDisplayPosts}
-                setDisplayPostsFromJoinedCommunities={setDisplayPostsFromJoinedCommunities}
-                setDisplayPostsFromOtherCommunities={setDisplayPostsFromOtherCommunities}
                 setClientInfo={setClientInfo}
-            />}
+                setFlash={setFlash} />}
 
             {display === NEWUSER && <Newuserpageview
                 setDisplay={setDisplay}
                 setClientInfo={setClientInfo}
-            />}
+                setFlash={setFlash} />}
 
             {display === USERPROFILE && <Userprofilepageview
-                setDisplay={setDisplay}
-            />}
+                setDisplay={setDisplay} />}
         </div>
     );
 }

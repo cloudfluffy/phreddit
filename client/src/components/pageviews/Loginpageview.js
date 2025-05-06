@@ -1,12 +1,13 @@
 import axios from 'axios';
 import { useState } from 'react';
 import { HOME } from '../../display.js';
+import errorFlash from '../../util/errorFlash.js';
 import Button from '../parts/Button.js';
 
 axios.defaults.withCredentials = true;
 
 export default function Loginpageview(props) {
-    const { setDisplay, setDisplayPosts, setDisplayPostsFromJoinedCommunities, setDisplayPostsFromOtherCommunities, setClientInfo } = props;
+    const { setDisplay, setClientInfo, setFlash } = props;
 
     const [errors, setErrors] = useState([false, false, false]);
     const [email, setEmail] = useState('');
@@ -26,24 +27,23 @@ export default function Loginpageview(props) {
 
         if (!emailEmptyError && !emailFormatError && !passwordEmptyError) {
             try {
-                const [{ data: { clientInfo } }, { data: { posts, postsFromJoinedCommunities, postsFromOtherCommunities } }] = await Promise.all([
-                    axios.post('http://localhost:8000/users/login', {
-                        email,
-                        password
-                    }),
-                    axios.get('http://localhost:8000/posts/newest')
-                ]);
+                const { data: { message, clientInfo } } = await axios.post('http://localhost:8000/users/login', {
+                    email,
+                    password
+                });
 
                 setClientInfo(clientInfo);
-                setDisplayPosts(posts);
-                setDisplayPostsFromJoinedCommunities(postsFromJoinedCommunities);
-                setDisplayPostsFromOtherCommunities(postsFromOtherCommunities);
 
                 setDisplay(HOME);
+
+                setFlash({ isSuccess: true, message })
             } catch (error) {
-                if (error.response.status === 401) {
-                    setErrors([emailEmptyError, emailFormatError, passwordEmptyError, true]);
+                if (error.response) {
+                    const { response: { status } } = error;
+                    setErrors([emailEmptyError, emailFormatError, passwordEmptyError, status === 400]);
                 }
+
+                errorFlash(error, setFlash);
             }
         }
     }

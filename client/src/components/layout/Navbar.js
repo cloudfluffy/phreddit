@@ -2,13 +2,14 @@ import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { COMMUNITY, HOME, NEWCOMMUNITY } from '../../display.js';
 import '../../stylesheets/layout/Navbar.css';
+import errorFlash from '../../util/errorFlash.js';
 import Button from '../parts/Button.js';
 
 axios.defaults.withCredentials = true;
 
 export default function Navbar(props) {
     const { display, displayCommunity, clientInfo } = props;
-    const { setDisplay, setDisplayPosts, setDisplayPostsFromJoinedCommunities, setDisplayPostsFromOtherCommunities, setDisplayCommunity } = props;
+    const { setDisplay, setDisplayCommunity, setFlash } = props;
 
     const [communities, setCommunities] = useState([]);
     const [joinedCommunities, setJoinedCommunities] = useState([]);
@@ -17,11 +18,15 @@ export default function Navbar(props) {
 
     useEffect(() => {
         (async () => {
-            const { data: { communities, joinedCommunities, otherCommunities } } = await axios.get('http://localhost:8000/communities');
+            try {
+                const { data: { communities, joinedCommunities, otherCommunities } } = await axios.get('http://localhost:8000/communities');
 
-            setCommunities(communities);
-            setJoinedCommunities(joinedCommunities);
-            setOtherCommunities(otherCommunities);
+                setCommunities(communities);
+                setJoinedCommunities(joinedCommunities);
+                setOtherCommunities(otherCommunities);
+            } catch (error) {
+                errorFlash(error, setFlash);
+            }
 
             setIsLoading(false);
         })();
@@ -33,16 +38,7 @@ export default function Navbar(props) {
                 active={display === HOME}
                 type='navbar'
                 content='Home'
-                onClick={async () => {
-                    const { data: { posts, postsFromJoinedCommunities, postsFromOtherCommunities } } = await axios.get('http://localhost:8000/posts/newest');
-
-                    setDisplayPosts(posts);
-                    setDisplayPostsFromJoinedCommunities(postsFromJoinedCommunities);
-                    setDisplayPostsFromOtherCommunities(postsFromOtherCommunities);
-
-                    setDisplay(HOME);
-                }}
-            />
+                onClick={async () => setDisplay(HOME)} />
 
             <hr />
 
@@ -54,38 +50,28 @@ export default function Navbar(props) {
                 content='Create Community'
                 onClick={() => setDisplay(NEWCOMMUNITY)} />
 
-            {!isLoading && !clientInfo && communities.map(community => (
+            {!isLoading && !clientInfo && communities?.map(community => (
                 <Button
                     key={community._id}
-                    active={display === COMMUNITY && displayCommunity._id === community._id}
+                    active={display === COMMUNITY && displayCommunity?._id === community._id}
                     type='navbar'
                     content={community.name}
                     onClick={async () => {
-                        const { data: { posts } } = await axios.get(`http://localhost:8000/communities/${community._id}/posts/newest`);
-
-                        setDisplayPosts(posts);
-
                         setDisplayCommunity(community);
-
                         setDisplay(COMMUNITY);
                     }} />
             ))}
 
             {!isLoading && clientInfo && <>
                 <p className='header'>JOINED COMMUNITIES</p>
-                {joinedCommunities.map(community => (
+                {joinedCommunities?.map(community => (
                     <Button
                         key={community._id}
-                        active={display === COMMUNITY && displayCommunity._id === community._id}
+                        active={display === COMMUNITY && displayCommunity?._id === community._id}
                         type='navbar'
                         content={community.name}
                         onClick={async () => {
-                            const { data: { posts } } = await axios.get(`http://localhost:8000/communities/${community._id}/posts/newest`);
-
-                            setDisplayPosts(posts);
-
                             setDisplayCommunity(community);
-
                             setDisplay(COMMUNITY);
                         }} />
                 ))}
@@ -93,19 +79,14 @@ export default function Navbar(props) {
 
             {!isLoading && clientInfo && <>
                 <p className='header'>OTHER COMMUNITIES</p>
-                {otherCommunities.map(community => (
+                {otherCommunities?.map(community => (
                     <Button
                         key={community._id}
-                        active={display === COMMUNITY && displayCommunity._id === community._id}
+                        active={display === COMMUNITY && displayCommunity?._id === community._id}
                         type='navbar'
                         content={community.name}
                         onClick={async () => {
-                            const { data: { posts } } = await axios.get(`http://localhost:8000/communities/${community._id}/posts/newest`);
-
-                            setDisplayPosts(posts);
-
                             setDisplayCommunity(community);
-
                             setDisplay(COMMUNITY);
                         }} />
                 ))}

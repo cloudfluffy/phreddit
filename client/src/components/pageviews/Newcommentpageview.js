@@ -1,13 +1,14 @@
 import axios from 'axios';
 import { useState } from 'react';
 import { POST } from '../../display.js';
+import errorFlash from '../../util/errorFlash.js';
 import Button from '../parts/Button.js';
 
 axios.defaults.withCredentials = true;
 
 export default function Newcommentpageview(props) {
     const { commentToID } = props;
-    const { setDisplay } = props;
+    const { setDisplay, setClientInfo, setFlash } = props;
 
     const [errors, setErrors] = useState([false, false, false, false]);
     const [content, setContent] = useState('');
@@ -41,12 +42,22 @@ export default function Newcommentpageview(props) {
         setErrors([hyperlinkNameEmptyError, hyperlinkProtocolError, contentEmptyError, contentExceedError]);
 
         if (!hyperlinkNameEmptyError && !hyperlinkProtocolError && !contentEmptyError && !contentExceedError) {
-            await axios.post('http://localhost:8000/comments', {
-                content,
-                commentToID
-            });
+            try {
+                const { data: { message } } = await axios.post('http://localhost:8000/comments', {
+                    content,
+                    commentToID
+                });
 
-            setDisplay(POST);
+                const { data: { clientInfo } } = await axios.get('http://localhost:8000/users/info');
+
+                setClientInfo(clientInfo);
+
+                setDisplay(POST);
+
+                setFlash({ isSuccess: true, message });
+            } catch (error) {
+                errorFlash(error, setFlash);
+            }
         }
     }
 

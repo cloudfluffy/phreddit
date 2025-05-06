@@ -8,7 +8,7 @@ export default function Content(props) {
     let characters = 0;
     let key = 0;
 
-    for (let i = 0; i < parts.length; i++) {
+    for (let i = 0; parts && i < parts.length; i++) {
         partsWithinLimit.push([]);
 
         for (let j = 0; j < parts[i].length; j++) {

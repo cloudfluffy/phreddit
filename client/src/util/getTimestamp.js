@@ -1,4 +1,8 @@
 export default function getTimestamp(date) {
+    if (!date) {
+        return;
+    }
+
     date = new Date(date);
 
     const millisecondDifference = Date.now() - date.getTime();

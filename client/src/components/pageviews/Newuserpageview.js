@@ -1,12 +1,13 @@
 import axios from 'axios';
 import { useState } from 'react';
 import { WELCOME } from '../../display.js';
+import errorFlash from '../../util/errorFlash.js';
 import Button from '../parts/Button.js';
 
 axios.defaults.withCredentials = true;
 
 export default function Newuserpageview(props) {
-    const { setDisplay } = props;
+    const { setDisplay, setFlash } = props;
 
     const [errors, setErrors] = useState([false, false, false, false, false, false, false, false, false, false, false, false, false, false]);
     const [firstName, setFirstName] = useState('');
@@ -45,7 +46,7 @@ export default function Newuserpageview(props) {
 
         if (!firstNameEmptyError && !lastNameEmptyError && !emailEmptyError && !emailFormatError && !displayNameEmptyError && !passwordEmptyError && !passwordContainsFirstNameError && !passwordContainsLastNameError && !passwordContainsDisplayNameError && !passwordContainsEmailIDError && !confirmPasswordEmptyError && !confirmPasswordNotMatchError) {
             try {
-                await axios.post('http://localhost:8000/users/register', {
+                const { data: { message } } = await axios.post('http://localhost:8000/users/register', {
                     firstName,
                     lastName,
                     email,
@@ -55,9 +56,13 @@ export default function Newuserpageview(props) {
                 });
 
                 setDisplay(WELCOME);
+
+                setFlash({ isSuccess: true, message });
             } catch (error) {
-                if (error.response.status === 400) {
-                    const { emailNotUnique, displayNameNotUnique } = error.response.data;
+                errorFlash(error, setFlash);
+
+                if (error.response) {
+                    const { response: { data: { emailNotUnique, displayNameNotUnique } } } = error;
                     setErrors([firstNameEmptyError, lastNameEmptyError, emailEmptyError, emailFormatError, emailNotUnique, displayNameEmptyError, displayNameNotUnique, passwordEmptyError, passwordContainsFirstNameError, passwordContainsLastNameError, passwordContainsDisplayNameError, passwordContainsEmailIDError, confirmPasswordEmptyError, confirmPasswordNotMatchError]);
                 }
             }

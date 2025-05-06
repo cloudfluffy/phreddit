@@ -1,36 +1,47 @@
+import axios from 'axios';
+import { useEffect, useState } from 'react';
+import errorFlash from '../../util/errorFlash.js';
 import Header from '../parts/Header.js';
 import Post from '../parts/Post.js';
 
+axios.defaults.withCredentials = true;
+
 export default function Searchresultspageview(props) {
     const { display, displayPosts, displayPostsFromJoinedCommunities, displayPostsFromOtherCommunities, query, clientInfo } = props;
-    const { setDisplay, setDisplayPosts, setDisplayPostsFromJoinedCommunities, setDisplayPostsFromOtherCommunities, setClientInfo, setDisplayPostID } = props;
+    const { setDisplay, setDisplayPosts, setDisplayPostsFromJoinedCommunities, setDisplayPostsFromOtherCommunities, setClientInfo, setDisplayPostID, setFlash } = props;
 
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        (async () => {
+            try {
+                const { data: { posts, postsFromJoinedCommunities, postsFromOtherCommunities } } = await axios.get(`http://localhost:8000/posts/search/${query}/newest`);
+
+                setDisplayPosts(posts);
+                setDisplayPostsFromJoinedCommunities(postsFromJoinedCommunities);
+                setDisplayPostsFromOtherCommunities(postsFromOtherCommunities);
+            } catch (error) {
+                errorFlash(error, setFlash);
+            }
+
+            setIsLoading(false);
+        })();
+    }, []);
 
     return (
         <>
-            <Header
-                title={displayPosts.length > 0 ? `Results for: ${query}` : `No results found for: ${query}`}
-                display={display}
-                displayPosts={displayPosts}
-                setDisplayPosts={setDisplayPosts}
-                setDisplayPostsFromJoinedCommunities={setDisplayPostsFromJoinedCommunities}
-                setDisplayPostsFromOtherCommunities={setDisplayPostsFromOtherCommunities}
-                query={query} />
+            {!isLoading && <>
+                <Header
+                    title={displayPosts?.length > 0 ? `Results for: ${query}` : `No results found for: ${query}`}
+                    display={display}
+                    displayPosts={displayPosts}
+                    setDisplayPosts={setDisplayPosts}
+                    setDisplayPostsFromJoinedCommunities={setDisplayPostsFromJoinedCommunities}
+                    setDisplayPostsFromOtherCommunities={setDisplayPostsFromOtherCommunities}
+                    query={query}
+                    setFlash={setFlash} />
 
-            {!clientInfo && displayPosts.map(post => (
-                <Post
-                    key={post._id}
-                    postID={post._id}
-                    showCommunity={true}
-                    clientInfo={clientInfo}
-                    setDisplay={setDisplay}
-                    setClientInfo={setClientInfo}
-                    setDisplayPostID={setDisplayPostID} />
-            ))}
-
-            {clientInfo && <>
-                <h3>Posts from Joined Communities</h3>
-                {displayPostsFromJoinedCommunities.map(post => (
+                {!clientInfo && displayPosts?.map(post => (
                     <Post
                         key={post._id}
                         postID={post._id}
@@ -38,21 +49,38 @@ export default function Searchresultspageview(props) {
                         clientInfo={clientInfo}
                         setDisplay={setDisplay}
                         setClientInfo={setClientInfo}
-                        setDisplayPostID={setDisplayPostID} />
-                ))}</>}
+                        setDisplayPostID={setDisplayPostID}
+                        setFlash={setFlash} />
+                ))}
 
-            {clientInfo && <>
-                <h3>Posts from Other Communities</h3>
-                {displayPostsFromOtherCommunities.map(post => (
-                    <Post
-                        key={post._id}
-                        postID={post._id}
-                        showCommunity={true}
-                        clientInfo={clientInfo}
-                        setDisplay={setDisplay}
-                        setClientInfo={setClientInfo}
-                        setDisplayPostID={setDisplayPostID} />
-                ))}</>}
+                {clientInfo && <>
+                    <h3>Posts from Joined Communities</h3>
+                    {displayPostsFromJoinedCommunities?.map(post => (
+                        <Post
+                            key={post._id}
+                            postID={post._id}
+                            showCommunity={true}
+                            clientInfo={clientInfo}
+                            setDisplay={setDisplay}
+                            setClientInfo={setClientInfo}
+                            setDisplayPostID={setDisplayPostID}
+                            setFlash={setFlash} />
+                    ))}</>}
+
+                {clientInfo && <>
+                    <h3>Posts from Other Communities</h3>
+                    {displayPostsFromOtherCommunities?.map(post => (
+                        <Post
+                            key={post._id}
+                            postID={post._id}
+                            showCommunity={true}
+                            clientInfo={clientInfo}
+                            setDisplay={setDisplay}
+                            setClientInfo={setClientInfo}
+                            setDisplayPostID={setDisplayPostID}
+                            setFlash={setFlash} />
+                    ))}</>}
+            </>}
         </>
     );
 }

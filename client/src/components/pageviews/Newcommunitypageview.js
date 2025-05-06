@@ -1,12 +1,13 @@
 import axios from 'axios';
 import { useState } from 'react';
 import { COMMUNITY } from '../../display.js';
+import errorFlash from '../../util/errorFlash.js';
 import Button from '../parts/Button.js';
 
 axios.defaults.withCredentials = true;
 
 export default function Newcommunitypageview(props) {
-    const { setDisplay, setDisplayPosts, setClientInfo, setDisplayCommunity } = props;
+    const { setDisplay, setClientInfo, setDisplayCommunity, setFlash } = props;
 
     const [errors, setErrors] = useState([false, false, false, false, false, false]);
     const [name, setName] = useState('');
@@ -45,24 +46,26 @@ export default function Newcommunitypageview(props) {
 
         if (!nameEmptyError && !nameExceedError && !hyperlinkNameEmptyError && !hyperlinkProtocolError && !descriptionEmptyError && !descriptionExceedError) {
             try {
-                const { data: { community } } = await axios.post('http://localhost:8000/communities', {
+                const { data: { message, community } } = await axios.post('http://localhost:8000/communities', {
                     name,
                     description
                 });
 
+                const { data: { clientInfo } } = await axios.get('http://localhost:8000/users/info');
+
                 setDisplayCommunity(community);
-
-                const [{ data: { posts } }, { data: { clientInfo } }] = await Promise.all([
-                    axios.get(`http://localhost:8000/communities/${community._id}/posts/newest`),
-                    axios.get('http://localhost:8000/users/info')
-                ])
-
-                setDisplayPosts(posts);
                 setClientInfo(clientInfo);
 
                 setDisplay(COMMUNITY);
+
+                setFlash({ isSuccess: true, message });
             } catch (error) {
-                setErrors([nameEmptyError, nameExceedError, true, hyperlinkNameEmptyError, hyperlinkProtocolError, descriptionEmptyError, descriptionExceedError]);
+                errorFlash(error, setFlash);
+
+                if (error.response) {
+                    const { response: { data: { nameNotUnique } } } = error;
+                    setErrors([nameEmptyError, nameExceedError, nameNotUnique, hyperlinkNameEmptyError, hyperlinkProtocolError, descriptionEmptyError, descriptionExceedError]);
+                }
             }
         }
     }

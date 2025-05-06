@@ -8,25 +8,26 @@ import Votebuttons from '../parts/Votebuttons.js';
 export default function Comment(props) {
     const { comment, depth } = props;
     const { clientInfo } = props;
-    const { setDisplay, setClientInfo, setCommentToID } = props;
+    const { setDisplay, setClientInfo, setCommentToID, setFlash } = props;
 
     return (
         <div className='Comment' style={{ marginLeft: `${depth * 35}px` }}>
-            <p className='info'>{comment.commentedBy.displayName} • {getTimestamp(comment.commentedDate)}</p>
-            <Content className='content' content={comment.content} />
+            <p className='info'>{comment?.commentedBy?.displayName} • {getTimestamp(comment?.commentedDate)}</p>
+            <Content className='content' content={comment?.content} />
             <div className='buttons'>
                 <Votebuttons
                     isPost={false}
                     votable={comment}
                     clientInfo={clientInfo}
-                    setClientInfo={setClientInfo} />
+                    setClientInfo={setClientInfo}
+                    setFlash={setFlash} />
                 <Button
                     disable={!clientInfo}
                     type='small'
                     content='Reply'
                     onClick={() => {
                         setCommentToID({
-                            _id: comment._id,
+                            _id: comment?._id,
                             isPost: false
                         });
 

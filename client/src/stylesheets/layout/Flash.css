@@ -1,0 +1,44 @@
+.Flash {
+    height: 40px;
+    padding: 7px 17px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background-color: #f2dede;
+    color: #a94442;
+    border: 1px solid #ebccd1;
+}
+
+.Flash button {
+    background-color: transparent;
+    color: #a94442;
+    border: 1px solid transparent;
+    opacity: 0.7;
+}
+
+.Flash button:hover {
+    background-color: #ebccd1;
+    color: #843534;
+    border-color: #e4b9c0;
+    opacity: 1;
+}
+
+.Flash.success {
+    background-color: #dff0d8;
+    color: #3c763d;
+    border: 1px solid #d0e9c6;
+}
+
+.Flash.success button {
+    background-color: transparent;
+    color: #3c763d;
+    border: 1px solid transparent;
+    opacity: 0.7;
+}
+
+.Flash.success button:hover {
+    background-color: #d0e9c6;
+    color: #2e5e2b;
+    border-color: #c7e4be;
+    opacity: 1;
+}
