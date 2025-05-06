@@ -103,6 +103,14 @@ async function main() {
             email: 'bigfeet@phreddit.com',
             displayName: 'bigfeet',
             password: '1234'
+        },
+        {
+            firstName: 'Bad',
+            lastName: 'Reputation',
+            email: 'badreputation@phreddit.com',
+            displayName: 'badreputation',
+            password: '1234',
+            reputation: 40
         }
     ]);
 

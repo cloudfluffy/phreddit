@@ -23,7 +23,7 @@ router.post('/register', async (req, res) => {
         const emailRegex = /(^[^\s@]+)@[^\s@]+\.[^\s@]+$/;
 
         if (!firstName || !lastName || !email || !displayName || !password || !confirmPassword) {
-            return res.status(400).json({ message: 'All fields are required.' })
+            return res.status(400).json({ message: 'First name, last name, email, display name, password, and confirm password are required.' })
         }
 
         if (!emailRegex.test(email)) {
@@ -59,6 +59,7 @@ router.post('/register', async (req, res) => {
 
         if (existingUserEmail || existingUserDisplayName) {
             return res.status(400).json({
+                message: 'Email or display name already in use.',
                 emailNotUnique: existingUserEmail ? true : false,
                 displayNameNotUnique: existingUserDisplayName ? true : false
             });
@@ -89,7 +90,7 @@ router.post('/login', async (req, res) => {
         const { email, password } = req.body;
 
         if (!email || !password) {
-            return res.status(400).json({ message: 'All fields are required.' });
+            return res.status(400).json({ message: 'Email and password are required.' });
         }
 
         const existingUser = await User.findOne({ email });
@@ -117,17 +118,17 @@ router.post('/login', async (req, res) => {
 
 router.get('/logout', (req, res) => {
     res.cookie('token', '', { ...cookieConfig, expires: new Date(0) });
-    return res.status(200).json({ message: 'Logged out successfully' });
+    return res.status(200).json({ message: 'Logged out successfully.' });
 });
 
 router.get('/loggedIn', attachUserIfAuthenticated, async (req, res) => {
     const { user } = req;
-    return res.status(200).json({ clientInfo: user });
+    return res.status(200).json({ message: user ? `Welcome back ${user.displayName}!` : 'Client is not logged in.', clientInfo: user });
 });
 
 router.get('/info', authenticate, async (req, res) => {
     const { user } = req;
-    return res.status(200).json({ clientInfo: user });
+    return res.status(200).json({ message: 'Successfully retrieved client information.', clientInfo: user });
 });
 
 module.exports = router;

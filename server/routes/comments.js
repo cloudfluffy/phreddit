@@ -14,7 +14,7 @@ router.post('/', authenticate, async (req, res) => {
         const { content, commentToID } = req.body;
 
         if (!content || !commentToID) {
-            return res.status(400).json({ message: 'Content and what the comment is commenting to is required.' });
+            return res.status(400).json({ message: 'Content and information on what and where the comment is commenting to is required.' });
         }
 
         const comment = new Comment({

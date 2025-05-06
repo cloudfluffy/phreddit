@@ -218,6 +218,7 @@ async function retrievePosts(req, res, sort) {
     }
 
     return res.status(200).json({
+        message: 'Successfully retrieved posts.',
         posts,
         postsFromJoinedCommunities,
         postsFromOtherCommunities
@@ -241,6 +242,7 @@ async function retrieveQueryPosts(req, res, sort) {
     }
 
     return res.status(200).json({
+        message: 'Successfully retrieved posts',
         posts,
         postsFromJoinedCommunities,
         postsFromOtherCommunities
