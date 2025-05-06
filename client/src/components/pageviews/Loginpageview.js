@@ -40,7 +40,7 @@ export default function Loginpageview(props) {
             } catch (error) {
                 if (error.response) {
                     const { response: { status } } = error;
-                    setErrors([emailEmptyError, emailFormatError, passwordEmptyError, status === 400]);
+                    setErrors([emailEmptyError, emailFormatError, passwordEmptyError, status === 401]);
                 }
 
                 errorFlash(error, setFlash);
