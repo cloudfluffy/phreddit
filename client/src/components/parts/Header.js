@@ -135,7 +135,7 @@ export default function Header(props) {
                     </div>
                 </div>
                 {displayCommunity && <Content content={displayCommunity.description} />}
-                {displayCommunity && <p>Created {getTimestamp(displayCommunity.startDate)}</p>}
+                {displayCommunity && <p>Created {getTimestamp(displayCommunity.startDate)} by {displayCommunity.owner.displayName}</p>}
                 <p>{displayPosts?.length} Post(s) {displayCommunity && `${displayCommunity.memberCount} Member(s)`}</p>
             </div>
             <hr />

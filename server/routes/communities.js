@@ -11,7 +11,10 @@ router.get('/', attachUserIfAuthenticated, async (req, res) => {
     try {
         const { user } = req;
 
-        const communities = await Community.find({}).sort({ name: 1 });
+        const communities = await Community.find({}).sort({ name: 1 }).populate({
+            path: 'owner',
+            select: 'displayName'
+        });
 
         let joinedCommunities = [];
         let otherCommunities = [];
@@ -37,7 +40,10 @@ router.get('/:communityId', async (req, res) => {
     try {
         const { communityId } = req.params;
 
-        const community = await Community.findById(communityId);
+        const community = await Community.findById(communityId).populate({
+            path: 'owner',
+            select: 'displayName'
+        });
 
         if (!community) {
             return res.status(400).json({ message: 'Community does not exist.' });
@@ -98,19 +104,25 @@ router.post('/', authenticate, async (req, res) => {
             return res.status(400).json({ message: 'Community name already in use.', nameNotUnique: true });
         }
 
-        const community = new Community({
+        const newCommunity = new Community({
             name,
             description,
-            owner: user
+            owner: user._id
         });
 
-        community.members.push(user);
+        newCommunity.members.push(user._id);
 
-        const savedCommunity = await community.save();
+        const savedCommunity = await newCommunity.save();
 
-        await User.updateOne({ _id: user._id }, { $push: { communityIDs: savedCommunity._id } });
+        const [community] = await Promise.all([
+            Community.findById(savedCommunity._id).populate({
+                path: 'owner',
+                select: 'displayName'
+            }),
+            User.updateOne({ _id: user._id }, { $push: { communityIDs: savedCommunity._id } })
+        ]);
 
-        return res.status(201).json({ message: 'Community created successfully.', community: savedCommunity });
+        return res.status(201).json({ message: 'Community created successfully.', community });
     } catch (error) {
         console.error('Error at POST /communities: ', error);
         return res.status(500).json({ message: 'Internal server error while creating community.' });

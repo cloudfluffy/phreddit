@@ -21,7 +21,7 @@ router.post('/', authenticate, async (req, res) => {
             title,
             content,
             communityID,
-            postedBy: user,
+            postedBy: user._id,
             linkFlairID: linkFlairID || null
         });
 
