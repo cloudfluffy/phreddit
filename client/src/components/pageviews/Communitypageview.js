@@ -16,7 +16,7 @@ export default function Communitypageview(props) {
         (async () => {
             try {
                 const { data: { posts } } = await axios.get(`http://localhost:8000/communities/${displayCommunity?._id}/posts/newest`);
-                console.log(posts);
+
                 setDisplayPosts(posts);
             } catch (error) {
                 errorFlash(error, setFlash);

@@ -174,7 +174,7 @@ async function authenticate(req, res, next) {
             return res.status(500).json({ message: 'Internal server error while retrieving user.' });
         }
     } catch (error) {
-        console.log('JWT verification failed at authenticate: ', error);
+        console.error('JWT verification failed at authenticate: ', error);
         return res.status(401).json({ message: 'Request denied. Invalid or expired token.' });
     }
 }

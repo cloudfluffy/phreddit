@@ -16,7 +16,7 @@ export default function Homepageview(props) {
         (async () => {
             try {
                 const { data: { posts, postsFromJoinedCommunities, postsFromOtherCommunities } } = await axios.get('http://localhost:8000/posts/newest');
-                console.log(posts);
+
                 setDisplayPosts(posts);
                 setDisplayPostsFromJoinedCommunities(postsFromJoinedCommunities);
                 setDisplayPostsFromOtherCommunities(postsFromOtherCommunities);
