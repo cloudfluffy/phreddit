@@ -38,7 +38,8 @@ export default function Banner(props) {
                 <Button
                     disable={!clientInfo}
                     active={display === USERPROFILE}
-                    content={clientInfo ? clientInfo.displayName : 'Guest'} />
+                    content={clientInfo ? clientInfo.displayName : 'Guest'}
+                    onClick={() => setDisplay(USERPROFILE)} />
 
                 <Button
                     disable={!clientInfo}
