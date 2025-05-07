@@ -15,7 +15,7 @@ router.post('/', authenticate, async (req, res) => {
         const hyperlinkRegex = /\[(.*?)\]\((.*?)\)/g;
         let match;
 
-        if (!content?.trim() || !commentToID?.trim()) {
+        if (!content?.trim() || !commentToID) {
             return res.status(400).json({ message: 'Content and information on what and where the comment is commenting to is required.' });
         }
 
