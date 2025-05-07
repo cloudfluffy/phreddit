@@ -47,7 +47,7 @@ export default function Newcommunitypageview(props) {
         if (!nameEmptyError && !nameExceedError && !hyperlinkNameEmptyError && !hyperlinkProtocolError && !descriptionEmptyError && !descriptionExceedError) {
             try {
                 const { data: { message, community } } = await axios.post('http://localhost:8000/communities', {
-                    name,
+                    name: name.trim(),
                     description
                 });
 

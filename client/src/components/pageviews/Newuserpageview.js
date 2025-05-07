@@ -141,10 +141,10 @@ export default function Newuserpageview(props) {
                 onChange={event => setPassword(event.target.value)}
             />
             {errors[7] && <p className='error'>Password should not be empty.</p>}
-            {errors[8] && <p className='error'>The password should not contain the first name.</p>}
-            {errors[9] && <p className='error'>The password should not contain the last name.</p>}
-            {errors[10] && <p className='error'>The password should not contain the display name.</p>}
-            {errors[11] && <p className='error'>The password should not contain the email ID.</p>}
+            {errors[8] && <p className='error'>The password should not contain your first name.</p>}
+            {errors[9] && <p className='error'>The password should not contain your last name.</p>}
+            {errors[10] && <p className='error'>The password should not contain your display name.</p>}
+            {errors[11] && <p className='error'>The password should not contain your email ID.</p>}
 
             <label htmlFor='confirmPassword'>Confirm Password*</label>
             <input

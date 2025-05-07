@@ -12,9 +12,27 @@ router.post('/', authenticate, async (req, res) => {
     try {
         const { user } = req;
         const { content, commentToID } = req.body;
+        const hyperlinkRegex = /\[(.*?)\]\((.*?)\)/g;
+        let match;
 
-        if (!content || !commentToID) {
+        if (!content?.trim() || !commentToID?.trim()) {
             return res.status(400).json({ message: 'Content and information on what and where the comment is commenting to is required.' });
+        }
+
+        while ((match = hyperlinkRegex.exec(content)) !== null) {
+            if (!match[1].trim() || !match[2].match(/^https?:\/\//)) {
+                return res.status(400).json({ message: 'The hyperlink name is empty or the URL did not start with "https://" or "http://".' });
+            }
+        }
+
+        const contentLength = content.replaceAll(hyperlinkRegex, '$1').replaceAll(/\s*\n\s*/g, '').trim().length;
+
+        if (!contentLength) {
+            return res.status(400).json({ message: 'The content should not be empty.' });
+        }
+
+        if (contentLength > 500) {
+            return res.status(400).json({ message: 'The content should not exceed 500 characters in length.' });
         }
 
         const comment = new Comment({

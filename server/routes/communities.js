@@ -93,9 +93,31 @@ router.post('/', authenticate, async (req, res) => {
     try {
         const { user } = req;
         const { name, description } = req.body;
+        const hyperlinkRegex = /\[(.*?)\]\((.*?)\)/g;
+        let match;
 
-        if (!name || !description) {
+        if (!name?.trim() || !description?.trim()) {
             return res.status(400).json({ message: 'Name and description are required.' });
+        }
+
+        while ((match = hyperlinkRegex.exec(description)) !== null) {
+            if (!match[1].trim() || !match[2].match(/^https?:\/\//)) {
+                return res.status(400).json({ message: 'The hyperlink name is empty or the URL did not start with "https://" or "http://".' });
+            }
+        }
+
+        const descriptionLength = description.replaceAll(hyperlinkRegex, '$1').replaceAll(/\s*\n\s*/g, '').trim().length;
+
+        if (!descriptionLength) {
+            return res.status(400).json({ message: 'The content should not be empty.' });
+        }
+
+        if (descriptionLength > 500) {
+            return res.status(400).json({ message: 'The content should not exceed 500 characters in length.' });
+        }
+
+        if (name.trim().length > 100) {
+            return res.status(400).json({ message: 'The community name should not exceed 100 characters in length.' });
         }
 
         const existingCommunity = await Community.findOne({ name });

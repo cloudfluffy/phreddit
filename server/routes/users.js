@@ -22,16 +22,16 @@ router.post('/register', async (req, res) => {
         const { firstName, lastName, email, displayName, password, confirmPassword } = req.body;
         const emailRegex = /(^[^\s@]+)@[^\s@]+\.[^\s@]+$/;
 
-        if (!firstName || !lastName || !email || !displayName || !password || !confirmPassword) {
+        if (!firstName?.trim() || !lastName?.trim() || !email?.trim() || !displayName?.trim() || !password?.trim() || !confirmPassword?.trim()) {
             return res.status(400).json({ message: 'First name, last name, email, display name, password, and confirm password are required.' })
         }
 
         if (!emailRegex.test(email)) {
-            return res.status(400).json({ message: 'Invalid email format.' });
+            return res.status(400).json({ message: 'Email should be in a valid email format.' });
         }
 
         if (password != confirmPassword) {
-            return res.status(400).json({ message: 'Password and confirmation do not match.' });
+            return res.status(400).json({ message: 'Password and confirm password shuold match.' });
         }
 
         const emailId = email.match(emailRegex)[1];

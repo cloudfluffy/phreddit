@@ -24,6 +24,10 @@ router.post('/', authenticate, async (req, res) => {
             return res.status(400).json({ message: 'Content is required.' });
         }
 
+        if (content.trim().length > 30) {
+            return res.status(400).json({ message: 'Link flair content should not exceed 30 characters in length.' });
+        }
+
         const linkFlair = new LinkFlair({ content });
         const savedLinkFlair = await linkFlair.save();
 

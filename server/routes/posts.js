@@ -12,9 +12,21 @@ router.post('/', authenticate, async (req, res) => {
     try {
         const { user } = req;
         const { title, content, communityID, linkFlairID } = req.body;
+        const hyperlinkRegex = /\[(.*?)\]\((.*?)\)/g;
+        let match;
 
-        if (!title || !content || !communityID) {
+        if (!title?.trim() || !content?.trim() || !communityID?.trim()) {
             return res.status(400).json({ message: 'Title, content, and community ID are required.' });
+        }
+
+        if (title.trim().length > 100) {
+            return res.status(400).json({ message: 'The title should not exceed 100 characters in length.' });
+        }
+
+        while ((match = hyperlinkRegex.exec(content)) !== null) {
+            if (!match[1].trim() || !match[2].match(/^https?:\/\//)) {
+                return res.status(400).json({ message: 'The hyperlink name is empty or the URL did not start with "https://" or "http://".' });
+            }
         }
 
         const post = new Post({
