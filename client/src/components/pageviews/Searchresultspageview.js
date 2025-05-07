@@ -26,7 +26,7 @@ export default function Searchresultspageview(props) {
 
             setIsLoading(false);
         })();
-    }, [query]);
+    }, [display, query, clientInfo]);
 
     return (
         <>
@@ -44,7 +44,7 @@ export default function Searchresultspageview(props) {
                 {!clientInfo && displayPosts?.map(post => (
                     <Post
                         key={post._id}
-                        postID={post._id}
+                        post={post}
                         showCommunity={true}
                         clientInfo={clientInfo}
                         setDisplay={setDisplay}
@@ -58,7 +58,7 @@ export default function Searchresultspageview(props) {
                     {displayPostsFromJoinedCommunities?.map(post => (
                         <Post
                             key={post._id}
-                            postID={post._id}
+                            post={post}
                             showCommunity={true}
                             clientInfo={clientInfo}
                             setDisplay={setDisplay}
@@ -72,7 +72,7 @@ export default function Searchresultspageview(props) {
                     {displayPostsFromOtherCommunities?.map(post => (
                         <Post
                             key={post._id}
-                            postID={post._id}
+                            post={post}
                             showCommunity={true}
                             clientInfo={clientInfo}
                             setDisplay={setDisplay}

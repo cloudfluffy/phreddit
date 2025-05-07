@@ -16,7 +16,7 @@ export default function Communitypageview(props) {
         (async () => {
             try {
                 const { data: { posts } } = await axios.get(`http://localhost:8000/communities/${displayCommunity?._id}/posts/newest`);
-
+                console.log(posts);
                 setDisplayPosts(posts);
             } catch (error) {
                 errorFlash(error, setFlash);
@@ -24,7 +24,7 @@ export default function Communitypageview(props) {
 
             setIsLoading(false);
         })();
-    }, []);
+    }, [display, clientInfo, displayCommunity]);
 
     return (
         <>
@@ -43,7 +43,7 @@ export default function Communitypageview(props) {
                     displayPosts?.map(post => (
                         <Post
                             key={post._id}
-                            postID={post._id}
+                            post={post}
                             showCommunity={false}
                             clientInfo={clientInfo}
                             setDisplay={setDisplay}

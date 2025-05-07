@@ -16,7 +16,7 @@ export default function Homepageview(props) {
         (async () => {
             try {
                 const { data: { posts, postsFromJoinedCommunities, postsFromOtherCommunities } } = await axios.get('http://localhost:8000/posts/newest');
-
+                console.log(posts);
                 setDisplayPosts(posts);
                 setDisplayPostsFromJoinedCommunities(postsFromJoinedCommunities);
                 setDisplayPostsFromOtherCommunities(postsFromOtherCommunities);
@@ -26,7 +26,7 @@ export default function Homepageview(props) {
 
             setIsLoading(false);
         })();
-    }, []);
+    }, [display, clientInfo]);
 
     return (
         <>
@@ -43,7 +43,7 @@ export default function Homepageview(props) {
                 {!clientInfo && displayPosts?.map(post => (
                     <Post
                         key={post._id}
-                        postID={post._id}
+                        post={post}
                         showCommunity={true}
                         clientInfo={clientInfo}
                         setDisplay={setDisplay}
@@ -57,7 +57,7 @@ export default function Homepageview(props) {
                     {displayPostsFromJoinedCommunities?.map(post => (
                         <Post
                             key={post._id}
-                            postID={post._id}
+                            post={post}
                             showCommunity={true}
                             clientInfo={clientInfo}
                             setDisplay={setDisplay}
@@ -71,7 +71,7 @@ export default function Homepageview(props) {
                     {displayPostsFromOtherCommunities?.map(post => (
                         <Post
                             key={post._id}
-                            postID={post._id}
+                            post={post}
                             showCommunity={true}
                             clientInfo={clientInfo}
                             setDisplay={setDisplay}

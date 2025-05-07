@@ -3,7 +3,7 @@ const express = require('express');
 const Community = require('../models/communities');
 const User = require('../models/users');
 
-const { newestPosts, oldestPosts, activePosts, authenticate, attachUserIfAuthenticated } = require('../util');
+const { newestPosts, oldestPosts, activePosts, authenticate, attachUserIfAuthenticated, retrievePostsOfCommunity } = require('../util');
 
 const router = express.Router();
 
@@ -58,9 +58,7 @@ router.get('/:communityId', async (req, res) => {
 
 router.get('/:communityId/posts/newest', attachUserIfAuthenticated, async (req, res) => {
     try {
-        const community = await Community.findOne({ _id: req.params.communityId }).populate('postIDs');
-        const posts = newestPosts(community.postIDs);
-        return res.status(200).json({ message: 'Successfully retrieved posts.', posts });
+        return retrievePostsOfCommunity(req, res, newestPosts);
     } catch (error) {
         console.error('Error at GET /:communityId/posts/newest: ', error);
         return res.status(500).json({ message: 'Internal server error while retrieving posts.' });
@@ -69,9 +67,7 @@ router.get('/:communityId/posts/newest', attachUserIfAuthenticated, async (req, 
 
 router.get('/:communityId/posts/oldest', attachUserIfAuthenticated, async (req, res) => {
     try {
-        const community = await Community.findOne({ _id: req.params.communityId }).populate('postIDs');
-        const posts = oldestPosts(community.postIDs);
-        return res.status(200).json({ message: 'Successfully retrieved posts.', posts });
+        return retrievePostsOfCommunity(req, res, oldestPosts);
     } catch (error) {
         console.error('Error at GET /:communityId/posts/oldest: ', error);
         return res.status(500).json({ message: 'Internal server error while retrieving posts.' });
@@ -80,9 +76,7 @@ router.get('/:communityId/posts/oldest', attachUserIfAuthenticated, async (req, 
 
 router.get('/:communityId/posts/active', attachUserIfAuthenticated, async (req, res) => {
     try {
-        const community = await Community.findOne({ _id: req.params.communityId }).populate('postIDs');
-        const posts = await activePosts(community.postIDs);
-        return res.status(200).json({ message: 'Successfully retrieved posts.', posts });
+        return retrievePostsOfCommunity(req, res, activePosts);
     } catch (error) {
         console.error('Error at GET /:communityId/posts/active: ', error);
         return res.status(500).json({ message: 'Internal server error while retrieving posts.' });

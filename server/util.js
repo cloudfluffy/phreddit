@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 
+const Community = require('./models/communities');
 const Post = require('./models/posts');
 const User = require('./models/users');
 
@@ -206,7 +207,19 @@ async function attachUserIfAuthenticated(req, res, next) {
 async function retrievePosts(req, res, sort) {
     const { user } = req;
 
-    let posts = await Post.find({});
+    let posts = await Post.find({}).populate([{
+        path: 'communityID',
+        select: 'name members'
+    }, {
+        path: 'postedBy',
+        select: 'displayName'
+    }, {
+        path: 'linkFlairID'
+    }]);
+
+    await Promise.all([...posts.map(post => populateCommentIDs(post))]);
+    await Promise.all([...posts.flatMap(post => post.commentIDs.map(commentID => populateUserDisplayNameForComment(commentID)))]);
+
     posts = await sort(posts);
 
     let postsFromJoinedCommunities = [];
@@ -229,8 +242,20 @@ async function retrieveQueryPosts(req, res, sort) {
     const { user } = req;
     const { query } = req.params;
 
-    let posts = await Post.find({});
+    let posts = await Post.find({}).populate([{
+        path: 'communityID',
+        select: 'name members'
+    }, {
+        path: 'postedBy',
+        select: 'displayName'
+    }, {
+        path: 'linkFlairID'
+    }]);
     posts = await searchPosts(query, posts);
+
+    await Promise.all([...posts.map(post => populateCommentIDs(post))]);
+    await Promise.all([...posts.flatMap(post => post.commentIDs.map(commentID => populateUserDisplayNameForComment(commentID)))]);
+
     posts = await sort(posts);
 
     let postsFromJoinedCommunities = [];
@@ -249,6 +274,26 @@ async function retrieveQueryPosts(req, res, sort) {
     });
 }
 
+async function retrievePostsOfCommunity(req, res, sort) {
+    const { communityId } = req.params;
+
+    let { postIDs: posts } = await Community.findById(communityId).populate('postIDs');
+
+    posts = await Post.populate(posts, [{
+        path: 'postedBy',
+        select: 'displayName'
+    }, {
+        path: 'linkFlairID'
+    }]);
+
+    await Promise.all([...posts.map(post => populateCommentIDs(post))]);
+    await Promise.all([...posts.flatMap(post => post.commentIDs.map(commentID => populateUserDisplayNameForComment(commentID)))]);
+
+    posts = await sort(posts);
+
+    return res.status(200).json({ message: 'Successfully retrieved posts.', posts });
+}
+
 module.exports = {
     populateCommentIDs,
     populateUserDisplayNameForComment,
@@ -259,5 +304,6 @@ module.exports = {
     authenticate,
     attachUserIfAuthenticated,
     retrievePosts,
-    retrieveQueryPosts
+    retrieveQueryPosts,
+    retrievePostsOfCommunity
 };
