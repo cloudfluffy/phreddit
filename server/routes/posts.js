@@ -308,7 +308,7 @@ router.delete('/:postId', authenticate, async (req, res) => {
         const { user } = req;
         const { postId } = req.params;
 
-        const post = await Post.findById(postId).populate('commentIDs');
+        const post = await Post.findById(postId);
 
         if (!post) {
             return res.status(400).json({ message: 'Post does not exist.' });
@@ -318,7 +318,7 @@ router.delete('/:postId', authenticate, async (req, res) => {
             return res.status(403).json({ message: "You're not the creator of the post." });
         }
 
-        deletePostAndItsComments(post);
+        await deletePostAndItsComments(post);
 
         return res.status(200).json({ message: 'Successfully deleted the post.' });
     } catch (error) {

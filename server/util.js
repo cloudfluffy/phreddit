@@ -327,11 +327,23 @@ async function deleteCommentAndItsReplies(comment) {
 }
 
 async function deletePostAndItsComments(post) {
+    await post.populate('commentIDs');
+
     await Promise.all([
         Post.deleteOne({ _id: post._id }),
         User.updateOne({ _id: post.postedBy }, { $pull: { postIDs: post._id, upvotedPostIDs: post._id, downvotedPostIDs: post._id } }),
         Community.updateOne({ _id: post.communityId }, { $pull: { postIDs: post._id } }),
-        post.commentIDs.map(commentID => deleteCommentAndItsReplies(commentID))
+        ...post.commentIDs.map(commentID => deleteCommentAndItsReplies(commentID))
+    ]);
+}
+
+async function deleteCommunityAndItsPosts(community) {
+    await community.populate('postIDs');
+
+    await Promise.all([
+        Community.deleteOne({ _id: community._id }),
+        User.updateOne({ _id: community.owner }, { $pull: { communityIDs: community._id } }),
+        ...community.postIDs.map(postID => deletePostAndItsComments(postID))
     ]);
 }
 
@@ -348,5 +360,6 @@ module.exports = {
     retrieveQueryPosts,
     retrievePostsOfCommunity,
     deleteCommentAndItsReplies,
-    deletePostAndItsComments
+    deletePostAndItsComments,
+    deleteCommunityAndItsPosts
 };

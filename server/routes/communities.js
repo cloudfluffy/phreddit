@@ -3,7 +3,7 @@ const express = require('express');
 const Community = require('../models/communities');
 const User = require('../models/users');
 
-const { newestPosts, oldestPosts, activePosts, authenticate, attachUserIfAuthenticated, retrievePostsOfCommunity } = require('../util');
+const { newestPosts, oldestPosts, activePosts, authenticate, attachUserIfAuthenticated, retrievePostsOfCommunity, deleteCommunityAndItsPosts } = require('../util');
 
 const router = express.Router();
 
@@ -261,6 +261,30 @@ router.put('/:communityId/edit', authenticate, async (req, res) => {
     } catch (error) {
         console.error('Error at PUT /communities/:communityId/edit: ', error);
         return res.status(500).json({ message: 'Internal server error while editing community.' });
+    }
+});
+
+router.delete('/:communityId', authenticate, async (req, res) => {
+    try {
+        const { user } = req;
+        const { communityId } = req.params;
+
+        const community = await Community.findById(communityId);
+
+        if (!community) {
+            return res.status(400).json({ message: 'Community does not exist' });
+        }
+
+        if (!community.owner.equals(user._id)) {
+            return res.status(403).json({ message: "You're not the owner of the community." });
+        }
+
+        await deleteCommunityAndItsPosts(community);
+
+        return res.status(200).json({ message: 'Successfully deleted the community.' });
+    } catch (error) {
+        console.error('Error at DELETE /communities/:communityId: ', error);
+        return res.status(500).json({ message: 'Internal server error while deleting community.' });
     }
 });
 
