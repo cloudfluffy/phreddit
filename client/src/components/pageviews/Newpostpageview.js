@@ -18,7 +18,8 @@ export default function Newpostpageview(props) {
     const [content, setContent] = useState(postToEdit ? postToEdit.content : '');
 
     const [linkflairs, setLinkflairs] = useState([]);
-    const [communities, setCommunities] = useState([]);
+    const [joinedCommunities, setJoinedCommunities] = useState([]);
+    const [otherCommunities, setOtherCommunities] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
@@ -30,7 +31,8 @@ export default function Newpostpageview(props) {
                 ]);
 
                 setLinkflairs(linkFlairs);
-                setCommunities([...joinedCommunities, ...otherCommunities]);
+                setJoinedCommunities(joinedCommunities);
+                setOtherCommunities(otherCommunities);
             } catch (error) {
                 errorFlash(error, setFlash);
             }
@@ -136,7 +138,10 @@ export default function Newpostpageview(props) {
                         value={communityID}
                         onChange={event => setCommunityID(event.target.value)}>
                         <option value=''>Select a Community*</option>
-                        {communities?.map(({ _id, name }) => (
+                        {joinedCommunities?.map(({ _id, name }) => (
+                            <option key={_id} value={_id}>{name}</option>
+                        ))}
+                        {otherCommunities?.map(({ _id, name }) => (
                             <option key={_id} value={_id}>{name}</option>
                         ))}
                     </select>
