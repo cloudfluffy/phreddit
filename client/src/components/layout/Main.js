@@ -104,6 +104,7 @@ export default function Main(props) {
 
             {display === USERPROFILE && <Userprofilepageview
                 clientInfo={clientInfo}
+                setClientInfo={setClientInfo}
                 setFlash={setFlash} />}
         </div>
     );
