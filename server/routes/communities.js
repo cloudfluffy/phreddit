@@ -1,3 +1,4 @@
+const ObjectId = require('mongoose').Types.ObjectId;
 const express = require('express');
 
 const Community = require('../models/communities');
@@ -211,10 +212,7 @@ router.put('/:communityId/edit', authenticate, async (req, res) => {
             return res.status(400).json({ message: 'Community does not exist.' });
         }
 
-        console.log(user._id);
-        console.log(community.owner);
-
-        if (user._id === community.owner) {
+        if (!community.owner.equals(user._id)) {
             return res.status(403).json({ message: "You're not the owner of the community." });
         }
 
@@ -247,7 +245,7 @@ router.put('/:communityId/edit', authenticate, async (req, res) => {
 
         const existingCommunity = await Community.findOne({ name });
 
-        if (existingCommunity) {
+        if (!existingCommunity._id.equals(communityId) && existingCommunity) {
             return res.status(400).json({ message: 'Community name already in use.', nameNotUnique: true });
         }
 
