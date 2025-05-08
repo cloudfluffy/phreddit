@@ -15,6 +15,7 @@ export default function Userprofilepageview(props) {
                 title='User Profile'
                 isUserProfile={true}
                 clientInfo={clientInfo}
+                listing={listing}
                 setListing={setListing} />
 
             {listing === COMMUNITIES && clientInfo.communityIDs.map(communityID => <Listitem

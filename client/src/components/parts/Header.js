@@ -11,7 +11,7 @@ axios.defaults.withCredentials = true;
 
 export default function Header(props) {
     const { title, isUserProfile } = props;
-    const { display, displayPosts, clientInfo, displayCommunity, query } = props;
+    const { display, displayPosts, clientInfo, displayCommunity, query, listing } = props;
     const { setDisplayPosts, setDisplayPostsFromJoinedCommunities, setDisplayPostsFromOtherCommunities, setDisplayCommunity, setClientInfo, setFlash, setListing } = props;
 
     return (
@@ -138,14 +138,17 @@ export default function Header(props) {
 
                         {isUserProfile && <>
                             <Button
+                                active={listing === COMMUNITIES}
                                 content='Communities'
                                 onClick={() => setListing(COMMUNITIES)} />
 
                             <Button
+                                active={listing === POSTS}
                                 content='Posts'
                                 onClick={() => setListing(POSTS)} />
 
                             <Button
+                                active={listing === COMMENTS}
                                 content='Comments'
                                 onClick={() => setListing(COMMENTS)} />
                         </>}
