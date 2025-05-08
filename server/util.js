@@ -326,6 +326,15 @@ async function deleteCommentAndItsReplies(comment) {
     await Promise.all(comments.map(comment => deleteComment(comment)));
 }
 
+async function deletePostAndItsComments(post) {
+    await Promise.all([
+        Post.deleteOne({ _id: post._id }),
+        User.updateOne({ _id: post.postedBy }, { $pull: { postIDs: post._id, upvotedPostIDs: post._id, downvotedPostIDs: post._id } }),
+        Community.updateOne({ _id: post.communityId }, { $pull: { postIDs: post._id } }),
+        post.commentIDs.map(commentID => deleteCommentAndItsReplies(commentID))
+    ]);
+}
+
 module.exports = {
     populateCommentIDs,
     populateUserDisplayNameForComment,
@@ -338,5 +347,6 @@ module.exports = {
     retrievePosts,
     retrieveQueryPosts,
     retrievePostsOfCommunity,
-    deleteCommentAndItsReplies
+    deleteCommentAndItsReplies,
+    deletePostAndItsComments
 };

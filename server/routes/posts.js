@@ -4,7 +4,7 @@ const Community = require('../models/communities');
 const Post = require('../models/posts');
 const User = require('../models/users');
 
-const { newestPosts, oldestPosts, activePosts, populateCommentIDs, populateUserDisplayNameForComment, authenticate, attachUserIfAuthenticated, retrievePosts, retrieveQueryPosts } = require('../util');
+const { newestPosts, oldestPosts, activePosts, populateCommentIDs, populateUserDisplayNameForComment, authenticate, attachUserIfAuthenticated, retrievePosts, retrieveQueryPosts, deletePostAndItsComments } = require('../util');
 
 const router = express.Router();
 
@@ -300,6 +300,30 @@ router.put('/:postId/edit', authenticate, async (req, res) => {
     } catch (error) {
         console.error('Error at PUT /posts/:postId/edit: ', error);
         return res.status(500).json({ message: '' });
+    }
+});
+
+router.delete('/:postId', authenticate, async (req, res) => {
+    try {
+        const { user } = req;
+        const { postId } = req.params;
+
+        const post = await Post.findById(postId).populate('commentIDs');
+
+        if (!post) {
+            return res.status(400).json({ message: 'Post does not exist.' });
+        }
+
+        if (!post.postedBy.equals(user._id)) {
+            return res.status(403).json({ message: "You're not the creator of the post." });
+        }
+
+        deletePostAndItsComments(post);
+
+        return res.status(200).json({ message: 'Successfully deleted the post.' });
+    } catch (error) {
+        console.error('Error at DELETE /posts/:postId: ', error);
+        return res.status(500).json({ message: 'Internal server error while deleting post.' });
     }
 });
 
