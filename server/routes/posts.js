@@ -269,6 +269,19 @@ router.put('/:postId/edit', authenticate, async (req, res) => {
             }
         }
 
+        const community = await Community.findById(communityID);
+
+        if (!community) {
+            return res.status(400).json({ message: 'Community does not exist.' });
+        }
+
+        if (!post.communityID.equals(communityID)) {
+            await Promise.all([
+                Community.updateOne({ _id: post.communityID }, { $pull: { postIDs: post._id } }),
+                Community.updateOne({ _id: communityID }, { $push: { postIDs: post._id } })
+            ]);
+        }
+
         const updatedPost = await Post.findByIdAndUpdate(
             postId,
             { title, content, communityID, linkFlairID: linkFlairID || null },
