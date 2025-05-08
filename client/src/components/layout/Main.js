@@ -107,7 +107,8 @@ export default function Main(props) {
                 postToEdit={postToEdit}
                 setDisplay={setDisplay}
                 setClientInfo={setClientInfo}
-                setFlash={setFlash} />}
+                setFlash={setFlash}
+                setDisplayPostID={setDisplayPostID} />}
 
             {display === WELCOME && <Welcomepageview
                 clientInfo={clientInfo}

@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { useEffect, useState } from 'react';
-import { HOME } from '../../display.js';
+import { HOME, POST } from '../../display.js';
 import errorFlash from '../../util/errorFlash.js';
 import Button from '../parts/Button.js';
 
@@ -8,7 +8,7 @@ axios.defaults.withCredentials = true;
 
 export default function Newpostpageview(props) {
     const { postToEdit } = props;
-    const { setDisplay, setClientInfo, setFlash } = props;
+    const { setDisplay, setClientInfo, setFlash, setDisplayPostID } = props;
 
     const [errors, setErrors] = useState([false, false, false, false, false, false, false, false]);
     const [communityID, setCommunityID] = useState(postToEdit ? postToEdit.communityID._id : '');
@@ -87,20 +87,35 @@ export default function Newpostpageview(props) {
                     linkFlairID = response.data.linkFlairID;
                 }
 
-                const { data: { message } } = await axios.post('http://localhost:8000/posts', {
-                    title,
-                    content,
-                    linkFlairID,
-                    communityID
-                });
+                if (postToEdit) {
+                    const { data: { message } } = await axios.put(`http://localhost:8000/posts/${postToEdit._id}/edit`, {
+                        title,
+                        content,
+                        linkFlairID,
+                        communityID
+                    });
 
-                const { data: { clientInfo } } = await axios.get('http://localhost:8000/users/info');
+                    setDisplayPostID(postToEdit._id);
 
-                setClientInfo(clientInfo);
+                    setDisplay(POST);
 
-                setDisplay(HOME);
+                    setFlash({ isSuccess: true, message });
+                } else {
+                    const { data: { message } } = await axios.post('http://localhost:8000/posts', {
+                        title,
+                        content,
+                        linkFlairID,
+                        communityID
+                    });
 
-                setFlash({ isSuccess: true, message });
+                    const { data: { clientInfo } } = await axios.get('http://localhost:8000/users/info');
+
+                    setClientInfo(clientInfo);
+
+                    setDisplay(HOME);
+
+                    setFlash({ isSuccess: true, message });
+                }
             } catch (error) {
                 errorFlash(error, setFlash);
             }
@@ -185,7 +200,7 @@ export default function Newpostpageview(props) {
                     {errors[7] && <p className='error'>The URL should start with "https://" or "http://".</p>}
 
                     <Button
-                        content='Submit Post' />
+                        content={postToEdit ? 'Edit Posts' : 'Submit Post'} />
                 </form >
             }
         </>

@@ -236,4 +236,58 @@ router.put('/:postId/downvote', authenticate, async (req, res) => {
     }
 });
 
+router.put('/:postId/edit', authenticate, async (req, res) => {
+    try {
+        const { user } = req;
+        const { postId } = req.params;
+        const { title, content, communityID, linkFlairID } = req.body;
+
+        const post = await Post.findById(postId);
+
+        if (!post) {
+            return res.status(400).json({ message: 'Post does not exist.' });
+        }
+
+        if (!post.postedBy.equals(user._id)) {
+            return res.status(403).json({ message: "You're not the creator of the post." });
+        }
+
+        const hyperlinkRegex = /\[(.*?)\]\((.*?)\)/g;
+        let match;
+
+        if (!title?.trim() || !content?.trim() || !communityID?.trim()) {
+            return res.status(400).json({ message: 'Title, content, and community ID are required.' });
+        }
+
+        if (title.trim().length > 100) {
+            return res.status(400).json({ message: 'The title should not exceed 100 characters in length.' });
+        }
+
+        while ((match = hyperlinkRegex.exec(content)) !== null) {
+            if (!match[1].trim() || !match[2].match(/^https?:\/\//)) {
+                return res.status(400).json({ message: 'The hyperlink name is empty or the URL did not start with "https://" or "http://".' });
+            }
+        }
+
+        const updatedPost = await Post.findByIdAndUpdate(
+            postId,
+            { title, content, communityID, linkFlairID: linkFlairID || null },
+            { new: true }
+        ).populate([{
+            path: 'communityID',
+            select: 'name members'
+        }, {
+            path: 'postedBy',
+            select: 'displayName'
+        }, {
+            path: 'linkFlairID'
+        }]);
+
+        return res.status(200).json({ message: 'Successfully edited the post.', post: updatedPost });
+    } catch (error) {
+        console.error('Error at PUT /posts/:postId/edit: ', error);
+        return res.status(500).json({ message: '' });
+    }
+});
+
 module.exports = router;
