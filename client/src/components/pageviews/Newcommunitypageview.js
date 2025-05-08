@@ -47,19 +47,32 @@ export default function Newcommunitypageview(props) {
 
         if (!nameEmptyError && !nameExceedError && !hyperlinkNameEmptyError && !hyperlinkProtocolError && !descriptionEmptyError && !descriptionExceedError) {
             try {
-                const { data: { message, community } } = await axios.post('http://localhost:8000/communities', {
-                    name: name.trim(),
-                    description
-                });
+                if (communityToEdit) {
+                    const { data: { message, community } } = await axios.put(`http://localhost:8000/communities/${communityToEdit._id}/edit`, {
+                        name: name.trim(),
+                        description
+                    });
 
-                const { data: { clientInfo } } = await axios.get('http://localhost:8000/users/info');
+                    setDisplayCommunity(community);
 
-                setDisplayCommunity(community);
-                setClientInfo(clientInfo);
+                    setDisplay(COMMUNITY);
 
-                setDisplay(COMMUNITY);
+                    setFlash({ isSuccess: true, message });
+                } else {
+                    const { data: { message, community } } = await axios.post('http://localhost:8000/communities', {
+                        name: name.trim(),
+                        description
+                    });
 
-                setFlash({ isSuccess: true, message });
+                    const { data: { clientInfo } } = await axios.get('http://localhost:8000/users/info');
+
+                    setDisplayCommunity(community);
+                    setClientInfo(clientInfo);
+
+                    setDisplay(COMMUNITY);
+
+                    setFlash({ isSuccess: true, message });
+                }
             } catch (error) {
                 errorFlash(error, setFlash);
 
@@ -102,7 +115,7 @@ export default function Newcommunitypageview(props) {
             {errors[6] && <p className='error'>The description should not exceed 500 characters in length.</p>}
 
             <Button
-                content='Engender Community' />
+                content={communityToEdit ? 'Edit Community' : 'Engender Community'} />
         </form>
     );
 }

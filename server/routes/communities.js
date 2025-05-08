@@ -199,4 +199,72 @@ router.put('/:communityId/leave', authenticate, async (req, res) => {
     }
 });
 
+router.put('/:communityId/edit', authenticate, async (req, res) => {
+    try {
+        const { user } = req;
+        const { communityId } = req.params;
+        const { name, description } = req.body;
+
+        const community = await Community.findById(communityId);
+
+        if (!community) {
+            return res.status(400).json({ message: 'Community does not exist.' });
+        }
+
+        console.log(user._id);
+        console.log(community.owner);
+
+        if (user._id === community.owner) {
+            return res.status(403).json({ message: "You're not the owner of the community." });
+        }
+
+        const hyperlinkRegex = /\[(.*?)\]\((.*?)\)/g;
+        let match;
+
+        if (!name?.trim() || !description?.trim()) {
+            return res.status(400).json({ message: 'Name and description are required.' });
+        }
+
+        while ((match = hyperlinkRegex.exec(description)) !== null) {
+            if (!match[1].trim() || !match[2].match(/^https?:\/\//)) {
+                return res.status(400).json({ message: 'The hyperlink name is empty or the URL did not start with "https://" or "http://".' });
+            }
+        }
+
+        const descriptionLength = description.replaceAll(hyperlinkRegex, '$1').replaceAll(/\s*\n\s*/g, '').trim().length;
+
+        if (!descriptionLength) {
+            return res.status(400).json({ message: 'The content should not be empty.' });
+        }
+
+        if (descriptionLength > 500) {
+            return res.status(400).json({ message: 'The content should not exceed 500 characters in length.' });
+        }
+
+        if (name.trim().length > 100) {
+            return res.status(400).json({ message: 'The community name should not exceed 100 characters in length.' });
+        }
+
+        const existingCommunity = await Community.findOne({ name });
+
+        if (existingCommunity) {
+            return res.status(400).json({ message: 'Community name already in use.', nameNotUnique: true });
+        }
+
+        const updatedCommunity = await Community.findByIdAndUpdate(
+            communityId,
+            { name, description },
+            { new: true }
+        ).populate({
+            path: 'owner',
+            select: 'displayName'
+        });
+
+        return res.status(200).json({ message: 'Successfully edited the community.', community: updatedCommunity });
+    } catch (error) {
+        console.error('Error at PUT /communities/:communityId/edit: ', error);
+        return res.status(500).json({ message: 'Internal server error while editing community.' });
+    }
+});
+
 module.exports = router;
