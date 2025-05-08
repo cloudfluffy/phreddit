@@ -42,29 +42,29 @@ export default function Userprofilepageview(props) {
                 listing={listing}
                 setListing={setListing} />
 
-            {listing === COMMUNITIES && communities.map(community => <Listitem
+            {listing === COMMUNITIES && (communities.length === 0 ? <p>You don't have any communities.</p> : communities.map(community => <Listitem
                 key={community._id}
                 communityID={community._id}
                 setDisplay={setDisplay}
                 setClientInfo={setClientInfo}
                 setFlash={setFlash}
-                setCommunityToEdit={setCommunityToEdit} />)}
+                setCommunityToEdit={setCommunityToEdit} />))}
 
-            {listing === POSTS && clientInfo.postIDs.map(postID => <Listitem
+            {listing === POSTS && (clientInfo.postIDs.length === 0 ? <p>You don't have any posts.</p> : clientInfo.postIDs.map(postID => <Listitem
                 key={postID}
                 postID={postID}
                 setDisplay={setDisplay}
                 setClientInfo={setClientInfo}
                 setFlash={setFlash}
-                setPostToEdit={setPostToEdit} />)}
+                setPostToEdit={setPostToEdit} />))}
 
-            {listing === COMMENTS && clientInfo.commentIDs.map(commentID => <Listitem
+            {listing === COMMENTS && (clientInfo.commentIDs.length === 0 ? <p>You don't have any comments.</p> : clientInfo.commentIDs.map(commentID => <Listitem
                 key={commentID}
                 commentID={commentID}
                 setDisplay={setDisplay}
                 setClientInfo={setClientInfo}
                 setFlash={setFlash}
-                setCommentToEdit={setCommentToEdit} />)}
+                setCommentToEdit={setCommentToEdit} />))}
         </>
     );
 }
