@@ -343,6 +343,7 @@ async function deleteCommunityAndItsPosts(community) {
     await Promise.all([
         Community.deleteOne({ _id: community._id }),
         User.updateOne({ _id: community.owner }, { $pull: { communityIDs: community._id } }),
+        User.updateMany({ communityIDs: community._id }, { $pull: { communityIDs: community._id } }),
         ...community.postIDs.map(postID => deletePostAndItsComments(postID))
     ]);
 }
