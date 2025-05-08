@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 
+const Comment = require('./models/comments');
 const Community = require('./models/communities');
 const Post = require('./models/posts');
 const User = require('./models/users');
@@ -294,6 +295,34 @@ async function retrievePostsOfCommunity(req, res, sort) {
     return res.status(200).json({ message: 'Successfully retrieved posts.', posts });
 }
 
+async function deleteComment(comment) {
+    await Comment.deleteOne({ _id: comment._id });
+    await User.updateOne({ _id: comment.commentedBy }, { $pull: { commentIDs: comment._id } });
+}
+
+async function getAllNestedComments(comment) {
+    const stack = [comment];
+    const allComments = [];
+
+    while (stack.length > 0) {
+        const current = stack.pop();
+        await current.populate('commentIDs');
+
+        allComments.push(current);
+
+        for (let commentID of current.commentIDs) {
+            stack.push(commentID);
+        }
+    }
+
+    return allComments;
+}
+
+async function deleteCommentAndItsReplies(comment) {
+    const comments = await getAllNestedComments(comment);
+    await Promise.all(comments.map(comment => deleteComment(comment)));
+}
+
 module.exports = {
     populateCommentIDs,
     populateUserDisplayNameForComment,
@@ -305,5 +334,6 @@ module.exports = {
     attachUserIfAuthenticated,
     retrievePosts,
     retrieveQueryPosts,
-    retrievePostsOfCommunity
+    retrievePostsOfCommunity,
+    deleteCommentAndItsReplies
 };

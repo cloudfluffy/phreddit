@@ -4,7 +4,7 @@ const Comment = require('../models/comments');
 const Post = require('../models/posts');
 const User = require('../models/users');
 
-const { authenticate } = require('../util');
+const { authenticate, deleteCommentAndItsReplies } = require('../util');
 
 const router = express.Router();
 
@@ -225,6 +225,30 @@ router.put('/:commentId/edit', authenticate, async (req, res) => {
     } catch (error) {
         console.error('Error at PUT /comments/:commentId/edit: ', error);
         return res.status(500).json({ message: 'Internal server error while editing comment.' });
+    }
+});
+
+router.delete('/:commentId', authenticate, async (req, res) => {
+    try {
+        const { user } = req;
+        const { commentId } = req.params;
+
+        const comment = await Comment.findById(commentId);
+
+        if (!comment) {
+            return res.status(400).json({ message: 'Comment does not exist.' });
+        }
+
+        if (!comment.commentedBy.equals(user._id)) {
+            return res.status(403).json({ message: "You're not the creator of the comment." });
+        }
+
+        await deleteCommentAndItsReplies(comment);
+
+        return res.status(200).json({ message: 'Successfully deleted the comment.' });
+    } catch (error) {
+        console.error('Error at DELETE /comments/:commentId: ', error);
+        return res.status(500).json({ message: 'Internal server error while deleting comment.' });
     }
 });
 
