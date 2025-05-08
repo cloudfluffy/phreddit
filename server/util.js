@@ -226,8 +226,8 @@ async function retrievePosts(req, res, sort) {
     let postsFromOtherCommunities = [];
 
     if (user) {
-        postsFromJoinedCommunities = posts.filter(post => user.communityIDs.includes(post.communityID));
-        postsFromOtherCommunities = posts.filter(post => !user.communityIDs.includes(post.communityID));
+        postsFromJoinedCommunities = posts.filter(post => user.communityIDs.includes(post.communityID._id));
+        postsFromOtherCommunities = posts.filter(post => !user.communityIDs.includes(post.communityID._id));
     }
 
     return res.status(200).json({
@@ -262,8 +262,8 @@ async function retrieveQueryPosts(req, res, sort) {
     let postsFromOtherCommunities = [];
 
     if (user) {
-        postsFromJoinedCommunities = posts.filter(post => user.communityIDs.includes(post.communityID));
-        postsFromOtherCommunities = posts.filter(post => !user.communityIDs.includes(post.communityID));
+        postsFromJoinedCommunities = posts.filter(post => user.communityIDs.includes(post.communityID._id));
+        postsFromOtherCommunities = posts.filter(post => !user.communityIDs.includes(post.communityID._id));
     }
 
     return res.status(200).json({
