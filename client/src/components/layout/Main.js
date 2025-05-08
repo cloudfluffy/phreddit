@@ -101,7 +101,8 @@ export default function Main(props) {
                 commentToInfo={commentToInfo}
                 setDisplay={setDisplay}
                 setClientInfo={setClientInfo}
-                setFlash={setFlash} />}
+                setFlash={setFlash}
+                setDisplayPostID={setDisplayPostID} />}
 
             {display === NEWPOST && <Newpostpageview
                 postToEdit={postToEdit}

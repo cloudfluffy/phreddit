@@ -8,7 +8,7 @@ axios.defaults.withCredentials = true;
 
 export default function Newcommentpageview(props) {
     const { commentToInfo, commentToEdit } = props;
-    const { setDisplay, setClientInfo, setFlash } = props;
+    const { setDisplay, setClientInfo, setFlash, setDisplayPostID } = props;
 
     const [errors, setErrors] = useState([false, false, false, false]);
     const [content, setContent] = useState(commentToEdit ? commentToEdit.content : '');
@@ -43,18 +43,30 @@ export default function Newcommentpageview(props) {
 
         if (!hyperlinkNameEmptyError && !hyperlinkProtocolError && !contentEmptyError && !contentExceedError) {
             try {
-                const { data: { message } } = await axios.post('http://localhost:8000/comments', {
-                    content,
-                    commentToInfo
-                });
+                if (commentToEdit) {
+                    const { data: { message, comment } } = await axios.put(`http://localhost:8000/comments/${commentToEdit._id}/edit`, {
+                        content
+                    });
 
-                const { data: { clientInfo } } = await axios.get('http://localhost:8000/users/info');
+                    setDisplayPostID(comment.postID);
 
-                setClientInfo(clientInfo);
+                    setDisplay(POST);
 
-                setDisplay(POST);
+                    setFlash({ isSuccess: true, message });
+                } else {
+                    const { data: { message } } = await axios.post('http://localhost:8000/comments', {
+                        content,
+                        commentToInfo
+                    });
 
-                setFlash({ isSuccess: true, message });
+                    const { data: { clientInfo } } = await axios.get('http://localhost:8000/users/info');
+
+                    setClientInfo(clientInfo);
+
+                    setDisplay(POST);
+
+                    setFlash({ isSuccess: true, message });
+                }
             } catch (error) {
                 errorFlash(error, setFlash);
             }
@@ -79,7 +91,7 @@ export default function Newcommentpageview(props) {
             {errors[3] && <p className='error'>The content should not exceed 500 characters in length.</p>}
 
             <Button
-                content='Submit Comment' />
+                content={commentToEdit ? 'Edit Comment' : 'Submit Comment'} />
         </form>
     );
 }

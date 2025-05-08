@@ -176,4 +176,56 @@ router.put('/:commentId/downvote', authenticate, async (req, res) => {
     }
 });
 
+router.put('/:commentId/edit', authenticate, async (req, res) => {
+    try {
+        const { user } = req;
+        const { commentId } = req.params;
+        const { content } = req.body;
+
+        const comment = await Comment.findById(commentId);
+
+        if (!comment) {
+            return res.status(400).json({ message: 'Comment does not exist.' });
+        }
+
+        if (!comment.commentedBy.equals(user._id)) {
+            return res.status(403).json({ message: "You're not the creator of the comment." });
+        }
+
+        const hyperlinkRegex = /\[(.*?)\]\((.*?)\)/g;
+        let match;
+
+        if (!content?.trim()) {
+            return res.status(400).json({ message: 'Content, information on what and where the comment is commenting to, and the post ID that the comment is commenting under is required.' });
+        }
+
+        while ((match = hyperlinkRegex.exec(content)) !== null) {
+            if (!match[1].trim() || !match[2].match(/^https?:\/\//)) {
+                return res.status(400).json({ message: 'The hyperlink name is empty or the URL did not start with "https://" or "http://".' });
+            }
+        }
+
+        const contentLength = content.replaceAll(hyperlinkRegex, '$1').replaceAll(/\s*\n\s*/g, '').trim().length;
+
+        if (!contentLength) {
+            return res.status(400).json({ message: 'The content should not be empty.' });
+        }
+
+        if (contentLength > 500) {
+            return res.status(400).json({ message: 'The content should not exceed 500 characters in length.' });
+        }
+
+        const updatedComment = await Comment.findByIdAndUpdate(
+            commentId,
+            { content },
+            { new: true }
+        );
+
+        return res.status(200).json({ message: 'Successfully edited the comment.', comment: updatedComment });
+    } catch (error) {
+        console.error('Error at PUT /comments/:commentId/edit: ', error);
+        return res.status(500).json({ message: 'Internal server error while editing comment.' });
+    }
+});
+
 module.exports = router;
