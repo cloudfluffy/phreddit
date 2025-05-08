@@ -1,4 +1,3 @@
-const ObjectId = require('mongoose').Types.ObjectId;
 const express = require('express');
 
 const Community = require('../models/communities');
