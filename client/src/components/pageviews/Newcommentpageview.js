@@ -7,11 +7,11 @@ import Button from '../parts/Button.js';
 axios.defaults.withCredentials = true;
 
 export default function Newcommentpageview(props) {
-    const { commentToInfo } = props;
+    const { commentToInfo, commentToEdit } = props;
     const { setDisplay, setClientInfo, setFlash } = props;
 
     const [errors, setErrors] = useState([false, false, false, false]);
-    const [content, setContent] = useState('');
+    const [content, setContent] = useState(commentToEdit ? commentToEdit.content : '');
 
     async function handleSubmit(event) {
         event.preventDefault();
@@ -63,7 +63,7 @@ export default function Newcommentpageview(props) {
 
     return (
         <form id='create_form' onSubmit={handleSubmit}>
-            <h2 id='create_form_title'>Create Comment</h2>
+            <h2 id='create_form_title'>{commentToEdit ? 'Edit Comment' : 'Create Comment'}</h2>
 
             <label htmlFor='content'>Content*</label>
             <textarea

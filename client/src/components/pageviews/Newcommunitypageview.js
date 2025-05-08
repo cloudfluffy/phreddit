@@ -7,11 +7,12 @@ import Button from '../parts/Button.js';
 axios.defaults.withCredentials = true;
 
 export default function Newcommunitypageview(props) {
+    const { communityToEdit } = props;
     const { setDisplay, setClientInfo, setDisplayCommunity, setFlash } = props;
 
     const [errors, setErrors] = useState([false, false, false, false, false, false]);
-    const [name, setName] = useState('');
-    const [description, setDescription] = useState('');
+    const [name, setName] = useState(communityToEdit ? communityToEdit.name : '');
+    const [description, setDescription] = useState(communityToEdit ? communityToEdit.description : '');
 
     async function handleSubmit(event) {
         event.preventDefault();
@@ -72,7 +73,7 @@ export default function Newcommunitypageview(props) {
 
     return (
         <form id='create_form' onSubmit={handleSubmit}>
-            <h2 id='create_form_title'>Create Community</h2>
+            <h2 id='create_form_title'>{communityToEdit ? 'Edit Community' : 'Create Community'}</h2>
 
             <label htmlFor='name'>Community Name*</label>
             <input

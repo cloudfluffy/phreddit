@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { COMMUNITY, HOME, LOGIN, NEWCOMMENT, NEWCOMMUNITY, NEWPOST, NEWUSER, POST, SEARCHRESULTS, USERPROFILE, WELCOME } from '../../display.js';
 import '../../stylesheets/layout/Main.css';
 import Communitypageview from '../pageviews/Communitypageview.js';
@@ -19,6 +19,24 @@ export default function Main(props) {
 
     const [displayPostID, setDisplayPostID] = useState(null);
     const [commentToInfo, setCommentToInfo] = useState(null);
+
+    const [communityToEdit, setCommunityToEdit] = useState(null);
+    const [postToEdit, setPostToEdit] = useState(null);
+    const [commentToEdit, setCommentToEdit] = useState(null);
+
+    useEffect(() => {
+        if (display !== NEWCOMMUNITY) {
+            setCommunityToEdit(null);
+        }
+
+        if (display !== NEWPOST) {
+            setPostToEdit(null);
+        }
+
+        if (display !== NEWCOMMENT) {
+            setCommentToEdit(null);
+        }
+    }, [display])
 
     return (
         <div className='Main'>
@@ -72,18 +90,21 @@ export default function Main(props) {
                 setFlash={setFlash} />}
 
             {display === NEWCOMMUNITY && <Newcommunitypageview
+                communityToEdit={communityToEdit}
                 setDisplay={setDisplay}
                 setClientInfo={setClientInfo}
                 setDisplayCommunity={setDisplayCommunity}
                 setFlash={setFlash} />}
 
             {display === NEWCOMMENT && <Newcommentpageview
+                commentToEdit={commentToEdit}
                 commentToInfo={commentToInfo}
                 setDisplay={setDisplay}
                 setClientInfo={setClientInfo}
                 setFlash={setFlash} />}
 
             {display === NEWPOST && <Newpostpageview
+                postToEdit={postToEdit}
                 setDisplay={setDisplay}
                 setClientInfo={setClientInfo}
                 setFlash={setFlash} />}
@@ -104,8 +125,12 @@ export default function Main(props) {
 
             {display === USERPROFILE && <Userprofilepageview
                 clientInfo={clientInfo}
+                setDisplay={setDisplay}
                 setClientInfo={setClientInfo}
-                setFlash={setFlash} />}
+                setFlash={setFlash}
+                setCommunityToEdit={setCommunityToEdit}
+                setPostToEdit={setPostToEdit}
+                setCommentToEdit={setCommentToEdit} />}
         </div>
     );
 }

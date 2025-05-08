@@ -1,12 +1,13 @@
 import axios from 'axios';
 import { useEffect, useState } from 'react';
+import { NEWCOMMENT, NEWCOMMUNITY, NEWPOST } from '../../display.js';
 import '../../stylesheets/parts/Listitem.css';
-import errorFlash from '../../util/errorFlash';
-import Content from './Content';
+import errorFlash from '../../util/errorFlash.js';
+import Content from './Content.js';
 
 export default function Listitem(props) {
     const { communityID, postID, commentID } = props;
-    const { setFlash } = props;
+    const { setDisplay, setFlash, setCommunityToEdit, setPostToEdit, setCommentToEdit } = props;
 
     const [community, setCommunity] = useState(null);
     const [post, setPost] = useState(null);
@@ -42,7 +43,23 @@ export default function Listitem(props) {
     return (
         <div
             className='Listitem'
-            tabIndex='0'>
+            tabIndex='0'
+            onClick={() => {
+                if (communityID) {
+                    setCommunityToEdit(community);
+                    setDisplay(NEWCOMMUNITY);
+                }
+
+                if (postID) {
+                    setPostToEdit(post)
+                    setDisplay(NEWPOST);
+                }
+
+                if (commentID) {
+                    setCommentToEdit(comment);
+                    setDisplay(NEWCOMMENT);
+                }
+            }}>
             {community && <>
                 <h3>{community.name}</h3>
             </>}

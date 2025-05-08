@@ -7,7 +7,7 @@ import Listitem from '../parts/Listitem.js';
 
 export default function Userprofilepageview(props) {
     const { clientInfo } = props;
-    const { setClientInfo, setFlash } = props;
+    const { setDisplay, setClientInfo, setFlash, setCommunityToEdit, setPostToEdit, setCommentToEdit } = props;
 
     const [listing, setListing] = useState(POSTS);
 
@@ -35,17 +35,23 @@ export default function Userprofilepageview(props) {
             {listing === COMMUNITIES && clientInfo.communityIDs.map(communityID => <Listitem
                 key={communityID}
                 communityID={communityID}
-                setFlash={setFlash} />)}
+                setDisplay={setDisplay}
+                setFlash={setFlash}
+                setCommunityToEdit={setCommunityToEdit} />)}
 
             {listing === POSTS && clientInfo.postIDs.map(postID => <Listitem
                 key={postID}
                 postID={postID}
-                setFlash={setFlash} />)}
+                setDisplay={setDisplay}
+                setFlash={setFlash}
+                setPostToEdit={setPostToEdit} />)}
 
             {listing === COMMENTS && clientInfo.commentIDs.map(commentID => <Listitem
                 key={commentID}
                 commentID={commentID}
-                setFlash={setFlash} />)}
+                setDisplay={setDisplay}
+                setFlash={setFlash}
+                setCommentToEdit={setCommentToEdit} />)}
         </>
     );
 }

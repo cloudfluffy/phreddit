@@ -7,14 +7,15 @@ import Button from '../parts/Button.js';
 axios.defaults.withCredentials = true;
 
 export default function Newpostpageview(props) {
+    const { postToEdit } = props;
     const { setDisplay, setClientInfo, setFlash } = props;
 
     const [errors, setErrors] = useState([false, false, false, false, false, false, false, false]);
-    const [communityID, setCommunityID] = useState('');
-    const [title, setTitle] = useState('');
-    const [existingLinkFlair, setExistingLinkFlair] = useState('');
+    const [communityID, setCommunityID] = useState(postToEdit ? postToEdit.communityID._id : '');
+    const [title, setTitle] = useState(postToEdit ? postToEdit.title : '');
+    const [existingLinkFlair, setExistingLinkFlair] = useState(postToEdit ? postToEdit?.linkFlairID?._id : '');
     const [newLinkFlair, setNewLinkFlair] = useState('');
-    const [content, setContent] = useState('');
+    const [content, setContent] = useState(postToEdit ? postToEdit.content : '');
 
     const [linkflairs, setLinkflairs] = useState([]);
     const [communities, setCommunities] = useState([]);
@@ -110,7 +111,7 @@ export default function Newpostpageview(props) {
         <>
             {!isLoading &&
                 <form id='create_form' onSubmit={handleSubmit}>
-                    <h2 id='create_form_title'>Create Post</h2>
+                    <h2 id='create_form_title'>{postToEdit ? 'Edit Post' : 'Create Post'}</h2>
 
                     <label htmlFor='communityID'>Community*</label>
                     <select

@@ -1,6 +1,6 @@
 import axios from 'axios';
 import '../../stylesheets/parts/Votebuttons.css';
-import errorFlash from '../../util/errorFlash';
+import errorFlash from '../../util/errorFlash.js';
 
 axios.defaults.withCredentials = true;
 
