@@ -15,7 +15,7 @@ axios.defaults.withCredentials = true;
 
 export default function Postpageview(props) {
     const { displayPostID, clientInfo } = props;
-    const { setDisplay, setClientInfo, setCommentToID, setFlash } = props;
+    const { setDisplay, setClientInfo, setCommentToInfo, setFlash } = props;
 
     const [post, setPost] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -57,9 +57,10 @@ export default function Postpageview(props) {
                 comment={commentID}
                 depth={depth}
                 clientInfo={clientInfo}
+                displayPostID={displayPostID}
                 setDisplay={setDisplay}
                 setClientInfo={setClientInfo}
-                setCommentToID={setCommentToID}
+                setCommentToInfo={setCommentToInfo}
                 setFlash={setFlash} />);
             renderComments(commentID.commentIDs, depth + 1, comments);
         }
@@ -89,9 +90,10 @@ export default function Postpageview(props) {
                             type='small'
                             content='Add a Comment'
                             onClick={() => {
-                                setCommentToID({
+                                setCommentToInfo({
                                     _id: post?._id,
-                                    isPost: true
+                                    isPost: true,
+                                    postID: displayPostID
                                 });
 
                                 setDisplay(NEWCOMMENT);

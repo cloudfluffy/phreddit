@@ -7,7 +7,7 @@ import Button from '../parts/Button.js';
 axios.defaults.withCredentials = true;
 
 export default function Newcommentpageview(props) {
-    const { commentToID } = props;
+    const { commentToInfo } = props;
     const { setDisplay, setClientInfo, setFlash } = props;
 
     const [errors, setErrors] = useState([false, false, false, false]);
@@ -45,7 +45,7 @@ export default function Newcommentpageview(props) {
             try {
                 const { data: { message } } = await axios.post('http://localhost:8000/comments', {
                     content,
-                    commentToID
+                    commentToInfo
                 });
 
                 const { data: { clientInfo } } = await axios.get('http://localhost:8000/users/info');

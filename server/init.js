@@ -192,6 +192,7 @@ async function main() {
         console.log(`\tcontent: ${comment.content}`);
         console.log(`\tcommentedDate: ${comment.commentedDate}`);
         console.log(`\tvoteCount: ${comment.voteCount}`);
+        console.log(`\tpostID: ${comment.postID}`);
         console.log(`\tcommentedBy: ${comment.commentedBy}`);
         console.log(`\tcommentIDs: [${comment.commentIDs}]\n`);
     }
@@ -298,7 +299,7 @@ async function createPost(post) {
         }
 
         if (post.commentIDs) {
-            newPost.commentIDs = await Promise.all(post.commentIDs.map(commentID => createComment(commentID)));
+            newPost.commentIDs = await Promise.all(post.commentIDs.map(commentID => createComment({ ...commentID, postID: newPost })));
         }
 
         const savedPost = await newPost.save();
@@ -316,11 +317,12 @@ async function createComment(comment) {
         const newComment = new Comment({
             content: comment.content,
             commentedDate: new Date(comment.commentedDate),
+            postID: comment.postID,
             commentedBy: comment.commentedBy
         });
 
         if (comment.commentIDs) {
-            newComment.commentIDs = await Promise.all(comment.commentIDs.map(commentID => createComment(commentID)));
+            newComment.commentIDs = await Promise.all(comment.commentIDs.map(commentID => createComment({ ...commentID, postID: comment.postID })));
         }
 
         const savedComment = await newComment.save();

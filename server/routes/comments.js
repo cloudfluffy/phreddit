@@ -11,12 +11,12 @@ const router = express.Router();
 router.post('/', authenticate, async (req, res) => {
     try {
         const { user } = req;
-        const { content, commentToID } = req.body;
+        const { content, commentToInfo } = req.body;
         const hyperlinkRegex = /\[(.*?)\]\((.*?)\)/g;
         let match;
 
-        if (!content?.trim() || !commentToID) {
-            return res.status(400).json({ message: 'Content and information on what and where the comment is commenting to is required.' });
+        if (!content?.trim() || !commentToInfo) {
+            return res.status(400).json({ message: 'Content, information on what and where the comment is commenting to, and the post ID that the comment is commenting under is required.' });
         }
 
         while ((match = hyperlinkRegex.exec(content)) !== null) {
@@ -37,19 +37,20 @@ router.post('/', authenticate, async (req, res) => {
 
         const comment = new Comment({
             content,
+            postID: commentToInfo.postID,
             commentedBy: user._id
         });
 
         const savedComment = await comment.save();
 
-        if (commentToID.isPost) {
+        if (commentToInfo.isPost) {
             await Promise.all([
-                Post.findOneAndUpdate({ _id: commentToID._id }, { $push: { commentIDs: savedComment._id } }),
+                Post.findOneAndUpdate({ _id: commentToInfo._id }, { $push: { commentIDs: savedComment._id } }),
                 User.updateOne({ _id: user._id }, { $push: { commentIDs: savedComment._id } })
             ]);
         } else {
             await Promise.all([
-                Comment.findOneAndUpdate({ _id: commentToID._id }, { $push: { commentIDs: savedComment._id } }),
+                Comment.findOneAndUpdate({ _id: commentToInfo._id }, { $push: { commentIDs: savedComment._id } }),
                 User.updateOne({ _id: user._id }, { $push: { commentIDs: savedComment._id } })
             ])
         }
@@ -58,6 +59,26 @@ router.post('/', authenticate, async (req, res) => {
     } catch (error) {
         console.error('Error at POST /comments: ', error);
         return res.status(500).json({ message: 'Internal server error while creating comment.' });
+    }
+});
+
+router.get('/:commentId', async (req, res) => {
+    try {
+        const { commentId } = req.params;
+
+        const comment = await Comment.findById(commentId).populate({
+            path: 'postID',
+            select: 'title'
+        });
+
+        if (!comment) {
+            return res.status(400).json({ message: 'Comment does not exist.' });
+        }
+
+        return res.status(200).json({ comment });
+    } catch (error) {
+        console.error('Error at GET /comments/:commentId: ', error);
+        return res.status(500).json({ message: 'Internal server error while retrieving comment.' });
     }
 });
 
