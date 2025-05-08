@@ -296,8 +296,11 @@ async function retrievePostsOfCommunity(req, res, sort) {
 }
 
 async function deleteComment(comment) {
-    await Comment.deleteOne({ _id: comment._id });
-    await User.updateOne({ _id: comment.commentedBy }, { $pull: { commentIDs: comment._id } });
+    await Promise.all([
+        Comment.deleteOne({ _id: comment._id }),
+        User.updateOne({ _id: comment.commentedBy }, { $pull: { commentIDs: comment._id, upvotedCommentIDs: comment._id, downvotedCommentIDs: comment._id } }),
+        Post.updateOne({ _id: comment.postID }, { $pull: { commentIDs: comment._id } })
+    ]);
 }
 
 async function getAllNestedComments(comment) {
