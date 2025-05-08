@@ -9,6 +9,7 @@ export default function Userprofilepageview(props) {
     const { clientInfo } = props;
     const { setDisplay, setClientInfo, setFlash, setCommunityToEdit, setPostToEdit, setCommentToEdit } = props;
 
+    const [communities, setCommunities] = useState([]);
     const [listing, setListing] = useState(POSTS);
 
     useEffect(() => {
@@ -17,11 +18,20 @@ export default function Userprofilepageview(props) {
                 const { data: { clientInfo } } = await axios.get('http://localhost:8000/users/info');
 
                 setClientInfo(clientInfo);
+
+                if (listing === COMMUNITIES) {
+                    let { data: { communities } } = await axios.get('http://localhost:8000/communities');
+
+                    communities = communities.filter(community => community.owner._id === clientInfo._id);
+
+                    setCommunities(communities);
+                }
             } catch (error) {
+                console.log(error);
                 errorFlash(error, setFlash);
             }
         })();
-    }, [clientInfo, listing])
+    }, [listing])
 
     return (
         <>
@@ -32,9 +42,9 @@ export default function Userprofilepageview(props) {
                 listing={listing}
                 setListing={setListing} />
 
-            {listing === COMMUNITIES && clientInfo.communityIDs.map(communityID => <Listitem
-                key={communityID}
-                communityID={communityID}
+            {listing === COMMUNITIES && communities.map(community => <Listitem
+                key={community._id}
+                communityID={community._id}
                 setDisplay={setDisplay}
                 setClientInfo={setClientInfo}
                 setFlash={setFlash}
