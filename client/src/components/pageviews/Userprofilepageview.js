@@ -21,7 +21,7 @@ export default function Userprofilepageview(props) {
                 errorFlash(error, setFlash);
             }
         })();
-    }, [listing])
+    }, [clientInfo, listing])
 
     return (
         <>
@@ -36,6 +36,7 @@ export default function Userprofilepageview(props) {
                 key={communityID}
                 communityID={communityID}
                 setDisplay={setDisplay}
+                setClientInfo={setClientInfo}
                 setFlash={setFlash}
                 setCommunityToEdit={setCommunityToEdit} />)}
 
@@ -43,6 +44,7 @@ export default function Userprofilepageview(props) {
                 key={postID}
                 postID={postID}
                 setDisplay={setDisplay}
+                setClientInfo={setClientInfo}
                 setFlash={setFlash}
                 setPostToEdit={setPostToEdit} />)}
 
@@ -50,6 +52,7 @@ export default function Userprofilepageview(props) {
                 key={commentID}
                 commentID={commentID}
                 setDisplay={setDisplay}
+                setClientInfo={setClientInfo}
                 setFlash={setFlash}
                 setCommentToEdit={setCommentToEdit} />)}
         </>

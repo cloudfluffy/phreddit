@@ -1,4 +1,6 @@
 .Listitem {
+    display: flex;
+    justify-content: space-between;
     padding: 4px 16px;
     border-bottom: 1px dotted var(--black);
     border-radius: 16px;
