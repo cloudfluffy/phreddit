@@ -1,0 +1,25 @@
+.Listitem {
+    padding: 4px 16px;
+    border-bottom: 1px dotted var(--black);
+    border-radius: 16px;
+    margin: 12px 0px;
+}
+
+.Listitem:hover,
+.Listitem:focus-visible {
+    background-color: var(--off_white);
+    outline: none;
+    cursor: pointer;
+}
+
+.Listitem>* {
+    margin: 5px 0px;
+}
+
+.Listitem h3 {
+    font-size: 18px;
+}
+
+.Listitem p {
+    font-size: 12px;
+}

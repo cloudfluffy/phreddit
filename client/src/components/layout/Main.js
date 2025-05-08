@@ -18,7 +18,7 @@ export default function Main(props) {
     const { setDisplay, setDisplayPosts, setDisplayPostsFromJoinedCommunities, setDisplayPostsFromOtherCommunities, setDisplayCommunity, setClientInfo, setFlash } = props;
 
     const [displayPostID, setDisplayPostID] = useState(null);
-    const [commentToID, setCommentToID] = useState(null);
+    const [commentToInfo, setCommentToInfo] = useState(null);
 
     return (
         <div className='Main'>
@@ -68,7 +68,7 @@ export default function Main(props) {
                 clientInfo={clientInfo}
                 setDisplay={setDisplay}
                 setClientInfo={setClientInfo}
-                setCommentToID={setCommentToID}
+                setCommentToInfo={setCommentToInfo}
                 setFlash={setFlash} />}
 
             {display === NEWCOMMUNITY && <Newcommunitypageview
@@ -78,7 +78,7 @@ export default function Main(props) {
                 setFlash={setFlash} />}
 
             {display === NEWCOMMENT && <Newcommentpageview
-                commentToID={commentToID}
+                commentToInfo={commentToInfo}
                 setDisplay={setDisplay}
                 setClientInfo={setClientInfo}
                 setFlash={setFlash} />}
@@ -103,7 +103,8 @@ export default function Main(props) {
                 setFlash={setFlash} />}
 
             {display === USERPROFILE && <Userprofilepageview
-                setDisplay={setDisplay} />}
+                clientInfo={clientInfo}
+                setFlash={setFlash} />}
         </div>
     );
 }

@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { COMMUNITY, HOME, SEARCHRESULTS } from '../../display.js';
+import { COMMENTS, COMMUNITIES, POSTS } from '../../listing.js';
 import '../../stylesheets/parts/Header.css';
 import errorFlash from '../../util/errorFlash.js';
 import getTimestamp from '../../util/getTimestamp.js';
@@ -9,9 +10,9 @@ import Content from './Content.js';
 axios.defaults.withCredentials = true;
 
 export default function Header(props) {
-    const { title } = props;
+    const { title, isUserProfile } = props;
     const { display, displayPosts, clientInfo, displayCommunity, query } = props;
-    const { setDisplayPosts, setDisplayPostsFromJoinedCommunities, setDisplayPostsFromOtherCommunities, setDisplayCommunity, setClientInfo, setFlash } = props;
+    const { setDisplayPosts, setDisplayPostsFromJoinedCommunities, setDisplayPostsFromOtherCommunities, setDisplayCommunity, setClientInfo, setFlash, setListing } = props;
 
     return (
         <>
@@ -19,74 +20,76 @@ export default function Header(props) {
                 <div className='top_line'>
                     <h2 className='title'>{title}</h2>
                     <div className='buttons'>
-                        <Button
-                            content='Newest'
-                            onClick={async () => {
-                                try {
-                                    if (display === HOME) {
-                                        const { data: { posts, postsFromJoinedCommunities, postsFromOtherCommunities } } = await axios.get('http://localhost:8000/posts/newest');
-                                        setDisplayPosts(posts);
-                                        setDisplayPostsFromJoinedCommunities(postsFromJoinedCommunities);
-                                        setDisplayPostsFromOtherCommunities(postsFromOtherCommunities);
-                                    } else if (display === COMMUNITY) {
-                                        const { data: { posts } } = await axios.get(`http://localhost:8000/communities/${displayCommunity._id}/posts/newest`);
-                                        setDisplayPosts(posts);
-                                    } else if (display === SEARCHRESULTS) {
-                                        const { data: { posts, postsFromJoinedCommunities, postsFromOtherCommunities } } = await axios.get(`http://localhost:8000/posts/search/${query}/newest`);
-                                        setDisplayPosts(posts);
-                                        setDisplayPostsFromJoinedCommunities(postsFromJoinedCommunities);
-                                        setDisplayPostsFromOtherCommunities(postsFromOtherCommunities);
+                        {!isUserProfile && <>
+                            <Button
+                                content='Newest'
+                                onClick={async () => {
+                                    try {
+                                        if (display === HOME) {
+                                            const { data: { posts, postsFromJoinedCommunities, postsFromOtherCommunities } } = await axios.get('http://localhost:8000/posts/newest');
+                                            setDisplayPosts(posts);
+                                            setDisplayPostsFromJoinedCommunities(postsFromJoinedCommunities);
+                                            setDisplayPostsFromOtherCommunities(postsFromOtherCommunities);
+                                        } else if (display === COMMUNITY) {
+                                            const { data: { posts } } = await axios.get(`http://localhost:8000/communities/${displayCommunity._id}/posts/newest`);
+                                            setDisplayPosts(posts);
+                                        } else if (display === SEARCHRESULTS) {
+                                            const { data: { posts, postsFromJoinedCommunities, postsFromOtherCommunities } } = await axios.get(`http://localhost:8000/posts/search/${query}/newest`);
+                                            setDisplayPosts(posts);
+                                            setDisplayPostsFromJoinedCommunities(postsFromJoinedCommunities);
+                                            setDisplayPostsFromOtherCommunities(postsFromOtherCommunities);
+                                        }
+                                    } catch (error) {
+                                        errorFlash(error, setFlash);
                                     }
-                                } catch (error) {
-                                    errorFlash(error, setFlash);
-                                }
-                            }} />
+                                }} />
 
-                        <Button
-                            content='Oldest'
-                            onClick={async () => {
-                                try {
-                                    if (display === HOME) {
-                                        const { data: { posts, postsFromJoinedCommunities, postsFromOtherCommunities } } = await axios.get('http://localhost:8000/posts/oldest');
-                                        setDisplayPosts(posts);
-                                        setDisplayPostsFromJoinedCommunities(postsFromJoinedCommunities);
-                                        setDisplayPostsFromOtherCommunities(postsFromOtherCommunities);
-                                    } else if (display === COMMUNITY) {
-                                        const { data: { posts } } = await axios.get(`http://localhost:8000/communities/${displayCommunity._id}/posts/oldest`);
-                                        setDisplayPosts(posts);
-                                    } else if (display === SEARCHRESULTS) {
-                                        const { data: { posts, postsFromJoinedCommunities, postsFromOtherCommunities } } = await axios.get(`http://localhost:8000/posts/search/${query}/oldest`);
-                                        setDisplayPosts(posts);
-                                        setDisplayPostsFromJoinedCommunities(postsFromJoinedCommunities);
-                                        setDisplayPostsFromOtherCommunities(postsFromOtherCommunities);
+                            <Button
+                                content='Oldest'
+                                onClick={async () => {
+                                    try {
+                                        if (display === HOME) {
+                                            const { data: { posts, postsFromJoinedCommunities, postsFromOtherCommunities } } = await axios.get('http://localhost:8000/posts/oldest');
+                                            setDisplayPosts(posts);
+                                            setDisplayPostsFromJoinedCommunities(postsFromJoinedCommunities);
+                                            setDisplayPostsFromOtherCommunities(postsFromOtherCommunities);
+                                        } else if (display === COMMUNITY) {
+                                            const { data: { posts } } = await axios.get(`http://localhost:8000/communities/${displayCommunity._id}/posts/oldest`);
+                                            setDisplayPosts(posts);
+                                        } else if (display === SEARCHRESULTS) {
+                                            const { data: { posts, postsFromJoinedCommunities, postsFromOtherCommunities } } = await axios.get(`http://localhost:8000/posts/search/${query}/oldest`);
+                                            setDisplayPosts(posts);
+                                            setDisplayPostsFromJoinedCommunities(postsFromJoinedCommunities);
+                                            setDisplayPostsFromOtherCommunities(postsFromOtherCommunities);
+                                        }
+                                    } catch (error) {
+                                        errorFlash(error, setFlash);
                                     }
-                                } catch (error) {
-                                    errorFlash(error, setFlash);
-                                }
-                            }} />
+                                }} />
 
-                        <Button
-                            content='Active'
-                            onClick={async () => {
-                                try {
-                                    if (display === HOME) {
-                                        const { data: { posts, postsFromJoinedCommunities, postsFromOtherCommunities } } = await axios.get('http://localhost:8000/posts/active');
-                                        setDisplayPosts(posts);
-                                        setDisplayPostsFromJoinedCommunities(postsFromJoinedCommunities);
-                                        setDisplayPostsFromOtherCommunities(postsFromOtherCommunities);
-                                    } else if (display === COMMUNITY) {
-                                        const { data: { posts } } = await axios.get(`http://localhost:8000/communities/${displayCommunity._id}/posts/active`);
-                                        setDisplayPosts(posts);
-                                    } else if (display === SEARCHRESULTS) {
-                                        const { data: { posts, postsFromJoinedCommunities, postsFromOtherCommunities } } = await axios.get(`http://localhost:8000/posts/search/${query}/active`);
-                                        setDisplayPosts(posts);
-                                        setDisplayPostsFromJoinedCommunities(postsFromJoinedCommunities);
-                                        setDisplayPostsFromOtherCommunities(postsFromOtherCommunities);
+                            <Button
+                                content='Active'
+                                onClick={async () => {
+                                    try {
+                                        if (display === HOME) {
+                                            const { data: { posts, postsFromJoinedCommunities, postsFromOtherCommunities } } = await axios.get('http://localhost:8000/posts/active');
+                                            setDisplayPosts(posts);
+                                            setDisplayPostsFromJoinedCommunities(postsFromJoinedCommunities);
+                                            setDisplayPostsFromOtherCommunities(postsFromOtherCommunities);
+                                        } else if (display === COMMUNITY) {
+                                            const { data: { posts } } = await axios.get(`http://localhost:8000/communities/${displayCommunity._id}/posts/active`);
+                                            setDisplayPosts(posts);
+                                        } else if (display === SEARCHRESULTS) {
+                                            const { data: { posts, postsFromJoinedCommunities, postsFromOtherCommunities } } = await axios.get(`http://localhost:8000/posts/search/${query}/active`);
+                                            setDisplayPosts(posts);
+                                            setDisplayPostsFromJoinedCommunities(postsFromJoinedCommunities);
+                                            setDisplayPostsFromOtherCommunities(postsFromOtherCommunities);
+                                        }
+                                    } catch (error) {
+                                        errorFlash(error, setFlash);
                                     }
-                                } catch (error) {
-                                    errorFlash(error, setFlash);
-                                }
-                            }} />
+                                }} />
+                        </>}
 
                         {displayCommunity && clientInfo &&
                             (clientInfo.communityIDs.includes(displayCommunity._id) ?
@@ -132,11 +135,32 @@ export default function Header(props) {
                                         }
                                     }}
                                 />)}
+
+                        {isUserProfile && <>
+                            <Button
+                                content='Communities'
+                                onClick={() => setListing(COMMUNITIES)} />
+
+                            <Button
+                                content='Posts'
+                                onClick={() => setListing(POSTS)} />
+
+                            <Button
+                                content='Comments'
+                                onClick={() => setListing(COMMENTS)} />
+                        </>}
                     </div>
                 </div>
                 {displayCommunity && <Content content={displayCommunity.description} />}
                 {displayCommunity && <p>Created {getTimestamp(displayCommunity.startDate)} by {displayCommunity.owner.displayName}</p>}
-                <p>{displayPosts?.length} Post(s) {displayCommunity && `${displayCommunity.memberCount} Member(s)`}</p>
+                {!isUserProfile && <p>{displayPosts?.length} Post(s) {displayCommunity && `${displayCommunity.memberCount} Member(s)`}</p>}
+
+                {isUserProfile && <>
+                    <p>Display Name: {clientInfo.displayName}</p>
+                    <p>Email: {clientInfo.email}</p>
+                    <p>Member since: {getTimestamp(clientInfo.memberSince)}</p>
+                    <p>Reputation: {clientInfo.reputation}</p>
+                </>}
             </div>
             <hr />
         </>

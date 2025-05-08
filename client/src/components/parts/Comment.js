@@ -7,8 +7,8 @@ import Votebuttons from '../parts/Votebuttons.js';
 
 export default function Comment(props) {
     const { comment, depth } = props;
-    const { clientInfo } = props;
-    const { setDisplay, setClientInfo, setCommentToID, setFlash } = props;
+    const { clientInfo, displayPostID } = props;
+    const { setDisplay, setClientInfo, setCommentToInfo, setFlash } = props;
 
     return (
         <div className='Comment' style={{ marginLeft: `${depth * 35}px` }}>
@@ -26,9 +26,10 @@ export default function Comment(props) {
                     type='small'
                     content='Reply'
                     onClick={() => {
-                        setCommentToID({
+                        setCommentToInfo({
                             _id: comment?._id,
-                            isPost: false
+                            isPost: false,
+                            postID: displayPostID
                         });
 
                         setDisplay(NEWCOMMENT);
