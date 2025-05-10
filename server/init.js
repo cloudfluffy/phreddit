@@ -33,7 +33,6 @@ if (!emailRegex.test(args[1])) {
 main();
 
 async function main() {
-    // mongodb://127.0.0.1:27017/phreddit
     try {
         await mongoose.connect(args[0]);
         console.log('MongoDB connected.\n');

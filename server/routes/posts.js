@@ -248,7 +248,7 @@ router.put('/:postId/edit', authenticate, async (req, res) => {
             return res.status(400).json({ message: 'Post does not exist.' });
         }
 
-        if (!post.postedBy.equals(user._id)) {
+        if (!post.postedBy.equals(user._id) && !user.isAdmin) {
             return res.status(403).json({ message: "You're not the creator of the post." });
         }
 
@@ -314,7 +314,7 @@ router.delete('/:postId', authenticate, async (req, res) => {
             return res.status(400).json({ message: 'Post does not exist.' });
         }
 
-        if (!post.postedBy.equals(user._id)) {
+        if (!post.postedBy.equals(user._id) && !user.isAdmin) {
             return res.status(403).json({ message: "You're not the creator of the post." });
         }
 

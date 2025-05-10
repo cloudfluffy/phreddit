@@ -218,8 +218,8 @@ async function retrievePosts(req, res, sort) {
         path: 'linkFlairID'
     }]);
 
-    await Promise.all([...posts.map(post => populateCommentIDs(post))]);
-    await Promise.all([...posts.flatMap(post => post.commentIDs.map(commentID => populateUserDisplayNameForComment(commentID)))]);
+    await Promise.all(posts.map(post => populateCommentIDs(post)));
+    await Promise.all(posts.flatMap(post => post.commentIDs.map(commentID => populateUserDisplayNameForComment(commentID))));
 
     posts = await sort(posts);
 
@@ -254,8 +254,8 @@ async function retrieveQueryPosts(req, res, sort) {
     }]);
     posts = await searchPosts(query, posts);
 
-    await Promise.all([...posts.map(post => populateCommentIDs(post))]);
-    await Promise.all([...posts.flatMap(post => post.commentIDs.map(commentID => populateUserDisplayNameForComment(commentID)))]);
+    await Promise.all(posts.map(post => populateCommentIDs(post)));
+    await Promise.all(posts.flatMap(post => post.commentIDs.map(commentID => populateUserDisplayNameForComment(commentID))));
 
     posts = await sort(posts);
 
@@ -287,8 +287,8 @@ async function retrievePostsOfCommunity(req, res, sort) {
         path: 'linkFlairID'
     }]);
 
-    await Promise.all([...posts.map(post => populateCommentIDs(post))]);
-    await Promise.all([...posts.flatMap(post => post.commentIDs.map(commentID => populateUserDisplayNameForComment(commentID)))]);
+    await Promise.all(posts.map(post => populateCommentIDs(post)));
+    await Promise.all(posts.flatMap(post => post.commentIDs.map(commentID => populateUserDisplayNameForComment(commentID))));
 
     posts = await sort(posts);
 
@@ -342,10 +342,29 @@ async function deleteCommunityAndItsPosts(community) {
 
     await Promise.all([
         Community.deleteOne({ _id: community._id }),
-        User.updateOne({ _id: community.owner }, { $pull: { communityIDs: community._id } }),
         User.updateMany({ communityIDs: community._id }, { $pull: { communityIDs: community._id } }),
         ...community.postIDs.map(postID => deletePostAndItsComments(postID))
     ]);
+}
+
+async function deleteUser(user) {
+    let communities = await Community.find({});
+
+    await Promise.all(communities.map(community => Community.updateOne({ _id: community._id }, { $pull: { members: user._id } })));
+
+    communities = communities.filter(community => community.owner.equals(user._id));
+
+    await Promise.all(communities.map(community => deleteCommunityAndItsPosts(community)));
+
+    user = await User.findById(user._id).populate('postIDs');
+
+    await Promise.all(user.postIDs.map(postID => deletePostAndItsComments(postID)));
+
+    user = await User.findById(user._id).populate('commentIDs');
+
+    await Promise.all(user.commentIDs.map(commentID => deleteCommentAndItsReplies(commentID)));
+
+    await User.deleteOne({ _id: user._id });
 }
 
 module.exports = {
@@ -362,5 +381,6 @@ module.exports = {
     retrievePostsOfCommunity,
     deleteCommentAndItsReplies,
     deletePostAndItsComments,
-    deleteCommunityAndItsPosts
+    deleteCommunityAndItsPosts,
+    deleteUser
 };

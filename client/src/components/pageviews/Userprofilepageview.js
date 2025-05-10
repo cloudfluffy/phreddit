@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { useEffect, useState } from 'react';
-import { COMMENTS, COMMUNITIES, POSTS } from '../../listing.js';
+import { COMMENTS, COMMUNITIES, POSTS, USERS } from '../../listing.js';
 import errorFlash from '../../util/errorFlash.js';
 import Header from '../parts/Header.js';
 import Listitem from '../parts/Listitem.js';
@@ -9,29 +9,42 @@ export default function Userprofilepageview(props) {
     const { clientInfo } = props;
     const { setDisplay, setClientInfo, setFlash, setCommunityToEdit, setPostToEdit, setCommentToEdit } = props;
 
+    const [displayUser, setDisplayUser] = useState(clientInfo);
+    const [users, setUsers] = useState([]);
     const [communities, setCommunities] = useState([]);
-    const [listing, setListing] = useState(POSTS);
+    const [listing, setListing] = useState(clientInfo.isAdmin ? USERS : POSTS);
+
+    const [refresh, setRefresh] = useState({});
 
     useEffect(() => {
         (async () => {
             try {
-                const { data: { clientInfo } } = await axios.get('http://localhost:8000/users/info');
+                const { data: { user } } = await axios.get(`http://localhost:8000/users/${displayUser._id}`);
 
-                setClientInfo(clientInfo);
+                setDisplayUser(user);
+
+                if (clientInfo._id === user._id) {
+                    setClientInfo(user);
+                }
 
                 if (listing === COMMUNITIES) {
                     let { data: { communities } } = await axios.get('http://localhost:8000/communities');
 
-                    communities = communities.filter(community => community.owner._id === clientInfo._id);
+                    communities = communities.filter(community => community.owner._id === displayUser._id);
 
                     setCommunities(communities);
                 }
+
+                if (listing === USERS) {
+                    let { data: { users } } = await axios.get('http://localhost:8000/users');
+
+                    setUsers(users);
+                }
             } catch (error) {
-                console.log(error);
                 errorFlash(error, setFlash);
             }
         })();
-    }, [listing])
+    }, [listing, refresh])
 
     return (
         <>
@@ -39,32 +52,59 @@ export default function Userprofilepageview(props) {
                 title='User Profile'
                 isUserProfile={true}
                 clientInfo={clientInfo}
+                displayUser={displayUser}
                 listing={listing}
+                setDisplayUser={setDisplayUser}
                 setListing={setListing} />
 
-            {listing === COMMUNITIES && (communities.length === 0 ? <p>You don't have any communities.</p> : communities.map(community => <Listitem
+            {listing === USERS && (users.length === 0 ? <p>There are no registered users.</p> : users.map(user => <Listitem
+                key={user._id}
+                userID={user._id}
+                clientInfo={clientInfo}
+                displayUser={displayUser}
+                setDisplay={setDisplay}
+                setClientInfo={setClientInfo}
+                setFlash={setFlash}
+                setDisplayUser={setDisplayUser}
+                setUsers={setUsers}
+                setListing={setListing}
+                setRefresh={setRefresh} />))}
+
+            {listing === COMMUNITIES && (communities.length === 0 ? <p>{clientInfo._id === displayUser._id ? "You don't have any communities." : "This user doesn't have any communities."}</p> : communities.map(community => <Listitem
                 key={community._id}
                 communityID={community._id}
+                clientInfo={clientInfo}
+                displayUser={displayUser}
                 setDisplay={setDisplay}
                 setClientInfo={setClientInfo}
                 setFlash={setFlash}
-                setCommunityToEdit={setCommunityToEdit} />))}
+                setCommunityToEdit={setCommunityToEdit}
+                setDisplayUser={setDisplayUser}
+                setRefresh={setRefresh} />))}
 
-            {listing === POSTS && (clientInfo.postIDs.length === 0 ? <p>You don't have any posts.</p> : clientInfo.postIDs.map(postID => <Listitem
+            {listing === POSTS && (displayUser.postIDs.length === 0 ? <p>{clientInfo._id === displayUser._id ? "You don't have any posts." : "This user doesn't have any posts."}</p> : displayUser.postIDs.map(postID => <Listitem
                 key={postID}
                 postID={postID}
+                clientInfo={clientInfo}
+                displayUser={displayUser}
                 setDisplay={setDisplay}
                 setClientInfo={setClientInfo}
                 setFlash={setFlash}
-                setPostToEdit={setPostToEdit} />))}
+                setPostToEdit={setPostToEdit}
+                setDisplayUser={setDisplayUser}
+                setRefresh={setRefresh} />))}
 
-            {listing === COMMENTS && (clientInfo.commentIDs.length === 0 ? <p>You don't have any comments.</p> : clientInfo.commentIDs.map(commentID => <Listitem
+            {listing === COMMENTS && (displayUser.commentIDs.length === 0 ? <p>{clientInfo._id === displayUser._id ? "You don't have any comments." : "This user doesn't have any comments."}</p> : displayUser.commentIDs.map(commentID => <Listitem
                 key={commentID}
                 commentID={commentID}
+                clientInfo={clientInfo}
+                displayUser={displayUser}
                 setDisplay={setDisplay}
                 setClientInfo={setClientInfo}
                 setFlash={setFlash}
-                setCommentToEdit={setCommentToEdit} />))}
+                setCommentToEdit={setCommentToEdit}
+                setDisplayUser={setDisplayUser}
+                setRefresh={setRefresh} />))}
         </>
     );
 }

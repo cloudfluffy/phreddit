@@ -4,7 +4,7 @@ const express = require('express');
 
 const User = require('../models/users');
 
-const { authenticate, attachUserIfAuthenticated } = require('../util');
+const { authenticate, attachUserIfAuthenticated, deleteUser } = require('../util');
 
 const router = express.Router();
 
@@ -31,7 +31,7 @@ router.post('/register', async (req, res) => {
         }
 
         if (password != confirmPassword) {
-            return res.status(400).json({ message: 'Password and confirm password shuold match.' });
+            return res.status(400).json({ message: 'Password and confirm password should match.' });
         }
 
         const emailId = email.match(emailRegex)[1];
@@ -129,6 +129,69 @@ router.get('/loggedIn', attachUserIfAuthenticated, async (req, res) => {
 router.get('/info', authenticate, async (req, res) => {
     const { user } = req;
     return res.status(200).json({ message: 'Successfully retrieved client information.', clientInfo: user });
+});
+
+router.get('/', authenticate, async (req, res) => {
+    try {
+        const { user } = req;
+
+        if (!user.isAdmin) {
+            return res.status(403).json({ message: 'You need to be an admin.' });
+        }
+
+        const users = await User.find({});
+
+        return res.status(200).json({ users });
+    } catch (error) {
+        console.error('Error at GET /users: ', error);
+        return res.status(500).json({ message: 'Internal server error while retrieving users.' });
+    }
+});
+
+router.get('/:userId', authenticate, async (req, res) => {
+    try {
+        const { user } = req;
+        const { userId } = req.params;
+
+        if (!user._id.equals(userId) && !user.isAdmin) {
+            return res.status(403).json({ message: "You're not the user and not the admin." });
+        }
+
+        const existingUser = await User.findById(userId);
+
+        if (!existingUser) {
+            return res.status(400).json({ message: 'User does not exist.' });
+        }
+
+        return res.status(200).json({ user: existingUser });
+    } catch (error) {
+        console.error('Error at GET /users: ', error);
+        return res.status(500).json({ message: 'Internal server error while retrieving users.' });
+    }
+});
+
+router.delete('/:userId', authenticate, async (req, res) => {
+    try {
+        const { user } = req;
+        const { userId } = req.params;
+
+        const existingUser = await User.findById(userId);
+
+        if (!existingUser) {
+            return res.status(400).json({ message: 'User does not exist.' });
+        }
+
+        if (!user.isAdmin) {
+            return res.status(403).json({ message: "You're not the admin." });
+        }
+
+        await deleteUser(existingUser);
+
+        return res.status(200).json({ message: 'Successfully deleted the user.' });
+    } catch (error) {
+        console.error('Error at DELETE /users/:userId: ', error);
+        return res.status(500).json({ message: 'Internal server error while deleting user.' });
+    }
 });
 
 module.exports = router;

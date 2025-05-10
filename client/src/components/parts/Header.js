@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { COMMUNITY, HOME, SEARCHRESULTS } from '../../display.js';
-import { COMMENTS, COMMUNITIES, POSTS } from '../../listing.js';
+import { COMMENTS, COMMUNITIES, POSTS, USERS } from '../../listing.js';
 import '../../stylesheets/parts/Header.css';
 import errorFlash from '../../util/errorFlash.js';
 import getTimestamp from '../../util/getTimestamp.js';
@@ -11,8 +11,8 @@ axios.defaults.withCredentials = true;
 
 export default function Header(props) {
     const { title, isUserProfile } = props;
-    const { display, displayPosts, clientInfo, displayCommunity, query, listing } = props;
-    const { setDisplayPosts, setDisplayPostsFromJoinedCommunities, setDisplayPostsFromOtherCommunities, setDisplayCommunity, setClientInfo, setFlash, setListing } = props;
+    const { display, displayPosts, clientInfo, displayCommunity, query, displayUser, listing } = props;
+    const { setDisplayPosts, setDisplayPostsFromJoinedCommunities, setDisplayPostsFromOtherCommunities, setDisplayCommunity, setClientInfo, setFlash, setDisplayUser, setListing } = props;
 
     return (
         <>
@@ -137,6 +137,18 @@ export default function Header(props) {
                                 />)}
 
                         {isUserProfile && <>
+                            {clientInfo.isAdmin && displayUser._id !== clientInfo._id && <Button
+                                content='Return to Admin Profile'
+                                onClick={() => {
+                                    setDisplayUser(clientInfo);
+                                    setListing(USERS);
+                                }} />}
+
+                            {clientInfo.isAdmin && displayUser._id === clientInfo._id && <Button
+                                active={listing === USERS}
+                                content='Users'
+                                onClick={() => setListing(USERS)} />}
+
                             <Button
                                 active={listing === COMMUNITIES}
                                 content='Communities'
@@ -159,10 +171,10 @@ export default function Header(props) {
                 {!isUserProfile && <p>{displayPosts?.length} Post(s) {displayCommunity && `${displayCommunity.memberCount} Member(s)`}</p>}
 
                 {isUserProfile && <>
-                    <p>Display Name: {clientInfo.displayName}</p>
-                    <p>Email: {clientInfo.email}</p>
-                    <p>Member since: {getTimestamp(clientInfo.memberSince)}</p>
-                    <p>Reputation: {clientInfo.reputation}</p>
+                    <p>Display Name: {displayUser.displayName}</p>
+                    <p>Email: {displayUser.email}</p>
+                    <p>Member since: {getTimestamp(displayUser.memberSince)}</p>
+                    <p>Reputation: {displayUser.reputation}</p>
                 </>}
             </div>
             <hr />

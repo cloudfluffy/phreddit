@@ -211,7 +211,7 @@ router.put('/:communityId/edit', authenticate, async (req, res) => {
             return res.status(400).json({ message: 'Community does not exist.' });
         }
 
-        if (!community.owner.equals(user._id)) {
+        if (!community.owner.equals(user._id) && !user.isAdmin) {
             return res.status(403).json({ message: "You're not the owner of the community." });
         }
 
@@ -275,7 +275,7 @@ router.delete('/:communityId', authenticate, async (req, res) => {
             return res.status(400).json({ message: 'Community does not exist' });
         }
 
-        if (!community.owner.equals(user._id)) {
+        if (!community.owner.equals(user._id) && !user.isAdmin) {
             return res.status(403).json({ message: "You're not the owner of the community." });
         }
 

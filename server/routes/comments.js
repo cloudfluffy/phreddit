@@ -188,7 +188,7 @@ router.put('/:commentId/edit', authenticate, async (req, res) => {
             return res.status(400).json({ message: 'Comment does not exist.' });
         }
 
-        if (!comment.commentedBy.equals(user._id)) {
+        if (!comment.commentedBy.equals(user._id) && !user.isAdmin) {
             return res.status(403).json({ message: "You're not the creator of the comment." });
         }
 
@@ -239,7 +239,7 @@ router.delete('/:commentId', authenticate, async (req, res) => {
             return res.status(400).json({ message: 'Comment does not exist.' });
         }
 
-        if (!comment.commentedBy.equals(user._id)) {
+        if (!comment.commentedBy.equals(user._id) && !user.isAdmin) {
             return res.status(403).json({ message: "You're not the creator of the comment." });
         }
 
