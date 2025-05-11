@@ -101,7 +101,7 @@ async function activePosts(posts) {
 };
 
 async function searchPosts(searchQuery, posts) {
-    let pattern = searchQuery.split(' ').filter(term => term);
+    let pattern = searchQuery.split(' ').filter(term => term).map(term => term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
 
     if (pattern.length === 0) {
         return [];
