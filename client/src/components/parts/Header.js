@@ -34,7 +34,11 @@ export default function Header(props) {
                                             const { data: { posts } } = await axios.get(`http://localhost:8000/communities/${displayCommunity._id}/posts/newest`);
                                             setDisplayPosts(posts);
                                         } else if (display === SEARCHRESULTS) {
-                                            const { data: { posts, postsFromJoinedCommunities, postsFromOtherCommunities } } = await axios.get(`http://localhost:8000/posts/search/${query}/newest`);
+                                            const { data: { posts, postsFromJoinedCommunities, postsFromOtherCommunities } } = await axios.get(`http://localhost:8000/posts/search/newest`, {
+                                                params: {
+                                                    query
+                                                }
+                                            });
                                             setDisplayPosts(posts);
                                             setDisplayPostsFromJoinedCommunities(postsFromJoinedCommunities);
                                             setDisplayPostsFromOtherCommunities(postsFromOtherCommunities);
@@ -57,7 +61,11 @@ export default function Header(props) {
                                             const { data: { posts } } = await axios.get(`http://localhost:8000/communities/${displayCommunity._id}/posts/oldest`);
                                             setDisplayPosts(posts);
                                         } else if (display === SEARCHRESULTS) {
-                                            const { data: { posts, postsFromJoinedCommunities, postsFromOtherCommunities } } = await axios.get(`http://localhost:8000/posts/search/${query}/oldest`);
+                                            const { data: { posts, postsFromJoinedCommunities, postsFromOtherCommunities } } = await axios.get(`http://localhost:8000/posts/search/oldest`, {
+                                                params: {
+                                                    query
+                                                }
+                                            });
                                             setDisplayPosts(posts);
                                             setDisplayPostsFromJoinedCommunities(postsFromJoinedCommunities);
                                             setDisplayPostsFromOtherCommunities(postsFromOtherCommunities);
@@ -80,7 +88,11 @@ export default function Header(props) {
                                             const { data: { posts } } = await axios.get(`http://localhost:8000/communities/${displayCommunity._id}/posts/active`);
                                             setDisplayPosts(posts);
                                         } else if (display === SEARCHRESULTS) {
-                                            const { data: { posts, postsFromJoinedCommunities, postsFromOtherCommunities } } = await axios.get(`http://localhost:8000/posts/search/${query}/active`);
+                                            const { data: { posts, postsFromJoinedCommunities, postsFromOtherCommunities } } = await axios.get(`http://localhost:8000/posts/search/active`, {
+                                                params: {
+                                                    query
+                                                }
+                                            });
                                             setDisplayPosts(posts);
                                             setDisplayPostsFromJoinedCommunities(postsFromJoinedCommunities);
                                             setDisplayPostsFromOtherCommunities(postsFromOtherCommunities);

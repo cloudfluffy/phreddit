@@ -15,7 +15,11 @@ export default function Searchresultspageview(props) {
     useEffect(() => {
         (async () => {
             try {
-                const { data: { posts, postsFromJoinedCommunities, postsFromOtherCommunities } } = await axios.get(`http://localhost:8000/posts/search/${query}/newest`);
+                const { data: { posts, postsFromJoinedCommunities, postsFromOtherCommunities } } = await axios.get(`http://localhost:8000/posts/search/newest`, {
+                    params: {
+                        query
+                    }
+                });
 
                 setDisplayPosts(posts);
                 setDisplayPostsFromJoinedCommunities(postsFromJoinedCommunities);

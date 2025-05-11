@@ -241,7 +241,7 @@ async function retrievePosts(req, res, sort) {
 
 async function retrieveQueryPosts(req, res, sort) {
     const { user } = req;
-    const { query } = req.params;
+    const { query } = req.query;
 
     let posts = await Post.find({}).populate([{
         path: 'communityID',

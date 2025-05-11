@@ -78,7 +78,7 @@ router.get('/active', attachUserIfAuthenticated, async (req, res) => {
     }
 });
 
-router.get('/search/:query/newest', attachUserIfAuthenticated, async (req, res) => {
+router.get('/search/newest', attachUserIfAuthenticated, async (req, res) => {
     try {
         return retrieveQueryPosts(req, res, newestPosts);
     } catch (error) {
@@ -87,7 +87,7 @@ router.get('/search/:query/newest', attachUserIfAuthenticated, async (req, res) 
     }
 });
 
-router.get('/search/:query/oldest', attachUserIfAuthenticated, async (req, res) => {
+router.get('/search/oldest', attachUserIfAuthenticated, async (req, res) => {
     try {
         return retrieveQueryPosts(req, res, oldestPosts);
     } catch (error) {
@@ -96,7 +96,7 @@ router.get('/search/:query/oldest', attachUserIfAuthenticated, async (req, res) 
     }
 });
 
-router.get('/search/:query/active', attachUserIfAuthenticated, async (req, res) => {
+router.get('/search/active', attachUserIfAuthenticated, async (req, res) => {
     try {
         return retrieveQueryPosts(req, res, activePosts);
     } catch (error) {
