@@ -1,0 +1,65 @@
+@startuml
+skinparam sequenceMessageAlign center
+skinparam ParticipantPadding 130
+
+participant User as User
+participant "React Client" as React
+participant "Node Server" as Node
+participant MongoDB as MongoDB
+
+User -> React: Clicks on a post in a post listing
+activate User
+activate React
+
+React -> Node: PUT /posts/:postId/views
+activate Node
+
+Node -> MongoDB: Post.findById(postId)
+activate MongoDB
+
+MongoDB --> Node: post
+deactivate MongoDB
+
+alt post exists
+
+    Node -> MongoDB: Post.updateOne({ _id: postId }, { $inc: { views: 1 } })
+    activate MongoDB
+    
+    MongoDB --> Node: update response
+    deactivate MongoDB
+
+    Node --> React: HTTP 200 OK
+
+    React -> Node: GET /posts/:postId
+
+    Node -> MongoDB: Post.findById(postId)
+    activate MongoDB
+    
+    MongoDB --> Node: post
+    deactivate MongoDB
+
+    alt post exists
+
+        Node --> React: HTTP 200 OK, post
+
+        React --> User: Display post page view
+
+    else post does not exist
+
+        Node --> React: HTTP 400 Bad Request
+
+        React --> User: Flash error message
+
+    end
+
+else post does not exist
+
+    Node --> React: HTTP 400 Bad Request
+    deactivate Node
+
+    React --> User: Flash error message
+    deactivate User
+    deactivate React
+
+end
+@enduml
