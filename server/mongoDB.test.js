@@ -71,12 +71,14 @@ test('server deletes user, post, comments, and community with proper authenticat
 
     const { postIDs: [post] } = community;
 
-    const data = JSON.stringify({
-        email: 'jesttest@phreddit.com',
-        password: '1234'
-    });
+    let cookie;
 
     await new Promise((resolve, reject) => {
+        const data = JSON.stringify({
+            email: 'jesttest@phreddit.com',
+            password: '1234'
+        });
+
         const req = http.request('http://localhost:8000/users/login', {
             method: 'POST',
             headers: {
@@ -85,73 +87,91 @@ test('server deletes user, post, comments, and community with proper authenticat
             }
         }, res => {
             const rawCookies = res.headers['set-cookie'];
-            const cookie = rawCookies?.map(cookie => cookie.split(';')[0]).join('; ');
+            cookie = rawCookies?.map(cookie => cookie.split(';')[0]).join('; ');
 
             res.on('data', () => { });
 
-            res.on('end', () => http.request(`http://localhost:8000/posts/${post._id}`, {
-                method: 'DELETE',
-                headers: {
-                    'Cookie': cookie
-                },
-            }, res => {
-                res.on('data', () => { });
-
-                res.on('end', async () => {
-                    const responses = await Promise.all([
-                        Post.findById(post._id),
-                        ...comments.map(comment => Comment.findById(comment._id))
-                    ])
-
-                    responses.forEach(response => expect(response).toBe(null));
-
-                    const user = await User.findById(admin._id);
-
-                    expect(user.postIDs.length).toBe(0);
-
-                    expect(user.commentIDs.length).toBe(0);
-
-                    http.request(`http://localhost:8000/communities/${community._id}`, {
-                        method: 'DELETE',
-                        headers: {
-                            'Cookie': cookie
-                        }
-                    }, res => {
-                        res.on('data', () => { });
-
-                        res.on('end', async () => {
-                            const existingCommunity = await Community.findById(community._id);
-
-                            expect(existingCommunity).toBe(null);
-
-                            http.request(`http://localhost:8000/users/${admin._id}`, {
-                                method: 'DELETE',
-                                headers: {
-                                    'Cookie': cookie
-                                }
-                            }, res => {
-                                res.on('data', () => { });
-
-                                res.on('end', async () => {
-                                    const user = await User.findById(admin._id);
-
-                                    expect(user).toBe(null);
-
-                                    await mongoose.connection.close();
-
-                                    resolve();
-                                })
-                            }).end();
-                        });
-                    }).end();
-                });
-            }).end());
+            res.on('end', () => resolve());
         })
 
         req.write(data);
 
         req.end();
     });
+
+    await new Promise((resolve, reject) => {
+        const req = http.request(`http://localhost:8000/posts/${post._id}`, {
+            method: 'DELETE',
+            headers: {
+                'Cookie': cookie
+            },
+        }, res => {
+            res.on('data', () => { });
+
+            res.on('end', async () => {
+                const responses = await Promise.all([
+                    Post.findById(post._id),
+                    ...comments.map(comment => Comment.findById(comment._id))
+                ])
+
+                responses.forEach(response => expect(response).toBe(null));
+
+                const user = await User.findById(admin._id);
+
+                expect(user.postIDs.length).toBe(0);
+
+                expect(user.commentIDs.length).toBe(0);
+
+                resolve();
+            });
+        });
+
+        req.end();
+    })
+
+    await new Promise((resolve, reject) => {
+        const req = http.request(`http://localhost:8000/communities/${community._id}`, {
+            method: 'DELETE',
+            headers: {
+                'Cookie': cookie
+            }
+        }, res => {
+            res.on('data', () => { });
+
+            res.on('end', async () => {
+                const existingCommunity = await Community.findById(community._id);
+
+                expect(existingCommunity).toBe(null);
+
+                resolve();
+            });
+        });
+
+        req.end();
+    });
+
+    await new Promise((resolve, reject) => {
+        const req = http.request(`http://localhost:8000/users/${admin._id}`, {
+            method: 'DELETE',
+            headers: {
+                'Cookie': cookie
+            }
+        }, res => {
+            res.on('data', () => { });
+
+            res.on('end', async () => {
+                const user = await User.findById(admin._id);
+
+                expect(user).toBe(null);
+
+                resolve();
+            })
+        });
+
+        req.end();
+    });
+
+    await mongoose.connection.close();
 });
 
 async function createCommunity(community) {

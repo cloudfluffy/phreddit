@@ -1,11 +1,10 @@
 import '@testing-library/jest-dom';
 import { render, screen } from '@testing-library/react';
-import React from 'react';
 import Banner from './src/components/layout/Banner.js';
 
 const foo = () => { };
 
-test('is disabled when user is a guest (no clientInfo)', () => {
+test('create post button is disabled when user is a guest (clientInfo is null)', () => {
     render(
         <Banner
             display={''}
@@ -21,11 +20,14 @@ test('is disabled when user is a guest (no clientInfo)', () => {
     expect(createPostButton).toBeDisabled();
 });
 
-test('is enabled when user is logged in (has clientInfo)', () => {
+
+test('create post button is enabled when user is logged in (clientInfo is not null)', () => {
+    const mockClientInfo = { username: 'bote' };
+
     render(
         <Banner
             display={''}
-            clientInfo={{ displayName: 'Bote' }}
+            clientInfo={mockClientInfo}
             setDisplay={foo}
             setQuery={foo}
             setClientInfo={foo}

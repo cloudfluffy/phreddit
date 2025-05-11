@@ -5,7 +5,7 @@ export default function Button(props) {
 
     return (
         <button
-            {...(disable && { tabIndex: -1 })}
+            {...(disable && { tabIndex: -1, disabled: true })}
             className={`Button ${disable && 'disable'} ${active && 'active'} ${type}`}
             {...(!disable && onClick && { onClick })}
         >{content}</button>
