@@ -268,7 +268,7 @@ router.put('/:communityId/edit', authenticate, async (req, res) => {
 
         const existingCommunity = await Community.findOne({ name });
 
-        if (!existingCommunity._id.equals(communityId) && existingCommunity) {
+        if (existingCommunity && !existingCommunity._id.equals(communityId)) {
             return res.status(400).json({ message: 'Community name already in use.', nameNotUnique: true });
         }
 
