@@ -165,7 +165,7 @@ router.get('/:userId', authenticate, async (req, res) => {
 
         return res.status(200).json({ user: existingUser });
     } catch (error) {
-        console.error('Error at GET /users: ', error);
+        console.error('Error at GET /users/:userId: ', error);
         return res.status(500).json({ message: 'Internal server error while retrieving users.' });
     }
 });

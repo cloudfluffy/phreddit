@@ -119,6 +119,10 @@ router.get('/:postId', async (req, res) => {
             path: 'linkFlairID'
         }]);
 
+        if (!post) {
+            return res.status(400).json({ message: 'Post does not exist.' });
+        }
+
         await populateCommentIDs(post);
         await Promise.all(post.commentIDs.map(commentID => populateUserDisplayNameForComment(commentID)));
 
@@ -132,6 +136,12 @@ router.get('/:postId', async (req, res) => {
 router.put('/:postId/views', async (req, res) => {
     try {
         const { postId } = req.params;
+
+        const post = await Post.findById(postId);
+
+        if (!post) {
+            return res.status(400).json({ message: 'Post does not exist.' });
+        }
 
         await Post.updateOne({ _id: postId }, { $inc: { views: 1 } });
 

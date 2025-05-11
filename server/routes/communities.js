@@ -58,6 +58,14 @@ router.get('/:communityId', async (req, res) => {
 
 router.get('/:communityId/posts/newest', attachUserIfAuthenticated, async (req, res) => {
     try {
+        const { communityId } = req.params;
+
+        const community = await Community.findById(communityId);
+
+        if (!community) {
+            return res.status(400).json({ message: 'Community does not exist.' });
+        }
+
         return retrievePostsOfCommunity(req, res, newestPosts);
     } catch (error) {
         console.error('Error at GET /:communityId/posts/newest: ', error);
@@ -67,6 +75,14 @@ router.get('/:communityId/posts/newest', attachUserIfAuthenticated, async (req, 
 
 router.get('/:communityId/posts/oldest', attachUserIfAuthenticated, async (req, res) => {
     try {
+        const { communityId } = req.params;
+
+        const community = await Community.findById(communityId);
+
+        if (!community) {
+            return res.status(400).json({ message: 'Community does not exist.' });
+        }
+
         return retrievePostsOfCommunity(req, res, oldestPosts);
     } catch (error) {
         console.error('Error at GET /:communityId/posts/oldest: ', error);
@@ -76,6 +92,14 @@ router.get('/:communityId/posts/oldest', attachUserIfAuthenticated, async (req, 
 
 router.get('/:communityId/posts/active', attachUserIfAuthenticated, async (req, res) => {
     try {
+        const { communityId } = req.params;
+
+        const community = await Community.findById(communityId);
+
+        if (!community) {
+            return res.status(400).json({ message: 'Community does not exist.' });
+        }
+
         return retrievePostsOfCommunity(req, res, activePosts);
     } catch (error) {
         console.error('Error at GET /:communityId/posts/active: ', error);
