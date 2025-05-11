@@ -1,0 +1,50 @@
+@startuml
+hide empty description
+skinparam Padding 25
+
+state MAIN {
+    [*] --> WelcomePage
+
+    WelcomePage --> RegisterPage: Register as a New User
+    WelcomePage --> LoginPage: Login as an Existing User
+    WelcomePage --> HomePage: Continue as a Guest User
+
+    RegisterPage --> WelcomePage: Successfully Registered
+    LoginPage --> HomePage: Successfully Logged In
+
+    HomePage --> PostPage: Clicked on a Post
+    CommunityPage --> PostPage: Clicked on a Post
+    SearchResultsPage --> PostPage: Clicked on a Post
+
+    PostPage --> CommentEditorPage: Create a New Comment/Reply
+
+    NewCommentPage --> PostPage: Successfully Created/Edited a Comment
+    NewPostPage --> PostPage: Successfully Created/Edited a Post
+    NewCommunityPage --> CommunityPage: Successfully Created/Edited a Community
+
+    UserProfilePage --> CommunityEditorPage: Clicked on Community
+    UserProfilePage --> CommentEditorPage: Clicked on Comment
+    UserProfilePage --> PostPage: Clicked on a Post
+}
+
+note top of MAIN
+    The following user-triggered transitions have been abstracted for simplicity, to avoid cluttering the diagram with excessive arrows.
+    These transitions can occur at any time, regardless of the current state of MAIN:
+
+    User --> WelcomePage: The user clicked on the app name in the banner.
+
+    User --> SearchResultsPage: The user performed a search using the search bar in the banner.
+
+    User --> UserProfilePage: The user clicked on the user profile button in the banner.
+
+    User --> NewPostPage: The user clicked on the create post button in the banner.
+
+    User --> WelcomePage: The user clicked on the logout button in the banner.
+
+    User --> HomePage: The user clicked on the home button in the navbar.
+
+    User --> NewCommunityPage: The user clicked on the create community button in the navbar.
+
+    User --> CommunityPage: The user clicked on a community in the navbar.
+end note
+@enduml
