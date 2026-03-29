@@ -1,6 +1,6 @@
 const http = require('http');
 
-const bcrypt = require('bcrypt');
+const bcryptjs = require('bcryptjs');
 
 const mongoose = require('mongoose');
 
@@ -250,7 +250,7 @@ async function createComment(comment) {
 async function createUser(user) {
     try {
         const saltRounds = 10;
-        const passwordHash = await bcrypt.hash(user.password, saltRounds);
+        const passwordHash = await bcryptjs.hash(user.password, saltRounds);
 
         const newUser = new User({
             firstName: user.firstName,

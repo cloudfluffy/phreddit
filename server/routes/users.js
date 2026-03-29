@@ -1,4 +1,4 @@
-const bcrypt = require('bcrypt');
+const bcryptjs = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const express = require('express');
 
@@ -66,7 +66,7 @@ router.post('/register', async (req, res) => {
         }
 
         const saltRounds = 10;
-        const passwordHash = await bcrypt.hash(password, saltRounds);
+        const passwordHash = await bcryptjs.hash(password, saltRounds);
 
         const newUser = new User({
             firstName,
@@ -99,7 +99,7 @@ router.post('/login', async (req, res) => {
             return res.status(401).json({ message: 'Invalid email or password.' });
         }
 
-        const isPasswordCorrect = await bcrypt.compare(password, existingUser.passwordHash);
+        const isPasswordCorrect = await bcryptjs.compare(password, existingUser.passwordHash);
 
         if (!isPasswordCorrect) {
             return res.status(401).json({ message: 'Invalid email or password.' });
