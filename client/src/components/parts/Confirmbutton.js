@@ -1,14 +1,14 @@
 import { useState } from 'react';
-import '../../stylesheets/parts/Comfirmbutton.css';
+import '../../stylesheets/parts/Confirmbutton.css';
 import Button from './Button.js';
 
-export default function Comfirmbutton(props) {
+export default function Confirmbutton(props) {
     const { content, onClick } = props
 
     const [confirm, setConfirm] = useState(false);
 
     return (
-        <div className='Comfirmbutton'>
+        <div className='Confirmbutton'>
             {!confirm && <Button
                 type='small'
                 content={content}

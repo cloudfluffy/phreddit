@@ -4,7 +4,7 @@ import { NEWCOMMENT, NEWCOMMUNITY, NEWPOST, WELCOME } from '../../display.js';
 import { POSTS } from '../../listing.js';
 import '../../stylesheets/parts/Listitem.css';
 import errorFlash from '../../util/errorFlash.js';
-import Comfirmbutton from './Comfirmbutton.js';
+import Confirmbutton from './Confirmbutton.js';
 import Content from './Content.js';
 
 export default function Listitem(props) {
@@ -103,7 +103,7 @@ export default function Listitem(props) {
                 </div>
             </>}
 
-            <Comfirmbutton
+            <Confirmbutton
                 content='Delete'
                 onClick={async () => {
                     try {
