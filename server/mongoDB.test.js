@@ -73,7 +73,7 @@ test('server deletes user, post, comments, and community with proper authenticat
 
     let cookie;
 
-    await new Promise((resolve, reject) => {
+    await new Promise(resolve => {
         const data = JSON.stringify({
             email: 'jesttest@phreddit.com',
             password: '1234'
@@ -99,7 +99,7 @@ test('server deletes user, post, comments, and community with proper authenticat
         req.end();
     });
 
-    await new Promise((resolve, reject) => {
+    await new Promise(resolve => {
         const req = http.request(`http://localhost:8000/posts/${post._id}`, {
             method: 'DELETE',
             headers: {
@@ -133,7 +133,7 @@ test('server deletes user, post, comments, and community with proper authenticat
         req.end();
     })
 
-    await new Promise((resolve, reject) => {
+    await new Promise(resolve => {
         const req = http.request(`http://localhost:8000/communities/${community._id}`, {
             method: 'DELETE',
             headers: {
@@ -154,7 +154,7 @@ test('server deletes user, post, comments, and community with proper authenticat
         req.end();
     });
 
-    await new Promise((resolve, reject) => {
+    await new Promise(resolve => {
         const req = http.request(`http://localhost:8000/users/${admin._id}`, {
             method: 'DELETE',
             headers: {
