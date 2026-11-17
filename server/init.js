@@ -30,7 +30,16 @@ if (!emailRegex.test(args[1])) {
     process.exit(1);
 }
 
+// The sample users, who take turns voting on the sample posts and comments.
+const voters = [];
+let nextVoter = 0;
+
 main();
+
+// Dates are relative to the moment the script runs, so the content always looks recent.
+function ago({ days = 0, hours = 0, minutes = 0 }) {
+    return new Date(Date.now() - ((days * 24 + hours) * 60 + minutes) * 60000);
+}
 
 async function main() {
     try {
@@ -48,141 +57,569 @@ async function main() {
 
     const savedUsers = await initializeUsers([
         {
-            firstName: 'Liam',
-            lastName: 'Carter',
-            email: 'rollo@phreddit.com',
-            displayName: 'rollo',
-            password: '1234'
-        },
-        {
-            firstName: 'Ava',
-            lastName: 'Mitchell',
-            email: 'shemp@phreddit.com',
-            displayName: 'shemp',
-            password: '1234'
-        },
-        {
-            firstName: 'Noah',
-            lastName: 'Bennett',
-            email: 'catlady13@phreddit.com',
-            displayName: 'catlady13',
-            password: '1234'
-        },
-        {
-            firstName: 'Sophia',
-            lastName: 'Hayes',
-            email: 'astyanax@phreddit.com',
-            displayName: 'astyanax',
-            password: '1234'
-        },
-        {
-            firstName: 'Ethan',
-            lastName: 'Brooks',
-            email: 'truckfan69@phreddit.com',
-            displayName: 'truckfan69',
-            password: '1234'
-        },
-        {
-            firstName: 'Mia',
-            lastName: 'Sullivan',
-            email: 'MarcoArelius@phreddit.com',
-            displayName: 'MarcoArelius',
-            password: '1234'
-        },
-        {
-            firstName: 'Lucas',
-            lastName: 'Parker',
-            email: 'outtheretruth47@phreddit.com',
-            displayName: 'outtheretruth47',
-            password: '1234'
-        },
-        {
-            firstName: 'Isabella',
-            lastName: 'Cooper',
-            email: 'bigfeet@phreddit.com',
-            displayName: 'bigfeet',
-            password: '1234'
-        },
-        {
-            firstName: 'Bad',
-            lastName: 'Reputation',
-            email: 'badreputation@phreddit.com',
-            displayName: 'badreputation',
+            firstName: 'Maya',
+            lastName: 'Okafor',
+            email: 'maya@example.com',
+            displayName: 'maya_codes',
             password: '1234',
-            reputation: 40
+            memberSince: ago({ days: 210 })
+        },
+        {
+            firstName: 'Devon',
+            lastName: 'Kim',
+            email: 'devon@example.com',
+            displayName: 'devon_k',
+            password: '1234',
+            memberSince: ago({ days: 402 })
+        },
+        {
+            firstName: 'Priya',
+            lastName: 'Sharma',
+            email: 'priya@example.com',
+            displayName: 'priya.s',
+            password: '1234',
+            memberSince: ago({ days: 95 })
+        },
+        {
+            firstName: 'Tomasz',
+            lastName: 'Nowak',
+            email: 'tomasz@example.com',
+            displayName: 'tomasz',
+            password: '1234',
+            memberSince: ago({ days: 330 })
+        },
+        {
+            firstName: 'Lena',
+            lastName: 'Fischer',
+            email: 'lena@example.com',
+            displayName: 'lena_runs',
+            password: '1234',
+            memberSince: ago({ days: 268 })
+        },
+        {
+            firstName: 'Basil',
+            lastName: 'Hart',
+            email: 'basil@example.com',
+            displayName: 'old_man_basil',
+            password: '1234',
+            memberSince: ago({ days: 511 })
+        },
+        {
+            firstName: 'Ines',
+            lastName: 'Moreau',
+            email: 'ines@example.com',
+            displayName: 'quietreader',
+            password: '1234',
+            memberSince: ago({ days: 187 })
+        },
+        {
+            firstName: 'Carl',
+            lastName: 'Jensen',
+            email: 'carl@example.com',
+            displayName: 'keycap_carl',
+            password: '1234',
+            memberSince: ago({ days: 143 })
+        },
+        {
+            firstName: 'Sam',
+            lastName: 'Rivera',
+            email: 'sam@example.com',
+            displayName: 'sourdough_sam',
+            password: '1234',
+            memberSince: ago({ days: 356 })
+        },
+        {
+            firstName: 'Ivy',
+            lastName: 'Tanaka',
+            email: 'ivy@example.com',
+            displayName: 'fern_and_ivy',
+            password: '1234',
+            memberSince: ago({ days: 74 })
+        },
+        {
+            firstName: 'Julia',
+            lastName: 'Weber',
+            email: 'julia@example.com',
+            displayName: 'julia_w',
+            password: '1234',
+            memberSince: ago({ days: 229 })
+        },
+        {
+            firstName: 'Nate',
+            lastName: 'Turner',
+            email: 'nate@example.com',
+            displayName: 'nate_t',
+            password: '1234',
+            memberSince: ago({ days: 58 })
+        },
+        {
+            firstName: 'Hal',
+            lastName: 'Brandt',
+            email: 'hal@example.com',
+            displayName: 'hot_take_hal',
+            password: '1234',
+            memberSince: ago({ days: 41 })
         }
     ]);
 
     savedUsers.forEach(savedUser => users[savedUser.displayName] = savedUser);
+    voters.push(...savedUsers.filter(savedUser => !savedUser.isAdmin));
 
-    const lf1 = await createLinkFlair({ content: 'The jerkstore called...' });
-    const lf3 = await createLinkFlair({ content: 'The walk among us' });
+    const linkFlairs = {};
 
-    await Promise.all([
-        createCommunity({
-            name: 'Am I the Jerk?',
-            description: 'A practical application of the principles of justice.',
-            startDate: 'August 10, 2024 04:18:00',
-            members: [users[args[2]], users.rollo, users.shemp, users.catlady13, users.astyanax, users.truckfan69],
-            owner: users[args[2]],
+    for (let content of ['Question', 'Discussion', 'Show and Tell', 'Today I Learned', 'Recipe', 'Guide', 'Recommendation', 'Trip Report']) {
+        linkFlairs[content] = await createLinkFlair({ content });
+    }
+
+    const communities = [
+        {
+            name: 'Web Development',
+            description: 'Frontend, backend, and everything in between. Share what you are building, ask for a code review, and trade notes on tools.\nNew here? The [MDN learning area](https://developer.mozilla.org/en-US/docs/Learn) is a good place to start.',
+            startDate: ago({ days: 390 }),
+            members: [users.devon_k, users.maya_codes, users['priya.s'], users.tomasz, users.nate_t, users.julia_w, users.quietreader, users.keycap_carl, users.hot_take_hal],
+            owner: users.devon_k,
             postIDs: [{
-                title: 'AITJ: I parked my cybertruck in the handicapped spot to protect it from bitter, jealous losers.',
-                content: 'Recently I went to the store in my brand new Tesla cybertruck. I know there are lots of haters out there, so I wanted to make sure my truck was protected. So I parked it so it overlapped with two of those extra-wide handicapped spots. When I came out of the store with my beef jerky someone in a wheelchair was shouting at me. So tell me prhreddit, was I the jerk?',
-                postedDate: 'August 23, 2024 01:19:00',
-                views: 14,
-                linkFlairID: lf1,
-                postedBy: users.truckfan69,
+                title: 'How do you structure an Express API once it grows past a handful of routes?',
+                content: 'My side project started as a single server.js and now has around forty endpoints. I split the routes by resource, but the handlers are full of repeated validation and permission checks.\nDo you move that into middleware, a service layer, or something else? I am curious what has held up for people on real projects.',
+                postedDate: ago({ hours: 5 }),
+                views: 412,
+                upvotes: 9,
+                upvotedBy: [users.maya_codes],
+                linkFlairID: linkFlairs['Question'],
+                postedBy: users['priya.s'],
                 commentIDs: [{
-                    content: 'There is no higher calling than the protection of Tesla products. God bless you sir and God bless Elon Musk. Oh, NTJ.',
-                    commentedDate: 'August 23, 2024 08:22:00',
-                    commentedBy: users.shemp,
+                    content: 'Routers per resource is the right first step. Next I would pull anything that touches more than one model into plain functions the handlers call. A handler then reads like a script: check the input, check the permission, call the function, send the response.',
+                    commentedDate: ago({ hours: 3, minutes: 30 }),
+                    upvotes: 7,
+                    upvotedBy: [users.maya_codes],
+                    commentedBy: users.devon_k,
                     commentIDs: [{
-                        content: 'My brother in Christ, are you ok? Also, YTJ.',
-                        commentedDate: 'August 23, 2024 09:31:00',
-                        commentedBy: users.rollo
-                    }]
-                }, {
-                    content: 'Obvious rage bait, but if not, then you are absolutely the jerk in this situation. Please delete your Tron vehicle and leave is in peace. YTJ.',
-                    commentedDate: 'August 23, 2024 10:57:00',
-                    commentedBy: users.astyanax
-                }]
-            }]
-        }),
-        createCommunity({
-            name: 'The History Channel',
-            description: 'A fantastical reimagining of our past and present.',
-            startDate: 'May 4, 2024 08:32:00',
-            members: [users[args[2]], users.MarcoArelius, users.astyanax, users.outtheretruth47, users.bigfeet],
-            owner: users[args[2]],
-            postIDs: [{
-                title: 'Remember when this was a HISTORY channel?',
-                content: 'Does anyone else remember when they used to show actual historical content on this channel and not just an endless stream of alien encounters, conspiracy theories, and cryptozoology? I do.\nBut, I am pretty sure I was abducted last night just as described in that show from last week, "Finding the Alien Within". Just thought I\'d let you all know.',
-                postedDate: 'September 9, 2024 14:24:00',
-                views: 1023,
-                linkFlairID: lf3,
-                postedBy: users.MarcoArelius,
-                commentIDs: [{
-                    content: 'The truth is out there.',
-                    commentedDate: 'September 10, 2024 6:41:00',
-                    commentedBy: users.astyanax,
-                    commentIDs: [{
-                        content: 'I want to believe.',
-                        commentedDate: 'September 10, 2024 07:18:00',
-                        commentedBy: users.outtheretruth47,
+                        content: 'That matches what hurts most right now. Deleting a community has to clean up its posts, their comments and the memberships, and all of that is sitting inside one route.',
+                        commentedDate: ago({ hours: 3, minutes: 5 }),
+                        upvotes: 3,
+                        commentedBy: users['priya.s'],
                         commentIDs: [{
-                            content: 'Generic poster slogan #42',
-                            commentedDate: 'September 10, 2024 09:43:00',
-                            commentedBy: users.bigfeet
+                            content: 'Exactly the kind of thing to extract. Cascading deletes are much easier to test as functions than through HTTP.',
+                            commentedDate: ago({ hours: 2, minutes: 45 }),
+                            upvotes: 4,
+                            upvotedBy: [users.maya_codes],
+                            commentedBy: users.devon_k,
+                            commentIDs: [{
+                                content: 'And easier to reuse. Deleting a user needs the same cleanup as deleting each of their posts.',
+                                commentedDate: ago({ hours: 2, minutes: 20 }),
+                                upvotes: 2,
+                                commentedBy: users.tomasz
+                            }]
                         }]
+                    }, {
+                        content: 'Seconding this. I resisted a service layer for a year because it sounded like ceremony. It turned out to be functions in another file.',
+                        commentedDate: ago({ hours: 3, minutes: 15 }),
+                        upvotes: 2,
+                        commentedBy: users.nate_t
                     }]
                 }, {
-                    content: 'The same thing happened to me. I guest this channel does still show real history.',
-                    commentedDate: 'September 09, 2024 017:03:00',
-                    commentedBy: users.bigfeet
+                    content: 'For validation, check at the edge and again in the schema. The [Express routing guide](https://expressjs.com/en/guide/routing.html) shows how far router-level middleware can take you before you need anything heavier.',
+                    commentedDate: ago({ hours: 4, minutes: 40 }),
+                    upvotes: 5,
+                    commentedBy: users.julia_w,
+                    commentIDs: [{
+                        content: 'Same here. Client-side checks are for the person typing, server-side checks are for the data.',
+                        commentedDate: ago({ hours: 4, minutes: 10 }),
+                        upvotes: 3,
+                        commentedBy: users.maya_codes
+                    }]
+                }, {
+                    content: 'Whatever you pick, write the permission rules down in one place. Mine lived in my head until an admin bug proved otherwise.',
+                    commentedDate: ago({ hours: 4, minutes: 20 }),
+                    upvotes: 2,
+                    commentedBy: users.quietreader
+                }]
+            }, {
+                title: 'TIL a numeric expiresIn in jsonwebtoken means seconds, not milliseconds',
+                content: 'I set a token to expire in 60000 * 60 * 24, thinking that was one day. The library reads plain numbers as seconds, so my sessions were valid for about a thousand days.\nPass a string such as "1d", or do the math in seconds.',
+                postedDate: ago({ days: 1, hours: 3 }),
+                views: 286,
+                upvotes: 8,
+                downvotes: 1,
+                linkFlairID: linkFlairs['Today I Learned'],
+                postedBy: users.tomasz,
+                commentIDs: [{
+                    content: 'The cookie maxAge next to it is in milliseconds, which makes this one very easy to get wrong.',
+                    commentedDate: ago({ days: 1, hours: 1 }),
+                    upvotes: 4,
+                    commentedBy: users.nate_t,
+                    commentIDs: [{
+                        content: 'That is exactly how I got there. I copied the number from the cookie options.',
+                        commentedDate: ago({ hours: 22 }),
+                        upvotes: 2,
+                        commentedBy: users.tomasz
+                    }]
+                }, {
+                    content: 'Going to check my own project now. Thank you for writing this up.',
+                    commentedDate: ago({ hours: 20 }),
+                    upvotes: 1,
+                    commentedBy: users['priya.s']
+                }]
+            }, {
+                title: 'A dark mode toggle in twenty lines, no dependencies',
+                content: 'A data-theme attribute on the root element, two sets of custom properties, and a button that flips the attribute and saves the choice to localStorage.\nIt reads prefers-color-scheme on the first visit, so the page starts in whatever the system uses.',
+                postedDate: ago({ days: 2, hours: 2 }),
+                views: 233,
+                upvotes: 6,
+                linkFlairID: linkFlairs['Show and Tell'],
+                postedBy: users.nate_t,
+                commentIDs: [{
+                    content: 'Reading the system preference first is the detail most toggles skip. Nice work.',
+                    commentedDate: ago({ days: 1, hours: 22 }),
+                    upvotes: 3,
+                    commentedBy: users.julia_w,
+                    commentIDs: [{
+                        content: 'Thanks. That part took longer than everything else combined.',
+                        commentedDate: ago({ days: 1, hours: 20 }),
+                        upvotes: 1,
+                        commentedBy: users.nate_t
+                    }]
+                }]
+            }, {
+                title: 'What is the smallest change that made your CSS easier to maintain?',
+                content: 'For me it was one stylesheet per component, named after the component. Nothing clever, but I always know where a rule lives.\nWhat was yours?',
+                postedDate: ago({ days: 3, hours: 6 }),
+                views: 198,
+                upvotes: 5,
+                linkFlairID: linkFlairs['Discussion'],
+                postedBy: users.julia_w,
+                commentIDs: [{
+                    content: 'Custom properties for colors and spacing. Changing the theme went from a search and replace to editing six lines.',
+                    commentedDate: ago({ days: 3, hours: 2 }),
+                    upvotes: 3,
+                    commentedBy: users.maya_codes
+                }, {
+                    content: 'Deleting the rules I was afraid to touch. Almost none of them were still used.',
+                    commentedDate: ago({ days: 2, hours: 20 }),
+                    upvotes: 1,
+                    commentedBy: users.keycap_carl
+                }]
+            }, {
+                title: 'Do you still reach for a state library, or is component state enough?',
+                content: 'My last two apps kept everything in a top-level component and passed it down as props. It was more typing, but I never had to wonder where a value came from.\nWhere do you draw the line?',
+                postedDate: ago({ days: 6, hours: 5 }),
+                views: 318,
+                upvotes: 6,
+                downvotes: 1,
+                linkFlairID: linkFlairs['Discussion'],
+                postedBy: users.devon_k,
+                commentIDs: [{
+                    content: 'When three unrelated screens need the same data and you are passing props through components that do not use them. Before that point a library is overhead.',
+                    commentedDate: ago({ days: 6, hours: 1 }),
+                    upvotes: 4,
+                    commentedBy: users.tomasz,
+                    commentIDs: [{
+                        content: 'That is a better rule than the one I had, which was a vague feeling of dread.',
+                        commentedDate: ago({ days: 5, hours: 22 }),
+                        upvotes: 2,
+                        commentedBy: users.devon_k
+                    }]
+                }, {
+                    content: 'Component state until it hurts. It took a surprisingly long time to hurt.',
+                    commentedDate: ago({ days: 5, hours: 15 }),
+                    upvotes: 2,
+                    commentedBy: users['priya.s']
+                }, {
+                    content: 'State libraries are always overkill. If your app needs one, your app is designed wrong.',
+                    commentedDate: ago({ days: 5, hours: 9 }),
+                    downvotes: 4,
+                    commentedBy: users.hot_take_hal
                 }]
             }]
-        })
-    ]);
+        },
+        {
+            name: 'Home Cooking',
+            description: 'Recipes, techniques and honest reports from ordinary kitchens. Post what worked, what failed, and what you would change next time.',
+            startDate: ago({ days: 340 }),
+            members: [users.sourdough_sam, users.maya_codes, users.old_man_basil, users.lena_runs, users.fern_and_ivy, users.julia_w, users['priya.s']],
+            owner: users.sourdough_sam,
+            postIDs: [{
+                title: 'Weeknight sourdough focaccia, no mixer needed',
+                content: 'Mix 500 g flour, 400 g water, 100 g active starter and 10 g salt before work. Fold it twice in the evening, rest it in the fridge overnight, then bake at 230 C for 25 minutes.\nThe long cold rest does the kneading for you.',
+                postedDate: ago({ hours: 2 }),
+                views: 173,
+                upvotes: 7,
+                upvotedBy: [users.maya_codes],
+                linkFlairID: linkFlairs['Recipe'],
+                postedBy: users.sourdough_sam,
+                commentIDs: [{
+                    content: 'Made this last night with rosemary and flaky salt. The crumb was better than my usual kneaded loaf.',
+                    commentedDate: ago({ hours: 1, minutes: 30 }),
+                    upvotes: 3,
+                    commentedBy: users.old_man_basil,
+                    commentIDs: [{
+                        content: 'Glad it worked. Rosemary is my favorite on this one too.',
+                        commentedDate: ago({ hours: 1, minutes: 5 }),
+                        upvotes: 2,
+                        commentedBy: users.sourdough_sam
+                    }]
+                }, {
+                    content: 'Does it work with a starter straight from the fridge, or should I feed it first?',
+                    commentedDate: ago({ minutes: 40 }),
+                    upvotes: 1,
+                    commentedBy: users.maya_codes
+                }]
+            }, {
+                title: 'Is a carbon steel pan worth it if I already have cast iron?',
+                content: 'I cook on cast iron almost every day and I am happy with it. People keep telling me carbon steel is lighter and heats faster.\nIs the difference big enough to justify another pan to season?',
+                postedDate: ago({ days: 1, hours: 8 }),
+                views: 264,
+                upvotes: 6,
+                downvotes: 1,
+                linkFlairID: linkFlairs['Question'],
+                postedBy: users.old_man_basil,
+                commentIDs: [{
+                    content: 'Worth it for eggs and anything you toss. I still reach for cast iron when I want a hard sear.',
+                    commentedDate: ago({ days: 1, hours: 5 }),
+                    upvotes: 4,
+                    commentedBy: users.julia_w
+                }, {
+                    content: 'The weight alone sold me. My wrist is grateful.',
+                    commentedDate: ago({ days: 1, hours: 2 }),
+                    upvotes: 2,
+                    commentedBy: users.lena_runs
+                }]
+            }, {
+                title: 'The batch cooking plan that got me through a busy month',
+                content: 'Two hours on Sunday: one grain, one pot of beans, two roasted trays of vegetables and a sauce. Everything else that week is assembly.\nI wrote the full plan up with a shopping list in the comments.',
+                postedDate: ago({ days: 6, hours: 4 }),
+                views: 351,
+                upvotes: 8,
+                linkFlairID: linkFlairs['Guide'],
+                postedBy: users.lena_runs,
+                commentIDs: [{
+                    content: 'Shopping list: rice or farro, dried chickpeas, two kinds of root vegetables, a head of broccoli, lemons, tahini, garlic and whatever greens look good.',
+                    commentedDate: ago({ days: 6, hours: 3 }),
+                    upvotes: 5,
+                    commentedBy: users.lena_runs
+                }, {
+                    content: 'Tried it this week. The sauce is what stops it from feeling like leftovers.',
+                    commentedDate: ago({ days: 5, hours: 20 }),
+                    upvotes: 2,
+                    commentedBy: users.fern_and_ivy
+                }]
+            }]
+        },
+        {
+            name: 'Book Club',
+            description: 'One book a month, read together. Nominations open on the first, the discussion thread opens on the fifteenth. Spoilers stay inside the discussion threads.',
+            startDate: ago({ days: 180 }),
+            members: [users.quietreader, users.maya_codes, users['priya.s'], users.old_man_basil, users.julia_w],
+            owner: users.quietreader,
+            postIDs: [{
+                title: 'This month\'s pick: The Left Hand of Darkness. Discussion thread',
+                content: 'The thread is open. To start us off: how did the reports and folk tales between the chapters change the way you read the main story?',
+                postedDate: ago({ hours: 9 }),
+                views: 148,
+                upvotes: 6,
+                linkFlairID: linkFlairs['Discussion'],
+                postedBy: users.quietreader,
+                commentIDs: [{
+                    content: 'They slowed me down in a good way. By the time the journey across the ice starts, the world already feels old.',
+                    commentedDate: ago({ hours: 7 }),
+                    upvotes: 3,
+                    commentedBy: users['priya.s'],
+                    commentIDs: [{
+                        content: 'Well put. The ice chapters would not land the same way without that weight behind them.',
+                        commentedDate: ago({ hours: 6 }),
+                        upvotes: 2,
+                        commentedBy: users.quietreader
+                    }]
+                }, {
+                    content: 'This was a reread for me after thirty years, and it is a different book now. I noticed the friendship far more than the politics.',
+                    commentedDate: ago({ hours: 4 }),
+                    upvotes: 2,
+                    commentedBy: users.old_man_basil
+                }]
+            }, {
+                title: 'Looking for short novels I can finish in a weekend',
+                content: 'Work has been busy and I keep abandoning long books halfway through. What are your favorite novels under 200 pages?',
+                postedDate: ago({ days: 4, hours: 2 }),
+                views: 231,
+                upvotes: 7,
+                linkFlairID: linkFlairs['Recommendation'],
+                postedBy: users.maya_codes,
+                commentIDs: [{
+                    content: 'We Have Always Lived in the Castle. Short, strange, and impossible to put down.',
+                    commentedDate: ago({ days: 4 }),
+                    upvotes: 4,
+                    commentedBy: users.quietreader
+                }, {
+                    content: 'Convenience Store Woman. I read it in one sitting on a train.',
+                    commentedDate: ago({ days: 3, hours: 18 }),
+                    upvotes: 3,
+                    commentedBy: users.julia_w
+                }, {
+                    content: 'The Old Man and the Sea, and not only because of my username.',
+                    commentedDate: ago({ days: 3, hours: 9 }),
+                    upvotes: 2,
+                    commentedBy: users.old_man_basil
+                }]
+            }]
+        },
+        {
+            name: 'Trail Running',
+            description: 'Routes, race reports, gear and training for people who would rather run on dirt. All paces welcome.',
+            startDate: ago({ days: 255 }),
+            members: [users.lena_runs, users.tomasz, users.nate_t, users.sourdough_sam],
+            owner: users.lena_runs,
+            postIDs: [{
+                title: 'First 25K done. Three things I would tell myself before the start',
+                content: 'Walk the climbs from the first kilometer, eat before you feel hungry, and do not trust a downhill just because it looks smooth.\nI finished an hour slower than I planned and I have never been happier with a result.',
+                postedDate: ago({ hours: 7 }),
+                views: 327,
+                upvotes: 9,
+                linkFlairID: linkFlairs['Trip Report'],
+                postedBy: users.lena_runs,
+                commentIDs: [{
+                    content: 'Congratulations. Walking the early climbs is the lesson everyone has to learn in person.',
+                    commentedDate: ago({ hours: 6 }),
+                    upvotes: 4,
+                    commentedBy: users.tomasz,
+                    commentIDs: [{
+                        content: 'I was told. I did not listen. Now I tell others.',
+                        commentedDate: ago({ hours: 5 }),
+                        upvotes: 2,
+                        commentedBy: users.lena_runs
+                    }]
+                }, {
+                    content: 'What did you eat during the race? I am still working that part out.',
+                    commentedDate: ago({ hours: 3 }),
+                    upvotes: 1,
+                    commentedBy: users.nate_t
+                }]
+            }, {
+                title: 'How do you carry water on runs longer than two hours?',
+                content: 'A handheld bottle is fine for an hour, but it is not enough for long days and I do not love the feel of a waist belt. Is a vest the only real answer?',
+                postedDate: ago({ days: 2, hours: 5 }),
+                views: 142,
+                upvotes: 4,
+                linkFlairID: linkFlairs['Question'],
+                postedBy: users.nate_t,
+                commentIDs: [{
+                    content: 'A vest with two soft flasks in front. After ten minutes you forget you are wearing it.',
+                    commentedDate: ago({ days: 2, hours: 1 }),
+                    upvotes: 3,
+                    commentedBy: users.lena_runs
+                }]
+            }]
+        },
+        {
+            name: 'Mechanical Keyboards',
+            description: 'Builds, switches, keycaps and layouts. Photos of your desk are welcome. So are questions from people about to buy their first board.',
+            startDate: ago({ days: 140 }),
+            members: [users.keycap_carl, users.devon_k, users.tomasz, users.nate_t, users.hot_take_hal],
+            owner: users.keycap_carl,
+            postIDs: [{
+                title: 'Finished my first hand-wired build. It only took four evenings',
+                content: 'Forty-two keys, a column-staggered layout and more solder joints than I care to count. Two diodes went in backwards and one row was dead until I found a cold joint.\nIt types beautifully and I am already planning the next one.',
+                postedDate: ago({ hours: 12 }),
+                views: 509,
+                upvotes: 10,
+                linkFlairID: linkFlairs['Show and Tell'],
+                postedBy: users.keycap_carl,
+                commentIDs: [{
+                    content: 'Hand-wiring a first build is brave. Which firmware did you flash?',
+                    commentedDate: ago({ hours: 11 }),
+                    upvotes: 3,
+                    commentedBy: users.devon_k,
+                    commentIDs: [{
+                        content: 'QMK. The [documentation](https://docs.qmk.fm) walked me through the whole matrix setup.',
+                        commentedDate: ago({ hours: 10 }),
+                        upvotes: 2,
+                        commentedBy: users.keycap_carl
+                    }]
+                }, {
+                    content: 'Backwards diodes are a rite of passage. Welcome.',
+                    commentedDate: ago({ hours: 8 }),
+                    upvotes: 2,
+                    commentedBy: users.tomasz
+                }]
+            }, {
+                title: 'Linear or tactile switches for long coding sessions?',
+                content: 'I type for eight hours a day and my current linears feel a little vague. Has anyone switched to tactiles and stayed with them?',
+                postedDate: ago({ days: 5, hours: 3 }),
+                views: 276,
+                upvotes: 5,
+                downvotes: 1,
+                linkFlairID: linkFlairs['Question'],
+                postedBy: users.devon_k,
+                commentIDs: [{
+                    content: 'Light tactiles, lubed. You get the feedback without the fatigue.',
+                    commentedDate: ago({ days: 5 }),
+                    upvotes: 3,
+                    commentedBy: users.keycap_carl
+                }, {
+                    content: 'I went the other way and came back within a month. Try a sampler pack before you commit.',
+                    commentedDate: ago({ days: 4, hours: 12 }),
+                    upvotes: 1,
+                    commentedBy: users.nate_t
+                }, {
+                    content: 'A membrane keyboard does the same job. Everyone here is wasting their money.',
+                    commentedDate: ago({ days: 4, hours: 6 }),
+                    upvotes: 1,
+                    downvotes: 3,
+                    commentedBy: users.hot_take_hal
+                }]
+            }]
+        },
+        {
+            name: 'Houseplants',
+            description: 'Leaves, light and the occasional fungus gnat. Ask for a diagnosis, show off new growth, or swap cuttings.',
+            startDate: ago({ days: 70 }),
+            members: [users.fern_and_ivy, users.sourdough_sam, users['priya.s'], users.lena_runs, users.old_man_basil],
+            owner: users.fern_and_ivy,
+            postIDs: [{
+                title: 'My monstera finally put out a split leaf after two years',
+                content: 'Two years of solid heart-shaped leaves, and this week the newest one unfurled with three splits. The only thing I changed was moving it a meter closer to the window.',
+                postedDate: ago({ days: 1, hours: 1 }),
+                views: 219,
+                upvotes: 8,
+                linkFlairID: linkFlairs['Show and Tell'],
+                postedBy: users.fern_and_ivy,
+                commentIDs: [{
+                    content: 'More light is the answer to almost every monstera question. Congratulations on the new leaf.',
+                    commentedDate: ago({ hours: 22 }),
+                    upvotes: 3,
+                    commentedBy: users.sourdough_sam
+                }, {
+                    content: 'Mine did the same after I gave it a moss pole. Patience pays.',
+                    commentedDate: ago({ hours: 18 }),
+                    upvotes: 1,
+                    commentedBy: users.old_man_basil
+                }]
+            }, {
+                title: 'Yellow leaves on a pothos: too much water or not enough light?',
+                content: 'The oldest leaves near the soil are turning yellow one at a time. I water once a week and it sits about three meters from a north window.',
+                postedDate: ago({ days: 8, hours: 4 }),
+                views: 164,
+                upvotes: 3,
+                linkFlairID: linkFlairs['Question'],
+                postedBy: users['priya.s'],
+                commentIDs: [{
+                    content: 'Most likely water. In low light it drinks slowly, so weekly is too often. Wait until the top few centimeters of soil are dry.',
+                    commentedDate: ago({ days: 8, hours: 1 }),
+                    upvotes: 4,
+                    commentedBy: users.fern_and_ivy,
+                    commentIDs: [{
+                        content: 'That makes sense. The pot does feel heavy for days after watering.',
+                        commentedDate: ago({ days: 7, hours: 20 }),
+                        upvotes: 1,
+                        commentedBy: users['priya.s']
+                    }]
+                }]
+            }]
+        }
+    ];
+
+    for (let community of communities) {
+        await createCommunity(community);
+    }
 
     const commentCollection = await Comment.find({});
 
@@ -239,7 +676,6 @@ async function main() {
         console.log(`\tlastName: ${user.lastName}`);
         console.log(`\temail: ${user.email}`);
         console.log(`\tdisplayName: ${user.displayName}`);
-        console.log(`\tpasswordHash: ${user.passwordHash}`);
         console.log(`\tmemberSince: ${user.memberSince}`);
         console.log(`\treputation: ${user.reputation}`);
         console.log(`\tisAdmin: ${user.isAdmin}`);
@@ -260,16 +696,16 @@ async function createCommunity(community) {
         const newCommunity = new Community({
             name: community.name,
             description: community.description,
-            startDate: new Date(community.startDate),
+            startDate: community.startDate,
             owner: community.owner,
             members: community.members
         });
 
         if (community.postIDs) {
-            newCommunity.postIDs = await Promise.all(community.postIDs.map(postID => {
+            for (let postID of community.postIDs) {
                 postID.communityID = newCommunity;
-                return createPost(postID);
-            }));
+                newCommunity.postIDs.push(await createPost(postID));
+            }
         }
 
         const savedCommunity = await newCommunity.save();
@@ -287,7 +723,7 @@ async function createPost(post) {
         const newPost = new Post({
             title: post.title,
             content: post.content,
-            postedDate: new Date(post.postedDate),
+            postedDate: post.postedDate,
             views: post.views,
             communityID: post.communityID,
             postedBy: post.postedBy
@@ -298,8 +734,12 @@ async function createPost(post) {
         }
 
         if (post.commentIDs) {
-            newPost.commentIDs = await Promise.all(post.commentIDs.map(commentID => createComment({ ...commentID, postID: newPost })));
+            for (let commentID of post.commentIDs) {
+                newPost.commentIDs.push(await createComment({ ...commentID, postID: newPost }));
+            }
         }
+
+        newPost.voteCount = await castVotes(newPost, 'Post', post.postedBy, post);
 
         const savedPost = await newPost.save();
         await User.findByIdAndUpdate(savedPost.postedBy._id, { $push: { postIDs: savedPost } });
@@ -315,14 +755,18 @@ async function createComment(comment) {
     try {
         const newComment = new Comment({
             content: comment.content,
-            commentedDate: new Date(comment.commentedDate),
+            commentedDate: comment.commentedDate,
             postID: comment.postID,
             commentedBy: comment.commentedBy
         });
 
         if (comment.commentIDs) {
-            newComment.commentIDs = await Promise.all(comment.commentIDs.map(commentID => createComment({ ...commentID, postID: comment.postID })));
+            for (let commentID of comment.commentIDs) {
+                newComment.commentIDs.push(await createComment({ ...commentID, postID: comment.postID }));
+            }
         }
+
+        newComment.voteCount = await castVotes(newComment, 'Comment', comment.commentedBy, comment);
 
         const savedComment = await newComment.save();
         await User.findByIdAndUpdate(comment.commentedBy._id, { $push: { commentIDs: savedComment } });
@@ -332,6 +776,35 @@ async function createComment(comment) {
         console.error('Error at createComment: ', error);
         process.exit(1);
     }
+}
+
+// Records the votes on the voters and on the author's reputation the way the vote routes do,
+// and returns the resulting vote count. Voters in upvotedBy always upvote; the rest take turns.
+async function castVotes(votable, kind, author, { upvotes = 0, downvotes = 0, upvotedBy = [] }) {
+    const upvoters = [...upvotedBy];
+    const downvoters = [];
+
+    while (upvoters.length < upvotes || downvoters.length < downvotes) {
+        const voter = voters[nextVoter++ % voters.length];
+
+        if (voter === author || upvoters.includes(voter) || downvoters.includes(voter)) {
+            continue;
+        }
+
+        if (upvoters.length < upvotes) {
+            upvoters.push(voter);
+        } else {
+            downvoters.push(voter);
+        }
+    }
+
+    await Promise.all([
+        User.updateMany({ _id: { $in: upvoters.map(voter => voter._id) } }, { $push: { [`upvoted${kind}IDs`]: votable._id } }),
+        User.updateMany({ _id: { $in: downvoters.map(voter => voter._id) } }, { $push: { [`downvoted${kind}IDs`]: votable._id } }),
+        User.updateOne({ _id: author._id }, { $inc: { reputation: 5 * upvoters.length - 10 * downvoters.length } })
+    ]);
+
+    return upvoters.length - downvoters.length;
 }
 
 async function createUser(user) {
@@ -346,6 +819,10 @@ async function createUser(user) {
             displayName: user.displayName,
             passwordHash: passwordHash
         });
+
+        if (user.memberSince) {
+            newUser.memberSince = user.memberSince;
+        }
 
         if (user.reputation) {
             newUser.reputation = user.reputation;
@@ -372,6 +849,7 @@ async function initializeUsers(users) {
             email: args[1],
             displayName: args[2],
             password: args[3],
+            memberSince: ago({ days: 540 }),
             reputation: 1000,
             isAdmin: true
         });
