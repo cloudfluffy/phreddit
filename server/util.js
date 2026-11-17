@@ -298,7 +298,9 @@ async function retrievePostsOfCommunity(req, res, sort) {
 async function deleteComment(comment) {
     await Promise.all([
         Comment.deleteOne({ _id: comment._id }),
-        User.updateOne({ _id: comment.commentedBy }, { $pull: { commentIDs: comment._id, upvotedCommentIDs: comment._id, downvotedCommentIDs: comment._id } }),
+        Comment.updateOne({ commentIDs: comment._id }, { $pull: { commentIDs: comment._id } }),
+        User.updateOne({ _id: comment.commentedBy }, { $pull: { commentIDs: comment._id } }),
+        User.updateMany({ $or: [{ upvotedCommentIDs: comment._id }, { downvotedCommentIDs: comment._id }] }, { $pull: { upvotedCommentIDs: comment._id, downvotedCommentIDs: comment._id } }),
         Post.updateOne({ _id: comment.postID }, { $pull: { commentIDs: comment._id } })
     ]);
 }
@@ -331,7 +333,8 @@ async function deletePostAndItsComments(post) {
 
     await Promise.all([
         Post.deleteOne({ _id: post._id }),
-        User.updateOne({ _id: post.postedBy }, { $pull: { postIDs: post._id, upvotedPostIDs: post._id, downvotedPostIDs: post._id } }),
+        User.updateOne({ _id: post.postedBy }, { $pull: { postIDs: post._id } }),
+        User.updateMany({ $or: [{ upvotedPostIDs: post._id }, { downvotedPostIDs: post._id }] }, { $pull: { upvotedPostIDs: post._id, downvotedPostIDs: post._id } }),
         Community.updateOne({ _id: post.communityID }, { $pull: { postIDs: post._id } }),
         ...post.commentIDs.map(commentID => deleteCommentAndItsReplies(commentID))
     ]);
