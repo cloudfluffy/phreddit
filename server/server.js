@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
 
-mongoose.connect('mongodb://127.0.0.1:27017/phreddit')
+const { PORT, MONGODB_URL, CLIENT_ORIGIN } = require('./environment');
+
+mongoose.connect(MONGODB_URL)
     .then(() => console.log('MongoDB connected.'))
     .catch(error => console.log(`MongoDB connection error: ${error}.`));
 
@@ -17,7 +19,7 @@ const postRoutes = require('./routes/posts');
 const userRoutes = require('./routes/users.js');
 
 app.use(cors({
-    origin: 'http://localhost:3000',
+    origin: CLIENT_ORIGIN,
     credentials: true
 }));
 
@@ -35,8 +37,8 @@ app.use('/posts', postRoutes);
 
 app.use('/users', userRoutes);
 
-const server = app.listen(8000, () => {
-    console.log('Server listening on port 8000...');
+const server = app.listen(PORT, () => {
+    console.log(`Server listening on port ${PORT}...`);
 });
 
 process.on('SIGINT', () => {
