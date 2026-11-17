@@ -122,6 +122,10 @@ test('server deletes user, post, comments, and community with proper authenticat
 
                 expect(user.commentIDs.length).toBe(0);
 
+                const { postIDs } = await Community.findById(community._id);
+
+                expect(postIDs.length).toBe(0);
+
                 resolve();
             });
         });
