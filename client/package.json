@@ -2,6 +2,7 @@
     "name": "client",
     "version": "0.1.0",
     "private": true,
+    "license": "MIT",
     "dependencies": {
         "@babel/preset-env": "^7.27.2",
         "@babel/preset-flow": "^7.27.1",
