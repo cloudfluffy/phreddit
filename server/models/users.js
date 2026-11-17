@@ -94,6 +94,14 @@ const UserSchema = new Schema({
         }],
         default: []
     }
+}, {
+    toJSON: {
+        // Keep the password hash out of every API response.
+        transform: (doc, ret) => {
+            delete ret.passwordHash;
+            return ret;
+        }
+    }
 });
 
 module.exports = mongoose.model('User', UserSchema);
