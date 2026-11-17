@@ -12,8 +12,8 @@ export default function Welcomepageview(props) {
                 <h2>Welcome to Phreddit</h2>
                 <div className='panel'>
                     <div className='description'>
-                        <h3>The heart of the internet</h3>
-                        <p>Phreddit is home to thousands of communities, endless conversation, and authentic human connection. Whether you're into breaking news, sports, TV fan theories, or a never-ending stream of the internet's cutest animals, there's a community on Reddit for you.</p>
+                        <h3>Communities for whatever you are into</h3>
+                        <p>Phreddit is a place to start communities, share posts, and talk things through in threaded comments. Register to post, comment and vote, or continue as a guest to browse and search.</p>
                     </div>
                     <div className='buttons'>
                         <Button
