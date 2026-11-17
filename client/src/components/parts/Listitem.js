@@ -48,7 +48,7 @@ export default function Listitem(props) {
             }
         }
         )();
-    }, []);
+    }, [userID, communityID, postID, commentID, setFlash]);
 
     return (
         <div

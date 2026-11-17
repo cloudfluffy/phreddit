@@ -44,7 +44,7 @@ export default function Userprofilepageview(props) {
                 errorFlash(error, setFlash);
             }
         })();
-    }, [listing, refresh])
+    }, [listing, refresh, clientInfo._id, displayUser._id, setClientInfo, setFlash])
 
     return (
         <>

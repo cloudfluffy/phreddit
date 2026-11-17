@@ -24,7 +24,7 @@ export default function Homepageview(props) {
 
             setIsLoading(false);
         })();
-    }, [display, clientInfo]);
+    }, [display, clientInfo, setDisplayPosts, setDisplayPostsFromJoinedCommunities, setDisplayPostsFromOtherCommunities, setFlash]);
 
     return (
         <>

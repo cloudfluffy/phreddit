@@ -30,7 +30,7 @@ export default function Postpageview(props) {
 
             setIsLoading(false);
         })();
-    }, [clientInfo]);
+    }, [clientInfo, displayPostID, setFlash]);
 
     function renderComments(commentIDs, depth, comments) {
         if (!commentIDs) {

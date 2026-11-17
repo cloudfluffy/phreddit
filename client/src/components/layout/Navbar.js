@@ -28,7 +28,7 @@ export default function Navbar(props) {
 
             setIsLoading(false);
         })();
-    }, [display, displayCommunity, clientInfo]);
+    }, [display, displayCommunity, clientInfo, setFlash]);
 
     return (
         <div className='Navbar'>

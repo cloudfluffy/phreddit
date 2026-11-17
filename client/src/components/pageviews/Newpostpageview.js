@@ -37,7 +37,7 @@ export default function Newpostpageview(props) {
 
             setIsLoading(false);
         })();
-    }, []);
+    }, [setFlash]);
 
     async function handleSubmit(event) {
         event.preventDefault();

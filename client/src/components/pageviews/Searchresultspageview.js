@@ -28,7 +28,7 @@ export default function Searchresultspageview(props) {
 
             setIsLoading(false);
         })();
-    }, [display, query, clientInfo]);
+    }, [display, query, clientInfo, setDisplayPosts, setDisplayPostsFromJoinedCommunities, setDisplayPostsFromOtherCommunities, setFlash]);
 
     return (
         <>

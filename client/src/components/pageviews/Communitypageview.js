@@ -22,7 +22,7 @@ export default function Communitypageview(props) {
 
             setIsLoading(false);
         })();
-    }, [display, clientInfo, displayCommunity]);
+    }, [display, clientInfo, displayCommunity, setDisplayPosts, setFlash]);
 
     return (
         <>
