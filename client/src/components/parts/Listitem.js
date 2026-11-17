@@ -1,4 +1,4 @@
-import axios from 'axios';
+import api from '../../api.js';
 import { useEffect, useState } from 'react';
 import { NEWCOMMENT, NEWCOMMUNITY, NEWPOST, WELCOME } from '../../display.js';
 import { POSTS } from '../../listing.js';
@@ -21,25 +21,25 @@ export default function Listitem(props) {
         (async () => {
             try {
                 if (userID) {
-                    const { data: { user } } = await axios.get(`http://localhost:8000/users/${userID}`);
+                    const { data: { user } } = await api.get(`/users/${userID}`);
 
                     setUser(user);
                 }
 
                 if (communityID) {
-                    const { data: { community } } = await axios.get(`http://localhost:8000/communities/${communityID}`);
+                    const { data: { community } } = await api.get(`/communities/${communityID}`);
 
                     setCommunity(community);
                 }
 
                 if (postID) {
-                    const { data: { post } } = await axios.get(`http://localhost:8000/posts/${postID}`);
+                    const { data: { post } } = await api.get(`/posts/${postID}`);
 
                     setPost(post);
                 }
 
                 if (commentID) {
-                    const { data: { comment } } = await axios.get(`http://localhost:8000/comments/${commentID}`);
+                    const { data: { comment } } = await api.get(`/comments/${commentID}`);
 
                     setComment(comment);
                 }
@@ -108,7 +108,7 @@ export default function Listitem(props) {
                 onClick={async () => {
                     try {
                         if (userID) {
-                            const { data: { message } } = await axios.delete(`http://localhost:8000/users/${userID}`);
+                            const { data: { message } } = await api.delete(`/users/${userID}`);
 
                             if (userID === clientInfo._id) {
                                 setClientInfo(null);
@@ -121,7 +121,7 @@ export default function Listitem(props) {
                         }
 
                         if (communityID) {
-                            const { data: { message } } = await axios.delete(`http://localhost:8000/communities/${communityID}`);
+                            const { data: { message } } = await api.delete(`/communities/${communityID}`);
 
                             setRefresh({});
 
@@ -129,7 +129,7 @@ export default function Listitem(props) {
                         }
 
                         if (postID) {
-                            const { data: { message } } = await axios.delete(`http://localhost:8000/posts/${postID}`);
+                            const { data: { message } } = await api.delete(`/posts/${postID}`);
 
                             setRefresh({});
 
@@ -137,7 +137,7 @@ export default function Listitem(props) {
                         }
 
                         if (commentID) {
-                            const { data: { message } } = await axios.delete(`http://localhost:8000/comments/${commentID}`);
+                            const { data: { message } } = await api.delete(`/comments/${commentID}`);
 
                             setRefresh({});
 

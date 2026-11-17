@@ -1,10 +1,8 @@
-import axios from 'axios';
+import api from '../../api.js';
 import { useState } from 'react';
 import { WELCOME } from '../../display.js';
 import errorFlash from '../../util/errorFlash.js';
 import Button from '../parts/Button.js';
-
-axios.defaults.withCredentials = true;
 
 export default function Newuserpageview(props) {
     const { setDisplay, setFlash } = props;
@@ -46,7 +44,7 @@ export default function Newuserpageview(props) {
 
         if (!firstNameEmptyError && !lastNameEmptyError && !emailEmptyError && !emailFormatError && !displayNameEmptyError && !passwordEmptyError && !passwordContainsFirstNameError && !passwordContainsLastNameError && !passwordContainsDisplayNameError && !passwordContainsEmailIDError && !confirmPasswordEmptyError && !confirmPasswordNotMatchError) {
             try {
-                const { data: { message } } = await axios.post('http://localhost:8000/users/register', {
+                const { data: { message } } = await api.post('/users/register', {
                     firstName,
                     lastName,
                     email,

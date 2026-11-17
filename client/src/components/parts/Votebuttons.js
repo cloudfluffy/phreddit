@@ -1,8 +1,6 @@
-import axios from 'axios';
+import api from '../../api.js';
 import '../../stylesheets/parts/Votebuttons.css';
 import errorFlash from '../../util/errorFlash.js';
-
-axios.defaults.withCredentials = true;
 
 export default function Votebuttons(props) {
     const { isPost, votable } = props;
@@ -22,12 +20,12 @@ export default function Votebuttons(props) {
                             event.stopPropagation();
 
                             if (isPost) {
-                                await axios.put(`http://localhost:8000/posts/${votable?._id}/upvote`);
+                                await api.put(`/posts/${votable?._id}/upvote`);
                             } else {
-                                await axios.put(`http://localhost:8000/comments/${votable?._id}/upvote`);
+                                await api.put(`/comments/${votable?._id}/upvote`);
                             }
 
-                            const { data: { clientInfo } } = await axios.get('http://localhost:8000/users/info');
+                            const { data: { clientInfo } } = await api.get('/users/info');
 
                             setClientInfo(clientInfo);
                         } catch (error) {
@@ -47,12 +45,12 @@ export default function Votebuttons(props) {
                             event.stopPropagation();
 
                             if (isPost) {
-                                await axios.put(`http://localhost:8000/posts/${votable?._id}/downvote`);
+                                await api.put(`/posts/${votable?._id}/downvote`);
                             } else {
-                                await axios.put(`http://localhost:8000/comments/${votable?._id}/downvote`);
+                                await api.put(`/comments/${votable?._id}/downvote`);
                             }
 
-                            const { data: { clientInfo } } = await axios.get('http://localhost:8000/users/info');
+                            const { data: { clientInfo } } = await api.get('/users/info');
 
                             setClientInfo(clientInfo);
                         } catch (error) {

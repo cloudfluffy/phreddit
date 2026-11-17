@@ -1,4 +1,4 @@
-import axios from 'axios';
+import api from '../../api.js';
 import { useEffect, useState } from 'react';
 import { WELCOME } from '../../display.js';
 import '../../stylesheets/layout/Phreddit.css';
@@ -7,8 +7,6 @@ import Banner from './Banner.js';
 import Flash from './Flash.js';
 import Main from './Main.js';
 import Navbar from './Navbar.js';
-
-axios.defaults.withCredentials = true;
 
 export default function Phreddit() {
     const [display, setDisplay] = useState(WELCOME);
@@ -24,7 +22,7 @@ export default function Phreddit() {
     useEffect(() => {
         (async () => {
             try {
-                const { data: { message, clientInfo } } = await axios.get('http://localhost:8000/users/loggedIn');
+                const { data: { message, clientInfo } } = await api.get('/users/loggedIn');
 
                 setClientInfo(clientInfo);
 

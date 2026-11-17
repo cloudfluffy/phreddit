@@ -1,10 +1,8 @@
-import axios from 'axios';
+import api from '../../api.js';
 import { useState } from 'react';
 import { POST } from '../../display.js';
 import errorFlash from '../../util/errorFlash.js';
 import Button from '../parts/Button.js';
-
-axios.defaults.withCredentials = true;
 
 export default function Newcommentpageview(props) {
     const { commentToInfo, commentToEdit } = props;
@@ -44,7 +42,7 @@ export default function Newcommentpageview(props) {
         if (!hyperlinkNameEmptyError && !hyperlinkProtocolError && !contentEmptyError && !contentExceedError) {
             try {
                 if (commentToEdit) {
-                    const { data: { message, comment } } = await axios.put(`http://localhost:8000/comments/${commentToEdit._id}/edit`, {
+                    const { data: { message, comment } } = await api.put(`/comments/${commentToEdit._id}/edit`, {
                         content
                     });
 
@@ -54,12 +52,12 @@ export default function Newcommentpageview(props) {
 
                     setFlash({ isSuccess: true, message });
                 } else {
-                    const { data: { message } } = await axios.post('http://localhost:8000/comments', {
+                    const { data: { message } } = await api.post('/comments', {
                         content,
                         commentToInfo
                     });
 
-                    const { data: { clientInfo } } = await axios.get('http://localhost:8000/users/info');
+                    const { data: { clientInfo } } = await api.get('/users/info');
 
                     setClientInfo(clientInfo);
 

@@ -1,10 +1,8 @@
-import axios from 'axios';
+import api from '../../api.js';
 import { useEffect, useState } from 'react';
 import errorFlash from '../../util/errorFlash.js';
 import Header from '../parts/Header.js';
 import Post from '../parts/Post.js';
-
-axios.defaults.withCredentials = true;
 
 export default function Searchresultspageview(props) {
     const { display, displayPosts, displayPostsFromJoinedCommunities, displayPostsFromOtherCommunities, query, clientInfo } = props;
@@ -15,7 +13,7 @@ export default function Searchresultspageview(props) {
     useEffect(() => {
         (async () => {
             try {
-                const { data: { posts, postsFromJoinedCommunities, postsFromOtherCommunities } } = await axios.get(`http://localhost:8000/posts/search/newest`, {
+                const { data: { posts, postsFromJoinedCommunities, postsFromOtherCommunities } } = await api.get(`/posts/search/newest`, {
                     params: {
                         query
                     }

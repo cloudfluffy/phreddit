@@ -1,10 +1,8 @@
-import axios from 'axios';
+import api from '../../api.js';
 import { useState } from 'react';
 import { HOME } from '../../display.js';
 import errorFlash from '../../util/errorFlash.js';
 import Button from '../parts/Button.js';
-
-axios.defaults.withCredentials = true;
 
 export default function Loginpageview(props) {
     const { setDisplay, setClientInfo, setFlash } = props;
@@ -27,7 +25,7 @@ export default function Loginpageview(props) {
 
         if (!emailEmptyError && !emailFormatError && !passwordEmptyError) {
             try {
-                const { data: { message, clientInfo } } = await axios.post('http://localhost:8000/users/login', {
+                const { data: { message, clientInfo } } = await api.post('/users/login', {
                     email,
                     password
                 });

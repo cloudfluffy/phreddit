@@ -1,4 +1,4 @@
-import axios from 'axios';
+import api from '../../api.js';
 import { POST } from '../../display.js';
 import '../../stylesheets/parts/Post.css';
 import countComments from '../../util/countComments.js';
@@ -7,8 +7,6 @@ import getTimestamp from '../../util/getTimestamp.js';
 import Content from './Content.js';
 import Linkflair from './Linkflair.js';
 import Votebuttons from './Votebuttons.js';
-
-axios.defaults.withCredentials = true;
 
 export default function Post(props) {
     const { post, showCommunity } = props;
@@ -21,7 +19,7 @@ export default function Post(props) {
             tabIndex='0'
             onClick={async () => {
                 try {
-                    await axios.put(`http://localhost:8000/posts/${post?._id}/views`);
+                    await api.put(`/posts/${post?._id}/views`);
 
                     setDisplayPostID(post?._id);
 

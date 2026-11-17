@@ -1,4 +1,4 @@
-import axios from 'axios';
+import api from '../../api.js';
 import { useEffect, useState } from 'react';
 import { NEWCOMMENT } from '../../display.js';
 import '../../stylesheets/pageviews/Postpageview.css';
@@ -11,8 +11,6 @@ import Content from '../parts/Content.js';
 import Linkflair from '../parts/Linkflair.js';
 import Votebuttons from '../parts/Votebuttons.js';
 
-axios.defaults.withCredentials = true;
-
 export default function Postpageview(props) {
     const { displayPostID, clientInfo } = props;
     const { setDisplay, setClientInfo, setCommentToInfo, setFlash } = props;
@@ -23,7 +21,7 @@ export default function Postpageview(props) {
     useEffect(() => {
         (async () => {
             try {
-                const { data: { post } } = await axios.get(`http://localhost:8000/posts/${displayPostID}`);
+                const { data: { post } } = await api.get(`/posts/${displayPostID}`);
 
                 setPost(post);
             } catch (error) {

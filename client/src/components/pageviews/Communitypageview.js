@@ -1,10 +1,8 @@
-import axios from 'axios';
+import api from '../../api.js';
 import { useEffect, useState } from 'react';
 import errorFlash from '../../util/errorFlash.js';
 import Header from '../parts/Header.js';
 import Post from '../parts/Post.js';
-
-axios.defaults.withCredentials = true;
 
 export default function Communitypageview(props) {
     const { display, displayPosts, clientInfo, displayCommunity } = props;
@@ -15,7 +13,7 @@ export default function Communitypageview(props) {
     useEffect(() => {
         (async () => {
             try {
-                const { data: { posts } } = await axios.get(`http://localhost:8000/communities/${displayCommunity?._id}/posts/newest`);
+                const { data: { posts } } = await api.get(`/communities/${displayCommunity?._id}/posts/newest`);
 
                 setDisplayPosts(posts);
             } catch (error) {

@@ -1,11 +1,9 @@
-import axios from 'axios';
+import api from '../../api.js';
 import { useEffect, useState } from 'react';
 import { COMMUNITY, HOME, NEWCOMMUNITY } from '../../display.js';
 import '../../stylesheets/layout/Navbar.css';
 import errorFlash from '../../util/errorFlash.js';
 import Button from '../parts/Button.js';
-
-axios.defaults.withCredentials = true;
 
 export default function Navbar(props) {
     const { display, displayCommunity, clientInfo } = props;
@@ -19,7 +17,7 @@ export default function Navbar(props) {
     useEffect(() => {
         (async () => {
             try {
-                const { data: { communities, joinedCommunities, otherCommunities } } = await axios.get('http://localhost:8000/communities');
+                const { data: { communities, joinedCommunities, otherCommunities } } = await api.get('/communities');
 
                 setCommunities(communities);
                 setJoinedCommunities(joinedCommunities);

@@ -1,10 +1,8 @@
-import axios from 'axios';
+import api from '../../api.js';
 import { useEffect, useState } from 'react';
 import { HOME, POST } from '../../display.js';
 import errorFlash from '../../util/errorFlash.js';
 import Button from '../parts/Button.js';
-
-axios.defaults.withCredentials = true;
 
 export default function Newpostpageview(props) {
     const { postToEdit } = props;
@@ -26,8 +24,8 @@ export default function Newpostpageview(props) {
         (async () => {
             try {
                 const [{ data: { linkFlairs } }, { data: { joinedCommunities, otherCommunities } }] = await Promise.all([
-                    axios.get('http://localhost:8000/linkflairs'),
-                    axios.get('http://localhost:8000/communities')
+                    api.get('/linkflairs'),
+                    api.get('/communities')
                 ]);
 
                 setLinkflairs(linkFlairs);
@@ -83,14 +81,14 @@ export default function Newpostpageview(props) {
                 }
 
                 if (newLinkFlair) {
-                    const response = await axios.post('http://localhost:8000/linkflairs', {
+                    const response = await api.post('/linkflairs', {
                         content: newLinkFlair
                     });
                     linkFlairID = response.data.linkFlairID;
                 }
 
                 if (postToEdit) {
-                    const { data: { message } } = await axios.put(`http://localhost:8000/posts/${postToEdit._id}/edit`, {
+                    const { data: { message } } = await api.put(`/posts/${postToEdit._id}/edit`, {
                         title,
                         content,
                         linkFlairID,
@@ -103,14 +101,14 @@ export default function Newpostpageview(props) {
 
                     setFlash({ isSuccess: true, message });
                 } else {
-                    const { data: { message } } = await axios.post('http://localhost:8000/posts', {
+                    const { data: { message } } = await api.post('/posts', {
                         title,
                         content,
                         linkFlairID,
                         communityID
                     });
 
-                    const { data: { clientInfo } } = await axios.get('http://localhost:8000/users/info');
+                    const { data: { clientInfo } } = await api.get('/users/info');
 
                     setClientInfo(clientInfo);
 

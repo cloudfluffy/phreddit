@@ -1,4 +1,4 @@
-import axios from 'axios';
+import api from '../../api.js';
 import { COMMUNITY, HOME, SEARCHRESULTS } from '../../display.js';
 import { COMMENTS, COMMUNITIES, POSTS, USERS } from '../../listing.js';
 import '../../stylesheets/parts/Header.css';
@@ -6,8 +6,6 @@ import errorFlash from '../../util/errorFlash.js';
 import getTimestamp from '../../util/getTimestamp.js';
 import Button from './Button.js';
 import Content from './Content.js';
-
-axios.defaults.withCredentials = true;
 
 export default function Header(props) {
     const { title, isUserProfile } = props;
@@ -26,15 +24,15 @@ export default function Header(props) {
                                 onClick={async () => {
                                     try {
                                         if (display === HOME) {
-                                            const { data: { posts, postsFromJoinedCommunities, postsFromOtherCommunities } } = await axios.get('http://localhost:8000/posts/newest');
+                                            const { data: { posts, postsFromJoinedCommunities, postsFromOtherCommunities } } = await api.get('/posts/newest');
                                             setDisplayPosts(posts);
                                             setDisplayPostsFromJoinedCommunities(postsFromJoinedCommunities);
                                             setDisplayPostsFromOtherCommunities(postsFromOtherCommunities);
                                         } else if (display === COMMUNITY) {
-                                            const { data: { posts } } = await axios.get(`http://localhost:8000/communities/${displayCommunity._id}/posts/newest`);
+                                            const { data: { posts } } = await api.get(`/communities/${displayCommunity._id}/posts/newest`);
                                             setDisplayPosts(posts);
                                         } else if (display === SEARCHRESULTS) {
-                                            const { data: { posts, postsFromJoinedCommunities, postsFromOtherCommunities } } = await axios.get(`http://localhost:8000/posts/search/newest`, {
+                                            const { data: { posts, postsFromJoinedCommunities, postsFromOtherCommunities } } = await api.get(`/posts/search/newest`, {
                                                 params: {
                                                     query
                                                 }
@@ -53,15 +51,15 @@ export default function Header(props) {
                                 onClick={async () => {
                                     try {
                                         if (display === HOME) {
-                                            const { data: { posts, postsFromJoinedCommunities, postsFromOtherCommunities } } = await axios.get('http://localhost:8000/posts/oldest');
+                                            const { data: { posts, postsFromJoinedCommunities, postsFromOtherCommunities } } = await api.get('/posts/oldest');
                                             setDisplayPosts(posts);
                                             setDisplayPostsFromJoinedCommunities(postsFromJoinedCommunities);
                                             setDisplayPostsFromOtherCommunities(postsFromOtherCommunities);
                                         } else if (display === COMMUNITY) {
-                                            const { data: { posts } } = await axios.get(`http://localhost:8000/communities/${displayCommunity._id}/posts/oldest`);
+                                            const { data: { posts } } = await api.get(`/communities/${displayCommunity._id}/posts/oldest`);
                                             setDisplayPosts(posts);
                                         } else if (display === SEARCHRESULTS) {
-                                            const { data: { posts, postsFromJoinedCommunities, postsFromOtherCommunities } } = await axios.get(`http://localhost:8000/posts/search/oldest`, {
+                                            const { data: { posts, postsFromJoinedCommunities, postsFromOtherCommunities } } = await api.get(`/posts/search/oldest`, {
                                                 params: {
                                                     query
                                                 }
@@ -80,15 +78,15 @@ export default function Header(props) {
                                 onClick={async () => {
                                     try {
                                         if (display === HOME) {
-                                            const { data: { posts, postsFromJoinedCommunities, postsFromOtherCommunities } } = await axios.get('http://localhost:8000/posts/active');
+                                            const { data: { posts, postsFromJoinedCommunities, postsFromOtherCommunities } } = await api.get('/posts/active');
                                             setDisplayPosts(posts);
                                             setDisplayPostsFromJoinedCommunities(postsFromJoinedCommunities);
                                             setDisplayPostsFromOtherCommunities(postsFromOtherCommunities);
                                         } else if (display === COMMUNITY) {
-                                            const { data: { posts } } = await axios.get(`http://localhost:8000/communities/${displayCommunity._id}/posts/active`);
+                                            const { data: { posts } } = await api.get(`/communities/${displayCommunity._id}/posts/active`);
                                             setDisplayPosts(posts);
                                         } else if (display === SEARCHRESULTS) {
-                                            const { data: { posts, postsFromJoinedCommunities, postsFromOtherCommunities } } = await axios.get(`http://localhost:8000/posts/search/active`, {
+                                            const { data: { posts, postsFromJoinedCommunities, postsFromOtherCommunities } } = await api.get(`/posts/search/active`, {
                                                 params: {
                                                     query
                                                 }
@@ -109,11 +107,11 @@ export default function Header(props) {
                                     content='Leave'
                                     onClick={async () => {
                                         try {
-                                            const { data: { message } } = await axios.put(`http://localhost:8000/communities/${displayCommunity._id}/leave`);
+                                            const { data: { message } } = await api.put(`/communities/${displayCommunity._id}/leave`);
 
                                             const [{ data: { community } }, { data: { clientInfo } }] = await Promise.all([
-                                                axios.get(`http://localhost:8000/communities/${displayCommunity._id}`),
-                                                axios.get('http://localhost:8000/users/info')
+                                                api.get(`/communities/${displayCommunity._id}`),
+                                                api.get('/users/info')
                                             ])
 
                                             setDisplayCommunity(community);
@@ -130,11 +128,11 @@ export default function Header(props) {
                                     content='Join'
                                     onClick={async () => {
                                         try {
-                                            const { data: { message } } = await axios.put(`http://localhost:8000/communities/${displayCommunity._id}/join`);
+                                            const { data: { message } } = await api.put(`/communities/${displayCommunity._id}/join`);
 
                                             const [{ data: { community } }, { data: { clientInfo } }] = await Promise.all([
-                                                axios.get(`http://localhost:8000/communities/${displayCommunity._id}`),
-                                                axios.get('http://localhost:8000/users/info')
+                                                api.get(`/communities/${displayCommunity._id}`),
+                                                api.get('/users/info')
                                             ])
 
                                             setDisplayCommunity(community);

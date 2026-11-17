@@ -1,10 +1,8 @@
-import axios from 'axios';
+import api from '../../api.js';
 import { NEWPOST, SEARCHRESULTS, USERPROFILE, WELCOME } from '../../display.js';
 import '../../stylesheets/layout/Banner.css';
 import errorFlash from '../../util/errorFlash.js';
 import Button from '../parts/Button.js';
-
-axios.defaults.withCredentials = true;
 
 export default function Banner(props) {
     const { display, clientInfo } = props;
@@ -51,7 +49,7 @@ export default function Banner(props) {
                     content='Logout'
                     onClick={async () => {
                         try {
-                            const { data: { message } } = await axios.get('http://localhost:8000/users/logout');
+                            const { data: { message } } = await api.get('/users/logout');
 
                             setClientInfo(null);
 

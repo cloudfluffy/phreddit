@@ -1,4 +1,4 @@
-import axios from 'axios';
+import api from '../../api.js';
 import { useEffect, useState } from 'react';
 import { COMMENTS, COMMUNITIES, POSTS, USERS } from '../../listing.js';
 import errorFlash from '../../util/errorFlash.js';
@@ -19,7 +19,7 @@ export default function Userprofilepageview(props) {
     useEffect(() => {
         (async () => {
             try {
-                const { data: { user } } = await axios.get(`http://localhost:8000/users/${displayUser._id}`);
+                const { data: { user } } = await api.get(`/users/${displayUser._id}`);
 
                 setDisplayUser(user);
 
@@ -28,7 +28,7 @@ export default function Userprofilepageview(props) {
                 }
 
                 if (listing === COMMUNITIES) {
-                    let { data: { communities } } = await axios.get('http://localhost:8000/communities');
+                    let { data: { communities } } = await api.get('/communities');
 
                     communities = communities.filter(community => community.owner._id === displayUser._id);
 
@@ -36,7 +36,7 @@ export default function Userprofilepageview(props) {
                 }
 
                 if (listing === USERS) {
-                    let { data: { users } } = await axios.get('http://localhost:8000/users');
+                    let { data: { users } } = await api.get('/users');
 
                     setUsers(users);
                 }

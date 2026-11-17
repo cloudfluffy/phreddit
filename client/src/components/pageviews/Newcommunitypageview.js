@@ -1,10 +1,8 @@
-import axios from 'axios';
+import api from '../../api.js';
 import { useState } from 'react';
 import { COMMUNITY } from '../../display.js';
 import errorFlash from '../../util/errorFlash.js';
 import Button from '../parts/Button.js';
-
-axios.defaults.withCredentials = true;
 
 export default function Newcommunitypageview(props) {
     const { communityToEdit } = props;
@@ -48,7 +46,7 @@ export default function Newcommunitypageview(props) {
         if (!nameEmptyError && !nameExceedError && !hyperlinkNameEmptyError && !hyperlinkProtocolError && !descriptionEmptyError && !descriptionExceedError) {
             try {
                 if (communityToEdit) {
-                    const { data: { message, community } } = await axios.put(`http://localhost:8000/communities/${communityToEdit._id}/edit`, {
+                    const { data: { message, community } } = await api.put(`/communities/${communityToEdit._id}/edit`, {
                         name: name.trim(),
                         description
                     });
@@ -59,12 +57,12 @@ export default function Newcommunitypageview(props) {
 
                     setFlash({ isSuccess: true, message });
                 } else {
-                    const { data: { message, community } } = await axios.post('http://localhost:8000/communities', {
+                    const { data: { message, community } } = await api.post('/communities', {
                         name: name.trim(),
                         description
                     });
 
-                    const { data: { clientInfo } } = await axios.get('http://localhost:8000/users/info');
+                    const { data: { clientInfo } } = await api.get('/users/info');
 
                     setDisplayCommunity(community);
                     setClientInfo(clientInfo);
